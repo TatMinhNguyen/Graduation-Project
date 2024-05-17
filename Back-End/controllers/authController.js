@@ -1,6 +1,7 @@
-const UserModel = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const UserModel = require("../models/UserModel");
+const BlackListToken = require("../models/BlackListTokenModel");
 
 const authController = {
     //Phương thức đăng kí
@@ -127,6 +128,62 @@ const authController = {
             res.status(500).json(err);
         }
     },
+
+    //Change password
+    changePassword: async (req, res) => {
+      try {
+        // Lấy thông tin từ request
+        const { oldPassword, newPassword } = req.body;
+
+        // Tìm người dùng theo ID
+        const user = await UserModel.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Kiểm tra mật khẩu cũ
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect old password' });
+        }
+
+        // Tạo mật khẩu mới
+        const salt = await bcrypt.genSalt(10);
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+        // Lưu mật khẩu mới vào cơ sở dữ liệu
+        user.password = hashedNewPassword;
+        await user.save();
+
+        res.status(200).json({ message: 'Password changed successfully' });
+      } catch (err) {
+          res.status(500).json(err);
+      }
+    },
+
+    logOut : async(req, res) => {
+      const token = req.headers.token;
+
+      // Tìm người dùng theo ID
+      const user = await UserModel.findById(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }  
+      
+      try {
+        // Thêm token vào cơ sở dữ liệu
+        const blacklistedToken = new BlackListToken({ token });
+        await blacklistedToken.save();
+
+        res.status(200).json({ message: 'Logged out successfully' });
+      } catch (err) {
+          res.status(500).json({ message: 'Internal server error' });
+      }
+    },
+
+
 }
 
 module.exports = authController;

@@ -1,7 +1,7 @@
-const authController = require("../controllers/authController");
-
 const router = require("express").Router();
-// const { verifyToken } = require("../controllers/middlewareController");
+
+const authController = require("../controllers/authController");
+const middleware = require("../Middleware/index");
 
 //REGISTER
 router.post("/register", authController.registerUser);
@@ -18,7 +18,10 @@ router.post("/get-verify", authController.resendVerificationCode)
 //LOG IN
 router.post("/login", authController.loginUser);
 
-//LOG OUT
-// router.post("/logout", verifyToken, authController.logOut);
+// CHANGE PASSWORD
+router.post("/change-password", middleware.verifyToken, authController.changePassword)
+
+// LOG OUT
+router.post("/logout", middleware.verifyToken, authController.logOut);
 
 module.exports = router;
