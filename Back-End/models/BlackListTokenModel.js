@@ -5,6 +5,12 @@ const BlacklistSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    expiresAt: {
+      type: Date,
+      required: true,
+      default: Date.now,
+      index: { expires: '7d' } // TTL index sẽ tự động xóa tài liệu sau 7 ngày
+  }
      
   },
     { timestamps: true }

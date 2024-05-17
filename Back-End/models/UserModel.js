@@ -34,6 +34,22 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-anh-thien-nhien-dep-3d-002.jpg"
     },
+    address:{
+      type: String,
+      default: ""
+    },
+    work:{
+      type: String,
+      default: ""
+    },  
+    blocked: {
+      type: Array,
+      default: []
+    },
+    blocking: {
+      type: Array,
+      default: []
+    },
     friendRequested: {
       type: Array,
       default: []
