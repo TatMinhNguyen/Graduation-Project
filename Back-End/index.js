@@ -3,11 +3,13 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+
 const app = express();
 dotenv.config();
 
 const authRoute = require("./routes/auth");
-const userRoute = require("./routes/user")
+const userRoute = require("./routes/user");
+const path = require("path");
 
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => console.log('CONNECTED TO MONGO DB!'));
@@ -16,7 +18,10 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
-//ROUTES
+// Endpoint để phục vụ file tĩnh
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ROUTES
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 
