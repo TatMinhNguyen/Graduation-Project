@@ -9,6 +9,8 @@ dotenv.config();
 
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
+const friendRoute = require("./routes/friend");
+
 const path = require("path");
 
 mongoose.connect(process.env.MONGODB_URL)
@@ -24,6 +26,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ROUTES
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/friend", friendRoute);
 
 app.listen(8000, () => {
     console.log("Server is running");

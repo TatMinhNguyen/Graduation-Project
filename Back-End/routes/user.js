@@ -7,9 +7,6 @@ const upload = require("../utils/upload");
 //GET PROFILE
 router.get("/get-profile/:id", middleware.verifyToken, userController.getProfileUser)
 
-//GET ALL USER
-router.get("/get-all-user", middleware.verifyToken, userController.getAllUsers)
-
 //UPDATE PROFILE
 router.post("/update-profile", middleware.verifyToken, userController.updateProfile)
 

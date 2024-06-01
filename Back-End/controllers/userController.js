@@ -30,18 +30,6 @@ const userController = {
         }
     },
 
-    //GET ALL USER
-    getAllUsers: async (req, res) => {
-        try {
-            const user = await UserModel.find({ isVerify: true }, 
-                { _id: 1, username: 1, profilePicture: 1, friendsCount: 1, isVerify: 1});
-
-            return res.status(200).json(user);
-        } catch (error) {
-            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
-        }
-    },
-
     // Cập nhật trang cá nhân
     updateProfile: async(req, res) =>{
         try {
