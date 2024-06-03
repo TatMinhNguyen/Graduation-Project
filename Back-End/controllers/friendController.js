@@ -216,6 +216,40 @@ const friendController = {
         } catch (error) {
             return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }
+    },
+
+    //get friend
+    getFriends: async(req, res) => {
+        try {
+            const { userId } = req.params;
+            const result = await UserModel.findById(userId).select('friends');
+
+            if(!result){
+                return res.status(404).json({ message: "userId invalid" })
+            }
+
+            const friendId = result.friends;
+            const friends = await UserModel.find({ _id: {$in: friendId} }).select('id username profilePicture friendsCount')
+
+            return res.status(200).json({ friends })
+        } catch (error) {
+            return res.status(500).json({error: error.message})
+        }
+    },
+
+    //get loi moi ket ban
+    getFriendsRequested: async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const result = await UserModel.findById(userId).select('friendRequested');
+
+            const friendId = result.friendRequested;
+            const friendsRequested = await UserModel.find({ _id: {$in: friendId} }).select('id username profilePicture friendsCount')
+
+            return res.status(200).json({ friendsRequested })
+        } catch (error) {
+            return res.status(500).json({error: error.message})
+        }
     }
     
 }

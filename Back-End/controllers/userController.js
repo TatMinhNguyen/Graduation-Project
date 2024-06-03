@@ -89,6 +89,50 @@ const userController = {
             return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }
     },
+
+    //Block
+    setBlock: async(req, res) => {
+        try {
+            const currentUserId = req.user.id; // Lấy ID của người dùng hiện tại từ res.user.id
+            const { userId } = req.params; // Lấy ID của người dùng mục tiêu từ params
+    
+            // Tìm người dùng hiện tại
+            const currentUser = await UserModel.findById(currentUserId);
+            if (!currentUser) {
+                return res.status(404).json({ message: 'Người dùng hiện tại không tồn tại.' });
+            }
+    
+            // Tìm người dùng mục tiêu
+            const targetUser = await UserModel.findById(userId);
+            if (!targetUser) {
+                return res.status(404).json({ message: 'Người dùng mục tiêu không tồn tại.' });
+            }
+    
+            // Kiểm tra xem đã chặn trước đó chưa
+            if (currentUser.blocking.includes(userId)) {
+                return res.status(400).json({ message: 'Bạn đã chặn trước đó.' });
+            }
+    
+            // Kiểm tra xem người dùng mục tiêu có chặn người dùng hiện tại không
+            if (targetUser.blocking.includes(currentUserId)) {
+                return res.status(403).json({ message: 'Bạn đã bị người dùng này chặn.' });
+            }
+    
+            // Thêm ID của người dùng mục tiêu vào danh sách blocking của người dùng hiện tại
+            currentUser.blocking.push(userId);
+    
+            // Thêm ID của người dùng hiện tại vào danh sách blocked của người dùng mục tiêu
+            targetUser.blocked.push(currentUserId);
+    
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await currentUser.save();
+            await targetUser.save();
+    
+            return res.status(200).json({ message: 'Đã block.' });            
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
+        }
+    }
 }
 
 module.exports = userController

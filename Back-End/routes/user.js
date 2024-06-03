@@ -16,4 +16,7 @@ router.post('/update-avatar', upload.single('image'), middleware.verifyToken, us
 // Route upload background
 router.post('/update-background', upload.single('image'), middleware.verifyToken, userController.uploadBackgroundPicture);
 
+//Block
+router.post('/block/:userId', middleware.verifyToken, userController.setBlock)
+
 module.exports = router;

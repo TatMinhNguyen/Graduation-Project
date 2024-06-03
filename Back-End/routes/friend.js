@@ -20,4 +20,10 @@ router.post("/cancel-friend/:userId", middleware.verifyToken, friendController.c
 //Từ chối kết bạn
 router.post("/refuse-friend/:userId", middleware.verifyToken, friendController.refuseFriend)
 
+//get friend
+router.get("/get-friends/:userId", middleware.verifyToken, friendController.getFriends)
+
+//get lời mời kết bạn
+router.get("/get-requested", middleware.verifyToken, friendController.getFriendsRequested)
+
 module.exports = router;
