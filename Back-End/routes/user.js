@@ -19,4 +19,10 @@ router.post('/update-background', upload.single('image'), middleware.verifyToken
 //Block
 router.post('/block/:userId', middleware.verifyToken, userController.setBlock)
 
+//UnBlock
+router.post('/unblock/:userId', middleware.verifyToken, userController.setUnBlock)
+
+//get block
+router.get('/get-block', middleware.verifyToken, userController.getBlocks)
+
 module.exports = router;

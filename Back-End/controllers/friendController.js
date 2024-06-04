@@ -1,20 +1,64 @@
 const UserModel = require("../models/UserModel");
 
 const friendController = {
-    //Gợi ý kết bạn
+
+    // Gợi ý kết bạn
     getSuggestFriends: async (req, res) => {
         try {
-            const userId = req.user.id
+            const userId = req.user.id;
 
-            const result = await UserModel.find({_id: { $ne: userId }, isVerify: true }, 
-                { _id: 1, username: 1, profilePicture: 1, friendsCount: 1, isVerify: 1}
+            // Lấy thông tin của người dùng hiện tại
+            const currentUser = await UserModel.findById(userId, 'friends friendRequested friendRequesting blocked blocking');
+            if (!currentUser) {
+                return res.status(404).json({ message: 'Người dùng không tồn tại.' });
+            }
+
+            // Lấy danh sách bạn bè, lời mời kết bạn đã gửi, lời mời kết bạn nhận được và danh sách chặn của người dùng
+            const friends = currentUser.friends;
+            const friendRequested = currentUser.friendRequested;
+            const friendRequesting = currentUser.friendRequesting;
+            const blocked = currentUser.blocked;
+            const blocking = currentUser.blocking;
+
+            // Tập hợp các điều kiện để lọc
+            const excludeUsers = [userId, ...friends, ...friendRequested, ...friendRequesting, ...blocked, ...blocking];
+
+            // Tìm người dùng phù hợp với điều kiện
+            const suggestedUsers = await UserModel.find(
+                { 
+                    _id: { $nin: excludeUsers }, // Loại bỏ các người dùng đã xác định
+                    isVerify: true // Chỉ lấy những người dùng đã xác thực
+                },
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    friends: 1, // Lấy danh sách bạn bè để tính toán bạn chung
+                    friendsCount: 1, 
+                    isVerify: 1
+                }
             ).limit(20);
-                
+
+            // Tính toán bạn chung cho mỗi người dùng được gợi ý
+            const result = suggestedUsers.map(user => {
+                const mutualFriends = user.friends.filter(friendId => friends.includes(friendId));
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    friendsCount: user.friendsCount,
+                    isVerify: user.isVerify,
+                    mutualFriends: mutualFriends.length, // Số lượng bạn chung
+                    mutualFriendsList: mutualFriends // Danh sách bạn chung
+                };
+            });
+
             return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }
     },
+
 
     //Gửi lời mời kết bạn
     requestFriend: async (req, res) => {
@@ -221,8 +265,7 @@ const friendController = {
     //get friend
     getFriends: async(req, res) => {
         try {
-            const { userId } = req.params;
-            const result = await UserModel.findById(userId).select('friends');
+            const result = await UserModel.findById(req.params.userId).select('friends');
 
             if(!result){
                 return res.status(404).json({ message: "userId invalid" })
