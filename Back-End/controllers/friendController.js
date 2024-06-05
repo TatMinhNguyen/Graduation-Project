@@ -6,23 +6,23 @@ const friendController = {
     getSuggestFriends: async (req, res) => {
         try {
             const userId = req.user.id;
-
+    
             // Lấy thông tin của người dùng hiện tại
             const currentUser = await UserModel.findById(userId, 'friends friendRequested friendRequesting blocked blocking');
             if (!currentUser) {
                 return res.status(404).json({ message: 'Người dùng không tồn tại.' });
             }
-
+    
             // Lấy danh sách bạn bè, lời mời kết bạn đã gửi, lời mời kết bạn nhận được và danh sách chặn của người dùng
             const friends = currentUser.friends;
             const friendRequested = currentUser.friendRequested;
             const friendRequesting = currentUser.friendRequesting;
             const blocked = currentUser.blocked;
             const blocking = currentUser.blocking;
-
+    
             // Tập hợp các điều kiện để lọc
             const excludeUsers = [userId, ...friends, ...friendRequested, ...friendRequesting, ...blocked, ...blocking];
-
+    
             // Tìm người dùng phù hợp với điều kiện
             const suggestedUsers = await UserModel.find(
                 { 
@@ -37,10 +37,10 @@ const friendController = {
                     friendsCount: 1, 
                     isVerify: 1
                 }
-            ).limit(20);
-
+            );
+    
             // Tính toán bạn chung cho mỗi người dùng được gợi ý
-            const result = suggestedUsers.map(user => {
+            const suggestedUsersWithMutualFriends = suggestedUsers.map(user => {
                 const mutualFriends = user.friends.filter(friendId => friends.includes(friendId));
                 return {
                     _id: user._id,
@@ -49,15 +49,22 @@ const friendController = {
                     friendsCount: user.friendsCount,
                     isVerify: user.isVerify,
                     mutualFriends: mutualFriends.length, // Số lượng bạn chung
-                    mutualFriendsList: mutualFriends // Danh sách bạn chung
+                    // mutualFriendsList: mutualFriends // Danh sách bạn chung
                 };
             });
-
-            return res.status(200).json(result);
+    
+            // Sắp xếp các người dùng theo số lượng bạn chung giảm dần
+            suggestedUsersWithMutualFriends.sort((a, b) => b.mutualFriends - a.mutualFriends);
+    
+            // Giới hạn kết quả trả về tối đa 20 người dùng
+            const topSuggestedUsers = suggestedUsersWithMutualFriends.slice(0, 20);
+    
+            return res.status(200).json(topSuggestedUsers);
         } catch (error) {
             return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }
     },
+    
 
 
     //Gửi lời mời kết bạn
