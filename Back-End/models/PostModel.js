@@ -21,7 +21,7 @@ const postSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
-        feed:{
+        felt:{
             type: Number,
             default: 0
         }

@@ -10,4 +10,8 @@ router.post('/create-post',
             postController.createPost
         )
 
+router.delete('/delete-post/:id', middleware.verifyToken, postController.deletePost)
+
+router.get('/get-all-posts', middleware.verifyToken, postController.getPosts)
+
 module.exports = router;

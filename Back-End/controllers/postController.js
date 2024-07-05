@@ -59,5 +59,94 @@ const postController = {
             return res.status(500).json({ error: error.message });
         }
     },
+
+    //Delete a post
+    deletePost: async (req, res) => {
+        try {
+            const postId = req.params.id;
+            const userId = req.user.id;
+
+            // Tìm bài viết
+            const post = await PostModel.findById(postId);
+
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            // Kiểm tra xem người dùng có phải là người tạo bài viết không
+            if (post.userId.toString() !== userId) {
+                return res.status(403).json({ error: "You do not have permission to delete this post" });
+            }
+
+            // Hàm trích xuất fileId từ URL
+            const extractFileIdFromUrl = (url) => {
+                const parts = url.split('/');
+                const fileWithExtension = parts[parts.length - 1];
+                const [fileId] = fileWithExtension.split('.'); // Lấy phần trước dấu chấm
+                return fileId;
+            }
+
+            // Xóa ảnh trên ImageKit
+            const imageDeletionPromises = post.images.map(imageUrl => {
+                const imageId = extractFileIdFromUrl(imageUrl);
+                console.log(imageId)
+                return imagekit.deleteFile(imageId);
+            });
+
+            // Xóa video trên ImageKit
+            const videoDeletionPromise = post.video ? imagekit.deleteFile(extractFileIdFromUrl(post.video))
+            : Promise.resolve(null);
+
+            // Chờ xóa tất cả các ảnh và video
+            await Promise.all([
+                ...imageDeletionPromises,
+                videoDeletionPromise
+            ]);
+
+            // Xóa bài viết khỏi database
+            await PostModel.findByIdAndDelete(postId);
+
+            return res.status(200).json({ message: "Post deleted successfully" });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    //Get all post
+    getPosts: async (req, res) => {
+        try {
+            // Tìm tất cả các bài viết
+            const posts = await PostModel.find();
+
+            // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
+            const userPromises = posts.map(post => UserModel.findById(post.userId));
+            
+            // Chờ tất cả các lời hứa hoàn thành
+            const users = await Promise.all(userPromises);
+
+            const results = posts.map((post, index) => {
+                const user = users[index];
+                return {
+                    postId: post._id,
+                    description: post.description,
+                    images: post.images,
+                    video: post.video,
+                    comment: post.comment,
+                    felt: post.felt,
+                    createdAt: post.createdAt,
+                    author: {
+                        authorId: user._id,
+                        authorName: user.username,
+                        authorAvatar: user.profilePicture
+                    }
+                };
+            });
+
+            return res.status(200).json(results);            
+        } catch (error) {
+            return res.status(500).json({ error: error.message});
+        }
+    }
+
 }
 module.exports = postController
