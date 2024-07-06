@@ -33,14 +33,22 @@ const userController = {
     // Cập nhật trang cá nhân
     updateProfile: async(req, res) =>{
         try {
+            const address = req.body.address;
+            const work = req.body.work;
+
             const user = await UserModel.findById(req.user.id);
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
             
-            user.address = req.body.address;
-            user.work = req.body.work;
+            if(address){
+                user.address = address;
+            }
+            
+            if(work){
+                user.work = work;
+            }
 
             await user.save();
             return res.status(200).json({message: 'Update profile successfully.'})

@@ -8,14 +8,16 @@ const postSchema = new mongoose.Schema(
         },
         description:{
             type: String,
-            required: true            
+            // required: true  
+            default: ""          
         },
         images:{
             type: Array,
+            validate: [arrayLimit, '{PATH} exceeds the limit of 5'],
             default: []
         },
         video:{
-            type: String
+            type: Object
         },
         comment:{
             type: Number,
@@ -28,5 +30,9 @@ const postSchema = new mongoose.Schema(
     },
     { timestamps: true }
 )
+
+function arrayLimit(val) {
+    return val.length <= 5;
+}
 
 module.exports = mongoose.model("PostModel", postSchema);
