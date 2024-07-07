@@ -5,7 +5,7 @@ const postController = require("../controllers/postController");
 const upload = require("../middleware/multerConfig");
 
 router.post('/create-post',  
-            upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]), 
+            upload.fields([{ name: 'images'}, { name: 'video', maxCount: 1 }]), 
             middleware.verifyToken,
             postController.createPost
         )
@@ -19,7 +19,7 @@ router.get('/get-a-post/:postId', middleware.verifyToken, postController.getAPos
 router.get('/get-user-post/:userId', middleware.verifyToken, postController.getUserPost)
 
 router.post('/update-a-post/:postId',
-    upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]),
+    upload.fields([{ name: 'images'}, { name: 'video', maxCount: 1 }]),
     middleware.verifyToken, 
     postController.updatePost
 )

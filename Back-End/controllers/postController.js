@@ -74,7 +74,10 @@ const postController = {
             const userId = req.user.id;
             const description = req.body.description;
             const imageIds = req.body.imageIds;
-            const video = req.body.video;
+            const videoId = req.body.videoId;
+
+            // Kiểm tra nếu imageIds không phải là mảng thì chuyển nó thành mảng, nếu không tồn tại thì gán mảng rỗng
+            const imageIdsArray = Array.isArray(imageIds) ? imageIds : (imageIds ? [imageIds] : []);
 
             const post = await PostModel.findById(postId)
 
@@ -120,9 +123,19 @@ const postController = {
                 fileId: videoUploadResult.fileId 
             } : null;
 
-            if(videoUrl){
+            if(videoUrl || videoId){               
+                let removeVideo = null;
+
+                if(videoUrl){
+                    removeVideo = post.video.fileId;
+                }
+
+                if(videoId){
+                    removeVideo = videoId;
+                }
+
                 // Xóa video trên ImageKit
-                const videoDeletionPromise = post.video ? imagekit.deleteFile(post.video.fileId)
+                const videoDeletionPromise = post.video ? imagekit.deleteFile(removeVideo)
                 : Promise.resolve(null);
 
                 // Chờ xóa tất cả các ảnh và video
@@ -132,19 +145,27 @@ const postController = {
                 ]);
 
                 //update DB
-                post.video = videoUrl
+                if(videoUrl){
+                    post.video = videoUrl
+                }else{
+                    post.video = null;
+                }
             }
 
-            if (imageUrls || imageIds) {
-                // Xóa ảnh trên ImageKit
-                const imageDeletionPromises = imageIds.map(image => {
-                    const imageId = image;
-                    return imagekit.deleteFile(imageId);
-                });
-            
-                await Promise.all(imageDeletionPromises);
-            
-                // Update DB
+            if (imageUrls.length > 0 || imageIdsArray.length > 0) {
+                if (imageIdsArray.length > 0) {
+                    // Xóa ảnh trên ImageKit
+                    const imageDeletionPromises = imageIdsArray.map(imageId => {
+                        return imagekit.deleteFile(imageId);
+                    });
+    
+                    await Promise.all(imageDeletionPromises);
+    
+                    // Update DB
+                    post.images = post.images.filter(image => !imageIdsArray.includes(image.fileId));
+                }
+    
+                // Thêm URL mới vào DB
                 post.images.push(...imageUrls);
             }
 
