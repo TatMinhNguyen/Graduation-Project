@@ -225,7 +225,7 @@ const postController = {
     getPosts: async (req, res) => {
         try {
             // Tìm tất cả các bài viết
-            const posts = await PostModel.find();
+            const posts = res.paginatedResults.results;
 
             // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
             const userPromises = posts.map(post => UserModel.findById(post.userId));
