@@ -19,8 +19,8 @@ const commentSchema = new mongoose.Schema(
         },
         felt: {
             type: Number,
+            default: 0
         }
-
     },
     { timestamps: true }
 )

@@ -22,7 +22,12 @@ router.get(
 
 router.get('/get-a-post/:postId', middleware.verifyToken, postController.getAPost)
 
-router.get('/get-user-post/:userId', middleware.verifyToken, postController.getUserPost)
+router.get(
+    '/get-user-post/:userId', 
+    middleware.verifyToken, 
+    middleware.paginatedResult(PostModel),
+    postController.getUserPost
+)
 
 router.post(
     '/update-a-post/:postId',

@@ -288,8 +288,16 @@ const postController = {
     //Get All Posts from a User
     getUserPost: async(req, res) => {
         try {
-            const userId = req.user.id;
-            const posts = await PostModel.find({ userId: userId });
+            const userId = req.params.userId;
+            
+            const postPromises = res.paginatedResults.results;
+
+            const posts = postPromises.filter(post => post.userId == userId)
+            // await PostModel.find({ userId: userId });
+
+            if(!posts) {
+                return res.status(404).json({ error: "Post not found" })
+            }
 
             // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
             const userPromises = posts.map(post => UserModel.findById(post.userId));
