@@ -189,7 +189,7 @@ const authController = {
         return password;
     },
 
-    // Đổi mật khẩu
+    // Quên mật khẩu
     forgotPassword: async (req, res) => {
         try {
             const { email } = req.body;
@@ -210,7 +210,7 @@ const authController = {
             user.password = hashedPassword;
             await user.save();
 
-            res.status(200).json({ newPassword: newPassword });
+            res.status(200).json({ email: email, newPassword: newPassword });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
