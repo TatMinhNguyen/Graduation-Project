@@ -1,19 +1,26 @@
 import React from 'react'
 
+import { Link, } from "react-router-dom";
+
 function Login() {
     return (
         <div className='bg-gray-100 h-screen'>
             <div className='flex h-full'>
                 <div className="flex-1 flex items-center justify-center" style={{ flex: '45%' }}>
-                    <img className='h-screen object-contain'
+                    <img className='h-screen object-fill'
                         src={require('../../assets/images/Frame1.png')} 
                         alt="Ảnh của tôi" 
                     />
                 </div>
                 <div className="flex-1  flex items-center" style={{ flex: '55%' }}>
-                    <div className='w-5/6 h-5/6 bg-white border border-white rounded-2xl shadow-xl p-4'>
-                        <form className="p-4">
-                            <div className="mb-4">
+                    <div className='w-5/6 h-[86vh] min-h-96 bg-white border border-white rounded-2xl shadow-xl p-4 mb-[3vh]'>
+                        <div className='flex-1 flex items-center justify-center pt-[5vh]'>
+                            <h1 className='text-center text-3xl font-medium'>
+                                See more on Lionelsocial
+                            </h1>
+                        </div>
+                        <form className="p-4 px-[14vh]">
+                            <div className="mb-4 mt-[2vh]">
                                 <input
                                     type="text"
                                     id="email"
@@ -21,10 +28,10 @@ function Login() {
                                     placeholder="Enter your email" 
                                     // value={name}
                                     // onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md"
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
                             </div>
-                            <div className="mb-4">
+                            <div className="mb-[5vh]">
                                 <input
                                     type="password"
                                     id="password"
@@ -32,11 +39,54 @@ function Login() {
                                     placeholder="Enter your password"
                                     // value={email}
                                     // onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md"
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
                             </div>
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>
+                            <div className='flex-1 flex items-center justify-center'>
+                                <button type="submit" 
+                                    className="w-[40vh] bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600"
+                                >
+                                    Log In
+                                </button>                                
+                            </div>
                         </form>
+                        <div className='flex-1 flex flex-col items-center justify-center mt-0'>
+                            <div className='text-blue-600 font-medium p-2 hover:text-blue-800'>
+                                <Link to = "/reset-password">
+                                    Forgotten password ?
+                                </Link>                                
+                            </div>
+                            <div>
+                                <Link className='text-gray-500 font-medium p-2 text-sm hover:text-gray-700'
+                                        to = "/get-verify-code"
+                                >
+                                    Forgot verification code ?
+                                </Link>                                
+                            </div>
+                        </div>
+                        <div className='flex-1 flex items-center justify-center mt-[3vh]'>
+                            <div className='text-gray-400'>
+                                __________________________
+                            </div>
+                            <div className='mx-[5vh] mt-2 text-gray-500 font-medium text-base'>
+                                Or
+                            </div>
+                            <div className='text-gray-400'>
+                                __________________________
+                            </div>
+                        </div>
+                        <div className='flex-1 flex flex-col items-center justify-center mt-[4vh]'>
+                            <div>
+                                Don't have an account yet?
+                            </div>
+                            <div className='flex-1 flex items-center justify-center mt-4'>
+                                <Link className='bg-green-600 text-white px-[6vh] py-2 rounded-xl font-medium hover:bg-green-700'
+                                    to="/register"
+                                >
+                                    Create a new account
+                                </Link>                                
+                            </div>                           
+                        </div>
                     </div>
                 </div>
             </div>        
