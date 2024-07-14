@@ -1,8 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 
-import { Link, } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
+import { registerUser } from '../../api/auth/auth';
 
 const Register = () => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleRegister = async(e) => {
+        e.preventDefault();
+        try {
+            const newUser = {
+                username : username,
+                email : email,
+                password : password
+            }
+            await registerUser(newUser, dispatch, navigate)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
   return (
     <div className='bg-gray-100 h-screen'>
         <div className='flex h-full'>
@@ -19,15 +41,15 @@ const Register = () => {
                             Create a new account
                         </h1>
                     </div>
-                    <form className="p-4 px-[14vh]">
+                    <form className="p-4 px-[14vh]" onSubmit={handleRegister}>
                         <div className="mb-5 mt-[2vh]">
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
                                 placeholder="Enter your username" 
-                                // value={name}
-                                // onChange={handleChange}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
                         </div>
@@ -37,8 +59,8 @@ const Register = () => {
                                 id="email"
                                 name="email"
                                 placeholder="Enter your email" 
-                                // value={name}
-                                // onChange={handleChange}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
                         </div>
@@ -48,8 +70,8 @@ const Register = () => {
                                 id="password"
                                 name="password"
                                 placeholder="Enter your password"
-                                // value={email}
-                                // onChange={handleChange}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
                         </div>

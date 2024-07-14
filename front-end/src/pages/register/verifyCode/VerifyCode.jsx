@@ -1,6 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom';
+import { setVeryficationCode } from '../../../api/auth/auth';
 
 const VerifyCode = () => {
+    const verificationCode = useSelector((state) => state.auth.verificationCode);
+
+    const [code, setCode] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleVerifyAccount = async(e) => {
+        e.preventDefault();
+        try {
+            const newCode = {
+                email : verificationCode.email,
+                verificationCode : code,
+            }
+            await setVeryficationCode(newCode, dispatch, navigate)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
   return (
     <div className='bg-gray-100 h-screen'>
         <div className='flex h-full'>
@@ -23,7 +45,7 @@ const VerifyCode = () => {
                                 Your verification code is  
                             </p>
                             <p className='text-center text-black text-base ml-2 font-medium'>
-                                012345
+                                {verificationCode.verificationCode}
                             </p>
                         </div>
                         <div className='flex-1 flex items-center px-[15vh] mt-4'>
@@ -32,15 +54,15 @@ const VerifyCode = () => {
                             </p>
                         </div>
                     </div>
-                    <form className="p-4 px-[14vh]">
+                    <form className="p-4 px-[14vh]" onSubmit={handleVerifyAccount}>
                         <div className="mb-5 mt-[0vh]">
                             <input
                                 type="text"
                                 id="code"
                                 name="code"
                                 placeholder="Enter your verify code" 
-                                // value={name}
-                                // onChange={handleChange}
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
                         </div>
@@ -55,6 +77,11 @@ const VerifyCode = () => {
                             >
                                 Next
                             </button>                                
+                        </div>
+                        <div className='flex-1 flex items-center justify-center mt-4 text-gray-500 font-medium text-base'>
+                            <Link to = "/get-verify-code">
+                                Can you send me the verification code again?
+                            </Link>
                         </div>
                     </form>
                 </div>

@@ -1,8 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Link, } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from '../../api/auth/auth';
 
 function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogin = async(e) => {
+        e.preventDefault();
+        try {
+            const user = {
+                email : email,
+                password : password
+            }
+            await loginUser(user, dispatch, navigate)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <div className='bg-gray-100 h-screen'>
             <div className='flex h-full'>
@@ -19,15 +38,15 @@ function Login() {
                                 See more on Lionelsocial
                             </h1>
                         </div>
-                        <form className="p-4 px-[14vh]">
+                        <form className="p-4 px-[14vh]" on onSubmit={handleLogin}>
                             <div className="mb-4 mt-[2vh]">
                                 <input
                                     type="text"
                                     id="email"
                                     name="email"
                                     placeholder="Enter your email" 
-                                    // value={name}
-                                    // onChange={handleChange}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
                             </div>
@@ -37,8 +56,8 @@ function Login() {
                                     id="password"
                                     name="password"
                                     placeholder="Enter your password"
-                                    // value={email}
-                                    // onChange={handleChange}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
                             </div>

@@ -6,12 +6,14 @@ import Register from './pages/register/Register';
 import VerifyCode from './pages/register/verifyCode/VerifyCode';
 import ForgotVerificationCode from './pages/register/verifyCode/ForgotVerificationCode';
 import ForgotPassword from './pages/login/forgotPassword/ForgotPassword';
+import Home from './pages/home/Home';
 
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/set-verify-code" element={<VerifyCode />} />

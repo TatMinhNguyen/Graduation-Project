@@ -22,7 +22,7 @@ const authController = {
             });
 
             await newUser.save();
-            res.status(200).json({ verificationCode: verificationCode });
+            res.status(200).json({ email: newUser.email, verificationCode: verificationCode });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
@@ -80,7 +80,7 @@ const authController = {
             await user.save();
 
             // Gửi lại mã xác thực mới cho người dùng
-            res.status(200).json({ verificationCode: verificationCode });
+            res.status(200).json({ email: user.email, verificationCode: verificationCode });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
@@ -119,7 +119,14 @@ const authController = {
 
             // Generate access token
             const accessToken = authController.generateAccessToken(user);
-            res.status(200).json({ accessToken });
+
+            const result = {
+                userId : user._id,
+                username : user.username,
+                avatar : user.profilePicture,
+                token : accessToken
+            }
+            res.status(200).json(result);
         } catch (error) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }

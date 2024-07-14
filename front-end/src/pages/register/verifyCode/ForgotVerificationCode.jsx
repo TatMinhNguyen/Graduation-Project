@@ -1,8 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 
-import { Link, } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
+import { getVeryficationCode } from '../../../api/auth/auth';
 
 const ForgotVerificationCode = () => {
+    const [email, setEmail] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleGetVerificationCode = async(e) => {
+        e.preventDefault();
+        try {
+            const newEmail = {
+                email : email,
+            }
+            await getVeryficationCode(newEmail, dispatch, navigate)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
   return (
     <div className='bg-gray-100 h-screen'>
         <div className='flex h-full'>
@@ -24,15 +42,15 @@ const ForgotVerificationCode = () => {
                             Please enter your email address to reset your account verification code.
                         </p>
                     </div>                    
-                    <form className="p-4 px-[14vh]">
+                    <form className="p-4 px-[14vh]" onSubmit={handleGetVerificationCode}>
                         <div className="mb-5 mt-[0vh]">
                             <input
                                 type="text"
                                 id="email"
                                 name="email"
                                 placeholder="Enter your email account" 
-                                // value={name}
-                                // onChange={handleChange}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
                         </div>
