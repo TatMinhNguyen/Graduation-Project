@@ -28,11 +28,11 @@ const userSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default: "https://static-00.iconduck.com/assets.00/user-avatar-1-icon-2048x2048-935gruik.png",
+      default: "https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png",
     },
     coverPicture: {
       type: String,
-      default: "https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-anh-thien-nhien-dep-3d-002.jpg"
+      default: "https://ik.imagekit.io/minhnt204587/Avatar/hinh-anh-thien-nhien-dep-3d-002.jpg"
     },
     address:{
       type: String,
