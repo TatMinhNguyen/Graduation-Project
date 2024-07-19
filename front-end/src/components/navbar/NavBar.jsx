@@ -1,9 +1,8 @@
 import React from 'react'
 
 const NavBar = ({user}) => {
-    console.log(user)
   return (
-    <div className='flex h-14 min-h-14 bg-white border border-white shadow-md'>
+    <div className='flex h-14 min-h-14 bg-white border border-white shadow'>
         <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>
             <img className='h-5/6'
                 src= {require("../../assets/images/logo.png")}
