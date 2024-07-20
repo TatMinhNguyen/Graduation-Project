@@ -8,7 +8,7 @@ export const getAllPosts = async (token, dispatch, params) => {
             headers: { token: `Bearer ${token}` },
             params: params
         });
-        console.log(res.data)
+        // console.log(res.data)
 
         dispatch(setAllPosts(res.data));
     } catch (error) {

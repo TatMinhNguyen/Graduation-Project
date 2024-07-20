@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const FivePictures = ({selectedImages}) => {
+export const SixPictures = ({selectedImages, extraImagesCount}) => {
   return (
     <div>
         <div className='flex h-72'>
@@ -22,10 +22,18 @@ export const FivePictures = ({selectedImages}) => {
                 src={selectedImages[3]}
                 alt=''
             />
-            <img className='w-1/3'
-                src={selectedImages[4]}
-                alt=''
-            />
+            <div className='relative w-1/3 overflow-hidden'>
+                <img className='opacity-50 h-52 w-full'
+                    src={selectedImages[4]}
+                    alt=''
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-black text-3xl font-bold">
+                        +{extraImagesCount}
+                    </span>
+                </div>                
+            </div>
+
         </div>
     </div>
   )
