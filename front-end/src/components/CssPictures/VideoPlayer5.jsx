@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactPlayer from 'react-player';
 
-export const VideoPlayer3 = ({url, selectedImages}) => {
+export const VideoPlayer5 = ({url, selectedImages, extraImagesCount}) => {
     // eslint-disable-next-line
     const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
     const [isWidthLarger, setIsWidthLarger] = useState(true);
@@ -35,26 +35,49 @@ export const VideoPlayer3 = ({url, selectedImages}) => {
                             alt=''
                         />
                     </div> 
-                    <div className='flex-1 pt-px'>
+                    <div className='flex-1 py-px'>
                         <img className='w-full h-full object-cover'
                             src= {selectedImages[1]}
                             alt=''
                         />
-                    </div>                                       
+                    </div> 
+                    <div className='relative flex-1 pt-px'>
+                        <img className='opacity-50 w-full h-full object-cover'
+                            src={selectedImages[2]}
+                            alt=''
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-black text-3xl font-bold">
+                                +{extraImagesCount}
+                            </span>
+                        </div> 
+                    </div>
+                                      
                 </div>
             ) : (
-                <div className='flex h-60'>
-                    <div className='w-1/2 pr-px'>
+                <div className='flex h-56'>
+                    <div className='w-1/3 pr-px'>
                         <img className='w-full h-full object-cover'
                             src= {selectedImages[0]}
                             alt=''
                         />
                     </div>  
-                    <div className='w-1/2 pl-px'>
+                    <div className='w-1/3 px-px'>
                         <img className='w-full h-full object-cover'
                             src= {selectedImages[1]}
                             alt=''
                         />
+                    </div> 
+                    <div className='relative w-1/3 pl-px'>
+                        <img className='opacity-50 w-full h-full object-cover'
+                            src= {selectedImages[2]}
+                            alt=''
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-black text-3xl font-bold">
+                                +{extraImagesCount}
+                            </span>
+                        </div> 
                     </div>              
                 </div>  
             )}         

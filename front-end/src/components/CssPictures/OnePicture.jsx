@@ -26,7 +26,7 @@ export const OnePicture = ({selectedImages}) => {
             </div>
         ) : (
             <div className='bg-gray-700 h-[70vh] overflow-hidden flex-1 flex items-center justify-center'>
-                <img className='w-3/4 '
+                <img className='w-3/4 h-full object-cover'
                     src={selectedImages[0]}
                     alt=''
                 />

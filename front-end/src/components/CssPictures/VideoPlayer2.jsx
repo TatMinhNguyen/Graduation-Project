@@ -16,8 +16,8 @@ export const VideoPlayer2 = ({url, selectedImages}) => {
     };
   
     return (
-        <div className={`${isWidthLarger ? '' : 'flex'} overflow-hidden`}>
-            <div className={`${isWidthLarger ? 'w-full' : 'w-1/2 pr-0.5'} `}>
+        <div className={`${isWidthLarger ? 'flex' : 'flex'} overflow-hidden`}>
+            <div className={`${isWidthLarger ? 'flex-1 flex items-center justify-center bg-gray-700' : 'h-96 w-1/2 bg-gray-700'} `}>
                 <ReactPlayer
                     url={url}
                     controls={true}
@@ -27,15 +27,15 @@ export const VideoPlayer2 = ({url, selectedImages}) => {
                 />
             </div>   
             {!isWidthLarger ? (
-                <div className='w-1/2'>
-                    <img className='h-full'
+                <div className='w-1/2 h-96 pl-0.5'>
+                    <img className='w-full h-full object-cover'
                         src= {selectedImages[0]}
                         alt=''
                     />
                 </div>
             ) : (
-                <div className='h-72 pt-0.5'>
-                    <img className='w-full'
+                <div className='w-2/5 h-80 pl-0.5'>
+                    <img className='w-full h-full object-cover'
                         src= {selectedImages[0]}
                         alt=''
                     />
