@@ -14,6 +14,7 @@ const postRoute = require('./routes/post');
 const commentRoute = require("./routes/comment"); 
 
 const path = require("path");
+const imagekit = require("./utils/imagekitConfig");
 
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => console.log('CONNECTED TO MONGO DB!'));
@@ -24,6 +25,11 @@ app.use(express.json());
 
 // Endpoint để phục vụ file tĩnh
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.get('/authentication', (req, res) => {
+  const result = imagekit.getAuthenticationParameters();
+  res.send(result);
+});
 
 // ROUTES
 app.use("/api/auth", authRoute);

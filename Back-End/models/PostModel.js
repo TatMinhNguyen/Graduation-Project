@@ -25,6 +25,10 @@ const postSchema = new mongoose.Schema(
         felt:{
             type: Number,
             default: 0
+        },
+        typeText: {
+            type: Boolean,
+            default: true
         }
     },
     { timestamps: true }

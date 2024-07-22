@@ -47,7 +47,8 @@ const postController = {
                 userId: user._id,
                 description: req.body.description,
                 images: imageUrls,
-                video: videoUrl
+                video: videoUrl,
+                typeText: req.body.typeText
             });
     
             await newPost.save();
@@ -72,9 +73,7 @@ const postController = {
         try {
             const postId = req.params.postId;
             const userId = req.user.id;
-            const description = req.body.description;
-            const imageIds = req.body.imageIds;
-            const videoId = req.body.videoId;
+            const {description, imageIds, videoId, typeText} = req.body;
 
             // Kiểm tra nếu imageIds không phải là mảng thì chuyển nó thành mảng, nếu không tồn tại thì gán mảng rỗng
             const imageIdsArray = Array.isArray(imageIds) ? imageIds : (imageIds ? [imageIds] : []);
@@ -91,6 +90,10 @@ const postController = {
 
             if(description){
                 post.description = description;
+            }
+
+            if(typeText) {
+                post.typeText = typeText;
             }
 
             const videoUploadPromise = req.files.video ? imagekit.upload({
@@ -242,6 +245,7 @@ const postController = {
                     video: post.video,
                     comment: post.comment,
                     felt: post.felt,
+                    typeText: post.typeText,
                     createdAt: post.createdAt,
                     author: {
                         authorId: user._id,

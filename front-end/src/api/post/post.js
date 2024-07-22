@@ -15,3 +15,16 @@ export const getAllPosts = async (token, dispatch, params) => {
         console.log(error);
     }
 };
+
+export const getAPost = async (token, postId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/post/get-a-post/${postId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        // console.log(res.data)
+
+        return res.data;
+    } catch (error) {
+        console.log(error);
+    }
+};

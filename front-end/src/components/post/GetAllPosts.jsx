@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { FivePictures } from '../CssPictures/FivePictures'
 import FourPictures from '../CssPictures/FourPictures'
@@ -11,15 +11,36 @@ import { VideoPlayer2 } from '../CssPictures/VideoPlayer2'
 import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
+import { useNavigate } from 'react-router-dom'
+import GetPost from './GetPost'
+import { getAPost } from '../../api/post/post'
 
 const GetAllPosts = ({user, posts}) => {
     // console.log(user)
     // console.log(posts)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [data, setData] = useState({});
+    const navigation = useNavigate();
+
+    const handleGetAPost = async(postId) => {
+        navigation(`/get-post/${postId}`)
+    }
+
+    const handleOpenModal = async(postId) => {
+        setIsModalOpen(true);
+        try {
+            const resul = await getAPost(user?.token, postId);
+            setData(resul)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
   return (
     <div>
         {posts?.map((post) => {
             return (
-                <div key={post.postId}
+                <div key={post.postId} 
                     className='bg-white mt-4 border border-white shadow rounded-md flex-1 items-center'
                 >
                     <div className='flex-1 flex items-center mx-3 my-2'>
@@ -39,13 +60,23 @@ const GetAllPosts = ({user, posts}) => {
                         </div>
                     </div>
                     <div>
-                        <p className='mx-3'>
-                            {post?.description ? (
-                                convertNewlinesToBreaks(post?.description)
-                            ) : (
-                                ''
-                            )}
-                        </p>
+                        {post?.typeText === false ?(
+                            <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
+                                {post?.description ? (
+                                    convertNewlinesToBreaks(post?.description)
+                                ) : (
+                                    ''
+                                )}
+                            </p>
+                        ) : (
+                            <p className='ml-3.5 font-sans' style={{color: "#050505"}}>
+                                {post?.description ? (
+                                    convertNewlinesToBreaks(post?.description)
+                                ) : (
+                                    ''
+                                )}
+                            </p>
+                        )}
                         <div className='mt-2'>
                             {(post?.video == null || !post?.video) ? (
                                 <>
@@ -99,7 +130,7 @@ const GetAllPosts = ({user, posts}) => {
                     <div className=''>
                         <div className='flex mt-2 mb-2'>
                             <div className='w-1/2 flex-1 flex items-center '>
-                                <img className='h-6 w-6 ml-6 rounded-full border-2 border-white shadow-xl'
+                                <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
                                     src={require("../../assets/icons/like-blue1.png")}
                                     alt=''
                                 />
@@ -120,12 +151,12 @@ const GetAllPosts = ({user, posts}) => {
                                 <p className='text-gray-500 font-normal text-base'>
                                     {post?.comment}
                                 </p>
-                                <p className='text-gray-500 font-normal text-base ml-1 mr-6'>
+                                <p className='text-gray-500 font-normal text-base ml-1 mr-3.5'>
                                     comments
                                 </p>
                             </div> 
                         </div>
-                        <div className='flex-1 flex border-t border-gray-300 py-2 mx-6'>
+                        <div className='flex-1 flex border-t border-gray-300 py-2 mx-3.5'>
                             <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
                                 <img className='h-6 w-6 ml-2'
                                     src={require("../../assets/icons/like.png")}
@@ -135,7 +166,15 @@ const GetAllPosts = ({user, posts}) => {
                                     Like
                                 </p>
                             </div>
-                            <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
+                            <div className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer`}
+                                onClick={() => {
+                                    if (!post?.images.length && !post?.video) {
+                                        handleOpenModal(post?.postId);
+                                    }else {
+                                        handleGetAPost(post?.postId);
+                                    }
+                                }}
+                            >
                                 <img className='h-5 w-5 ml-2'
                                     src={require("../../assets/icons/comment.png")}
                                     alt=''
@@ -143,7 +182,12 @@ const GetAllPosts = ({user, posts}) => {
                                 <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
                                     Comment
                                 </p>
-                            </div>                            
+                            </div>
+                            <GetPost 
+                                isOpen={isModalOpen} 
+                                onClose={() => setIsModalOpen(false)}
+                                post = {data}
+                            />                            
                         </div>
                     </div>
                 </div>
