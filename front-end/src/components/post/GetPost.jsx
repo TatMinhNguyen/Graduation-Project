@@ -24,7 +24,7 @@ const GetPost = ({ isOpen, onClose, post }) => {
                         <img className="w-6 h-6" src={require("../../assets/icons/close.png")} alt="" />
                     </div>
                 </div>
-                <div className='pb-2 h-[calc(100%-11rem)] overflow-y-auto p-0'>
+                <div className='pb-2 h-[calc(100%-9rem)] overflow-y-auto p-0'>
                     <div>
                         <div className='flex-1 flex items-center mx-3 mb-2'>
                             <div className='w-10 h-10'>
@@ -131,10 +131,10 @@ const GetPost = ({ isOpen, onClose, post }) => {
                         <textarea
                             id="description"
                             name="description"
-                            rows="2"
+                            rows="1"
                             // value={description}
                             // onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-4 py-2 rounded-2xl mt-1 bg-gray-200 cursor-pointer
+                            className="w-full px-4 py-2 rounded-2xl mt-1 bg-gray-200 
                                 focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
                             placeholder="Write your comment here..."
                         />

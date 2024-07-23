@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
 
 const GetMedia = ({post}) => {
     console.log(post?.post?.images)
+    // eslint-disable-next-line
     const [photoIndex, setPhotoIndex] = useState(0);
+    // eslint-disable-next-line
     const [isOpen, setIsOpen] = useState(false);
 
     const [isWidthLarger, setIsWidthLarger] = useState(true);
@@ -95,7 +95,7 @@ const GetMedia = ({post}) => {
                             ))}
                         </div>
 
-                        {isOpen && (
+                        {/* {isOpen && (
                             <Lightbox
                                 mainSrc={post?.post?.images[photoIndex].url}
                                 nextSrc={post?.post?.images[(photoIndex + 1) % post?.post?.images.length].url}
@@ -108,7 +108,7 @@ const GetMedia = ({post}) => {
                                     setPhotoIndex((photoIndex + 1) % post?.post?.images.length)
                                 }
                             />
-                        )}  
+                        )}   */}
                     </>
                 ) : (
                     <>  
