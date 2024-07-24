@@ -24,7 +24,7 @@ const GetPost = ({ isOpen, onClose, post }) => {
                         <img className="w-6 h-6" src={require("../../assets/icons/close.png")} alt="" />
                     </div>
                 </div>
-                <div className='pb-2 h-[calc(100%-9rem)] overflow-y-auto p-0'>
+                <div className='pb-2 h-[calc(100%-9rem)] overflow-y-auto p-0 no-scrollbar'>
                     <div>
                         <div className='flex-1 flex items-center mx-3 mb-2'>
                             <div className='w-10 h-10'>

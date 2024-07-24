@@ -49,7 +49,7 @@ const NavBar = ({user}) => {
                 </div>
                 <div className='flex items-center justify-center cursor-pointer ml-3'>
                     <img className='h-10 w-10 rounded-full'
-                        src={user.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
+                        src={user?.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                         alt="User Avatar" 
                     />
                 </div>

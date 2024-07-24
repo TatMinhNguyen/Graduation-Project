@@ -24,7 +24,7 @@ export const Comment = ({user}) => {
         "image": {
           "url" : 'https://ik.imagekit.io/minhnt204587/images/mbappe-1692071684060106670076_1FGW28r86U.jpg'
         },
-        "content": "12345",
+        "content": "Vl1 chương trình mới r bạn lí thuyết thì học file của clb htht còn bài tạp trắc nghiệm+ tự luận thì học hiểu thoi",
         "felt": 0,
         "createdAt": "2024-07-08T09:37:58.758Z",
         "author": {
@@ -37,7 +37,7 @@ export const Comment = ({user}) => {
         "commentId": "668b7f475c84274641765029",
         "postId": "6689424ed38b1bf4db097391",
         "image": null,
-        "content": "abcd",
+        "content": "Cho e hỏi trượt vldc 1 thì cách học ntn để ôn thi giữa kỳ, cuối kỳ? E thấy trên tailieuhust nhiều tài liệu vldc 1 quá, e ko rõ là học tài liệu nào là trọng tâm.",
         "felt": 1,
         "createdAt": "2024-07-08T05:55:19.743Z",
         "author": {
@@ -115,7 +115,7 @@ export const Comment = ({user}) => {
     "commentId": "668b7f475c84274641765029",
     "postId": "6689424ed38b1bf4db097391",
     "image": null,
-    "content": "abcdghdvgsdgxddgsfhdfhsfhfdhfdgsd",
+    "content": "Sửa được. Nhưng mất thời gian tý. Lỗi thầy cô thì cứ cố gắng phối hợp thoii. Mà sao có thời gian để kiểm tra, thắc mắc sao không báo luôn lúc đấy ?",
     "felt": 1,
     "createdAt": "2024-07-08T05:55:19.743Z",
     "author": {
@@ -144,7 +144,7 @@ export const Comment = ({user}) => {
                       {comment?.author?.authorName}
                     </h2> 
                   </div>
-                  <p className='pb-0 px-1'>
+                  <p className='pb-0 px-'>
                     {convertNewlinesToBreaks(comment?.content)}
                   </p>               
                 </div>

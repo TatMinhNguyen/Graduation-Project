@@ -64,7 +64,7 @@ const Home = () => {
           <div className='h-16 bg-white mt-2 border border-white shadow rounded-md flex-1 flex items-center'>
             <Link className='ml-4 h-12 w-12'>
               <img className='h-full w-full object-cover rounded-full border-2 border-blue-400'
-                src={user.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
+                src={user?.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                 alt="User Avatar" 
               />              
             </Link>

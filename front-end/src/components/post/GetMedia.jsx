@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { convertNewlinesToBreaks, timeAgo } from '../../utils'
+import { convertNewlinesToBreaks, } from '../../utils'
 
 const GetMedia = ({post}) => {
     console.log(post?.post?.images)
@@ -42,22 +42,6 @@ const GetMedia = ({post}) => {
 
   return (
     <div>
-        <div className='flex-1 flex items-center mx-3 my-2'>
-            <div className='w-10 h-10'>
-                <img className='h-full w-full object-cover rounded-full shadow'
-                    src= {post?.author?.authorAvatar}
-                    alt=''
-                />
-            </div>
-            <div className='ml-3'>
-                <h1 className='font-medium text-base'>
-                    {post?.author?.authorName}
-                </h1>
-                <p className='text-xs text-gray-500'>
-                    {timeAgo(post?.post?.createdAt)}
-                </p>
-            </div>
-        </div>
         <div>
             {post?.post?.typeText === false ?(
                 <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
