@@ -1,8 +1,19 @@
 import React from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils';
 import { Comment } from '../comment/Comment';
+import { FivePictures } from '../CssPictures/FivePictures'
+import FourPictures from '../CssPictures/FourPictures'
+import ThreePictures from '../CssPictures/ThreePictures'
+import TwoPictures from '../CssPictures/TwoPictures'
+import { SixPictures } from '../CssPictures/SixPictures'
+import { OnePicture } from '../CssPictures/OnePicture'
+import VideoPlayer from '../CssPictures/VideoPlayer'
+import { VideoPlayer2 } from '../CssPictures/VideoPlayer2'
+import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
+import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
+import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 
-const GetPost = ({ isOpen, onClose, post }) => {
+const GetPost = ({ isOpen, onClose, post, user }) => {
     if (!isOpen) return null;
     // console.log(post)
 
@@ -59,7 +70,56 @@ const GetPost = ({ isOpen, onClose, post }) => {
                                         ''
                                     )}
                                 </p>
-                            )}                        
+                            )} 
+                            <div className='mt-2'>
+                                {(post?.post?.video == null || !post?.post?.video) ? (
+                                    <>
+                                        {post?.post?.images.length > 5 ? (
+                                            <SixPictures
+                                                selectedImages={post?.post?.images.slice(0, 5).map(img => img.url)} 
+                                                extraImagesCount={post?.post?.images.length - 4}
+                                            />
+                                        ) : post?.post?.images.length === 5 ? (
+                                            <FivePictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                        ) : post?.post?.images.length === 4 ? (
+                                            <FourPictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                        ) : post?.post?.images.length === 3 ? (
+                                            <ThreePictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                        ) : post?.post?.images.length === 2 ? (
+                                            <TwoPictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                        ) : post?.post?.images.length === 1 ? (
+                                            <OnePicture selectedImages={post?.post?.images.map(img => img.url)}/>
+                                        ) : ('')}
+                                    </>
+                                ) : (
+                                    <>  
+                                        {post?.post?.images.length > 3 ? (
+                                            <VideoPlayer5
+                                                url = {post?.post?.video.url}
+                                                selectedImages = {post?.post?.images.map(img => img.url)}
+                                                extraImagesCount={post?.post?.images.length - 2}
+                                            /> 
+                                        ) : post?.post?.images.length === 3 ? (
+                                            <VideoPlayer4
+                                                url = {post?.post?.video.url}
+                                                selectedImages = {post?.post?.images.map(img => img.url)}
+                                            />                                        
+                                        ) : post?.post?.images.length === 2 ? (
+                                            <VideoPlayer3 
+                                                url = {post?.post?.video.url}
+                                                selectedImages = {post?.post?.images.map(img => img.url)}
+                                            />                                        
+                                        ) : post?.post?.images.length === 1 ? (
+                                            <VideoPlayer2 
+                                                url = {post?.post?.video.url}
+                                                selectedImages = {post?.post?.images.map(img => img.url)}
+                                            />                                        
+                                        ) : (
+                                            <VideoPlayer url = {post?.post?.video.url}/>
+                                        )} 
+                                    </>
+                                )} 
+                            </div>                                                   
                         </div>
                         <div className=''>
                             <div className='flex mt-2 mb-2'>
@@ -123,7 +183,7 @@ const GetPost = ({ isOpen, onClose, post }) => {
                                 shadow border-t-2 border-gray-200 z-51'>
                     <div className='h-11 w-11 mr-3'>
                         <img className='h-full w-full object-cover rounded-full shadow'
-                            src={post?.author?.authorAvatar}
+                            src={user?.avatar}
                             alt=''
                         />
                     </div>

@@ -26,6 +26,11 @@ const GetAllPosts = ({user, posts}) => {
         navigation(`/get-post/${postId}`)
     }
 
+    const handleCloseModal = () => {
+        setIsModalOpen(false)
+        setData({})
+    }
+
     const handleOpenModal = async(postId) => {
         setIsModalOpen(true);
         try {
@@ -121,7 +126,7 @@ const GetAllPosts = ({user, posts}) => {
                                             selectedImages = {post?.images.map(img => img.url)}
                                         />                                        
                                     ) : (
-                                        <VideoPlayer url = {post.video.url}/>
+                                        <VideoPlayer url = {post?.video.url}/>
                                     )} 
                                 </>
                             )} 
@@ -171,7 +176,7 @@ const GetAllPosts = ({user, posts}) => {
                                     if (!post?.images.length && !post?.video) {
                                         handleOpenModal(post?.postId);
                                     }else {
-                                        handleGetAPost(post?.postId);
+                                        handleOpenModal(post?.postId);
                                     }
                                 }}
                             >
@@ -185,8 +190,9 @@ const GetAllPosts = ({user, posts}) => {
                             </div>
                             <GetPost 
                                 isOpen={isModalOpen} 
-                                onClose={() => setIsModalOpen(false)}
+                                onClose={handleCloseModal}
                                 post = {data}
+                                user={user}
                             />                            
                         </div>
                     </div>

@@ -1,125 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { convertNewlinesToBreaks, } from '../../utils'
+import { Image, List } from 'antd';
 
 const GetMedia = ({post}) => {
     console.log(post?.post?.images)
-    // eslint-disable-next-line
-    const [photoIndex, setPhotoIndex] = useState(0);
-    // eslint-disable-next-line
-    const [isOpen, setIsOpen] = useState(false);
-
-    const [isWidthLarger, setIsWidthLarger] = useState(true);
-    const [imageDimensions, setImageDimensions] = useState([]);
-
-    const getImageDimensions = (url) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = url;
-          img.onload = () => resolve({ width: img.width, height: img.height });
-          img.onerror = reject;
-        });
-    };  
-
-    useEffect(() => {
-        const fetchImageDimensions = async () => {
-          try {
-            const dimensions = await Promise.all(
-              post?.post?.images.map(image => getImageDimensions(image.url))
-            );
-            setImageDimensions(dimensions);
-          } catch (error) {
-            console.error("Error loading image dimensions:", error);
-          }
-        };
-    
-        fetchImageDimensions();
-    }, [post?.post?.images]);
-
-    useEffect(() => {
-        const allImagesWide = imageDimensions.every(dim => dim.width > dim.height);
-        setIsWidthLarger(allImagesWide);
-    }, [imageDimensions]);  
 
   return (
-    <div>
+    <div className='bg-white h-screen'>
         <div>
-            {post?.post?.typeText === false ?(
-                <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
-                    {post?.post?.description ? (
-                        convertNewlinesToBreaks(post?.post?.description)
-                    ) : (
-                        ''
-                    )}
-                </p>
-            ) : (
-                <p className='ml-3.5 font-sans' style={{color: "#050505"}}>
-                    {post?.post?.description ? (
-                        convertNewlinesToBreaks(post?.post?.description)
-                    ) : (
-                        ''
-                    )}
-                </p>
-            )}
-            <div className='mt-2'>
+            <div className=''>
                 {(post?.post?.video == null || !post?.post?.video) ? (
                     <>
-                        <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden">
-                            {post?.post?.images.map((image, index) => (
-                            <div key={index} className="relative">
-                                <img
-                                    src={image.url}
-                                    onClick={() => {
-                                        setPhotoIndex(index);
-                                        setIsOpen(true);
-                                    }}
-                                    className={`w-full ${isWidthLarger ? 'h-auto' : 'h-[90vh] object-cover'}`}
-                                    alt="Ảnh của tôi"
+                        <Image.PreviewGroup>
+                            <List
+                            grid={{ gutter: 16, column: 4 }}
+                            dataSource={post?.post?.images}
+                            renderItem={(item) => (
+                                <List.Item>
+                                <Image
+                                    width={200}
+                                    src={item.url}
+                                    alt={item.title}
                                 />
-                            </div>
-                            ))}
-                        </div>
-
-                        {/* {isOpen && (
-                            <Lightbox
-                                mainSrc={post?.post?.images[photoIndex].url}
-                                nextSrc={post?.post?.images[(photoIndex + 1) % post?.post?.images.length].url}
-                                prevSrc={post?.post?.images[(photoIndex + post?.post?.images.length - 1) % post?.post?.images.length].url}
-                                onCloseRequest={() => setIsOpen(false)}
-                                onMovePrevRequest={() =>
-                                    setPhotoIndex((photoIndex + post?.post?.images.length - 1) % post?.post?.images.length)
-                                }
-                                onMoveNextRequest={() =>
-                                    setPhotoIndex((photoIndex + 1) % post?.post?.images.length)
-                                }
+                                </List.Item>
+                            )}
                             />
-                        )}   */}
+                        </Image.PreviewGroup>
                     </>
                 ) : (
                     <>  
-                        {/* {post?.images.length > 3 ? (
-                            <VideoPlayer5
-                                url = {post.video.url}
-                                selectedImages = {post?.images.map(img => img.url)}
-                                extraImagesCount={post?.images.length - 2}
-                            /> 
-                        ) : post?.images.length === 3 ? (
-                            <VideoPlayer4
-                                url = {post.video.url}
-                                selectedImages = {post?.images.map(img => img.url)}
-                            />                                        
-                        ) : post?.images.length === 2 ? (
-                            <VideoPlayer3 
-                                url = {post.video.url}
-                                selectedImages = {post?.images.map(img => img.url)}
-                            />                                        
-                        ) : post?.images.length === 1 ? (
-                            <VideoPlayer2 
-                                url = {post.video.url}
-                                selectedImages = {post?.images.map(img => img.url)}
-                            />                                        
-                        ) : (
-                            <VideoPlayer url = {post.video.url}/>
-                        )}  */}
+                        
                     </>
                 )} 
             </div>

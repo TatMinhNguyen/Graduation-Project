@@ -1,4 +1,5 @@
 const UserModel = require("../models/UserModel");
+const imagekit = require("../utils/imagekitConfig");
 
 const userController = {
     //get profile
@@ -67,8 +68,23 @@ const userController = {
                 return res.status(404).json({ message: 'User not found' });
             }
 
+            // Upload ảnh lên ImageKit
+            const imageUploadPromises = req.files.image ? imagekit.upload({
+                file: req.files.image[0].buffer, // buffer video từ multer
+                fileName: req.files.image[0].originalname,
+                folder: '/Avatar' // Thư mục lưu video
+            }) : Promise.resolve(null);
+
+            const [imageUploadResults] = await Promise.all([
+                imageUploadPromises,
+            ]);
+    
+            const imageUrl = imageUploadResults ? 
+                `${imageUploadResults.url}`
+             : null; 
+
             // Lưu URL ảnh vào profile của user
-            user.profilePicture = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            user.profilePicture = imageUrl;
 
             await user.save();
             return res.status(200).json({ message: 'Upload profile picture successfully.', profilePicture: user.profilePicture });
@@ -87,8 +103,23 @@ const userController = {
                 return res.status(404).json({ message: 'User not found' });
             }
 
+            // Upload ảnh lên ImageKit
+            const imageUploadPromises = req.files.image ? imagekit.upload({
+                file: req.files.image[0].buffer, // buffer video từ multer
+                fileName: req.files.image[0].originalname,
+                folder: '/Avatar' // Thư mục lưu video
+            }) : Promise.resolve(null);
+
+            const [imageUploadResults] = await Promise.all([
+                imageUploadPromises,
+            ]);
+    
+            const imageUrl = imageUploadResults ? 
+                `${imageUploadResults.url}`
+             : null; 
+
             // Lưu URL ảnh vào profile của user
-            user.coverPicture = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            user.coverPicture = imageUrl;
 
             await user.save();
             return res.status(200).json({ message: 'Upload cover picture successfully.', coverPicture: user.coverPicture });

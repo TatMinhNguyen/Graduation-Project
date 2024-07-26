@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const userController = require("../controllers/userController");
 const middleware = require("../middleware/index");
-const upload = require("../utils/upload");
+const upload = require("../middleware/multerConfig");
 
 //GET PROFILE
 router.get("/get-profile/:id", middleware.verifyToken, userController.getProfileUser)
@@ -11,10 +11,18 @@ router.get("/get-profile/:id", middleware.verifyToken, userController.getProfile
 router.post("/update-profile", middleware.verifyToken, userController.updateProfile)
 
 // Route upload avatar
-router.post('/update-avatar', upload.single('image'), middleware.verifyToken, userController.uploadProfilePicture);
+router.post('/update-avatar', 
+    upload.fields([{ name: 'image', maxCount: 1 }]), 
+    middleware.verifyToken, 
+    userController.uploadProfilePicture
+);
 
 // Route upload background
-router.post('/update-background', upload.single('image'), middleware.verifyToken, userController.uploadBackgroundPicture);
+router.post('/update-background', 
+    upload.fields([{ name: 'image', maxCount: 1 }]), 
+    middleware.verifyToken, 
+    userController.uploadBackgroundPicture
+);
 
 //Block
 router.post('/block/:userId', middleware.verifyToken, userController.setBlock)

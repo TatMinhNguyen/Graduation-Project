@@ -2,11 +2,11 @@ import React from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { Comment } from '../comment/Comment'
 
-export const GetComment = ({post}) => {
+export const GetComment = ({post, user}) => {
   return (
     <div>
         <div className="h-screen w-full relative bg-white rounded-lg shadow z-50 overflow-hidden">
-            <div className='pb-2 h-[calc(100%-4rem)] overflow-y-auto p-0 no-scrollbar'>
+            <div className='pb-2 h-[calc(100%-4rem)] overflow-y-auto p-0 no-scrollbar mt-2'>
                 <div>
                     <div className='flex-1 flex items-center mx-3 mb-2'>
                         <div className='w-10 h-10'>
@@ -105,7 +105,7 @@ export const GetComment = ({post}) => {
                             shadow border-t-2 border-gray-200 z-51'>
                 <div className='h-11 w-11 mr-3'>
                     <img className='h-full w-full object-cover rounded-full shadow'
-                        src={post?.author?.authorAvatar}
+                        src={user?.avatar}
                         alt=''
                     />
                 </div>

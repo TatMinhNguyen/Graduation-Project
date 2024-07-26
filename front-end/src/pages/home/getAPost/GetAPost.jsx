@@ -34,7 +34,10 @@ const GetAPost = () => {
           <GetMedia post={post} />
         </div>
         <div className="w-1/4 bg-white overflow-y-auto no-scrollbar">
-          <GetComment post={post} />
+          <GetComment 
+            post={post}
+            user = {user} 
+          />
         </div>
       </div>
     )
