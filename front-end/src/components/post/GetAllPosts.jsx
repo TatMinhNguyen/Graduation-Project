@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { FivePictures } from '../CssPictures/FivePictures'
 import FourPictures from '../CssPictures/FourPictures'
@@ -12,33 +12,15 @@ import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useNavigate } from 'react-router-dom'
-import GetPost from './GetPost'
-import { getAPost } from '../../api/post/post'
 
 const GetAllPosts = ({user, posts}) => {
     // console.log(user)
     // console.log(posts)
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [data, setData] = useState({});
+
     const navigation = useNavigate();
 
     const handleGetAPost = async(postId) => {
         navigation(`/get-post/${postId}`)
-    }
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false)
-        setData({})
-    }
-
-    const handleOpenModal = async(postId) => {
-        setIsModalOpen(true);
-        try {
-            const resul = await getAPost(user?.token, postId);
-            setData(resul)
-        } catch (error) {
-            console.log(error)
-        }
     }
 
   return (
@@ -87,7 +69,7 @@ const GetAllPosts = ({user, posts}) => {
                                 <>
                                     {post?.images.length > 5 ? (
                                         <SixPictures
-                                            selectedImages={post?.images.slice(0, 5).map(img => img.url)} 
+                                            selectedImages={post?.images.map(img => img.url)} 
                                             extraImagesCount={post?.images.length - 4}
                                         />
                                     ) : post?.images.length === 5 ? (
@@ -172,13 +154,7 @@ const GetAllPosts = ({user, posts}) => {
                                 </p>
                             </div>
                             <div className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer`}
-                                onClick={() => {
-                                    if (!post?.images.length && !post?.video) {
-                                        handleOpenModal(post?.postId);
-                                    }else {
-                                        handleOpenModal(post?.postId);
-                                    }
-                                }}
+                                onClick={() => handleGetAPost(post?.postId)}
                             >
                                 <img className='h-5 w-5 ml-2'
                                     src={require("../../assets/icons/comment.png")}
@@ -187,13 +163,7 @@ const GetAllPosts = ({user, posts}) => {
                                 <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
                                     Comment
                                 </p>
-                            </div>
-                            <GetPost 
-                                isOpen={isModalOpen} 
-                                onClose={handleCloseModal}
-                                post = {data}
-                                user={user}
-                            />                            
+                            </div>                          
                         </div>
                     </div>
                 </div>

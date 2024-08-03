@@ -165,7 +165,7 @@ export const Comment = ({user}) => {
                   <p className='pb-0 px-1'>
                     {convertNewlinesToBreaks(comment?.content)}
                   </p>
-                  <div className='w-3/5 flex ml-1'>
+                  <div className='w-1/2 flex ml-1'>
                     <img className='h-full w-full object-cover rounded-lg'
                         src={comment?.image?.url}
                         alt=''
