@@ -1,7 +1,19 @@
 import React from 'react'
 import { convertNewlinesToBreaks, timeAgo} from '../../utils'
+import LightGallery from 'lightgallery/react';
+
+// import styles
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-zoom.css';
+import 'lightgallery/css/lg-thumbnail.css';
+
+// import plugins if you need
+import lgZoom from 'lightgallery/plugins/zoom';
 
 export const Comment = ({user}) => {
+  const onInit = () => {
+    // console.log('lightGallery has been initialized');
+  };
   const data = [
     {
         "commentId": "668bcc1d69fb226adb7021b4",
@@ -166,10 +178,17 @@ export const Comment = ({user}) => {
                     {convertNewlinesToBreaks(comment?.content)}
                   </p>
                   <div className='w-1/2 flex ml-1'>
-                    <img className='h-full w-full object-cover rounded-lg'
-                        src={comment?.image?.url}
-                        alt=''
-                    />              
+                    <LightGallery
+                      onInit={onInit}
+                      speed={500}
+                      plugins={[lgZoom]}
+                      elementClassNames="flex h-full w-full"
+                    >
+                      <img className='h-full w-full object-cover rounded-lg'
+                          src={comment?.image?.url}
+                          alt=''
+                      /> 
+                     </LightGallery>            
                   </div>                
                 </div>
                 <div>

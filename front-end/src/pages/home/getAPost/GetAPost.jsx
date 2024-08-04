@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { getAPost } from '../../../api/post/post';
 import { useSelector } from 'react-redux';
@@ -21,6 +21,15 @@ const GetAPost = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
 
     const [post, setPost] = useState({})
+    const [description, setDescription] = useState('');
+    const textareaRef = useRef(null);
+  
+    const handleInput = (e) => {
+      setDescription(e.target.value);
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto'; // Reset the height to auto
+      textarea.style.height = `${textarea.scrollHeight}px`; // Set the height to match the scroll height
+    };
 
     const handleGetPost = async() => {
         try {
@@ -42,7 +51,7 @@ const GetAPost = () => {
   return (
     <div className="fixed inset-0 z-50 flex-1 flex items-center justify-center bg-black">
       <div className="h-full w-1/2 relative bg-white shadow z-50 overflow-hidden">
-          <div className='py-2 h-[calc(100%-4rem)] overflow-y-auto p-0 '>
+          <div className='py-2 h-[calc(100%)] overflow-y-auto p-0 overflow-x-hidden'>
               <div>
                   <div className='flex-1 flex items-center mx-3 mb-2'>
                       <div className='w-10 h-10'>
@@ -158,7 +167,7 @@ const GetAPost = () => {
                           </div> 
                       </div>
                       <div className='flex-1 flex border-t border-b border-gray-300 py-2 mx-3.5'>
-                          <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
+                          <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer mr-[8vh]'>
                               <img className='h-6 w-6 ml-2'
                                   src={require("../../../assets/icons/like.png")}
                                   alt=''
@@ -167,7 +176,7 @@ const GetAPost = () => {
                                   Like
                               </p>
                           </div>
-                          <div className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer`}
+                          <div className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer ml-[8vh]`}
                           >
                               <img className='h-5 w-5 ml-2'
                                   src={require("../../../assets/icons/comment.png")}
@@ -180,33 +189,70 @@ const GetAPost = () => {
                       </div>
                   </div>                    
               </div>
+                <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white '>
+                    <div className='h-11 w-11 mr-3'>
+                        <img className='h-full w-full object-cover rounded-full shadow'
+                            src={user?.avatar}
+                            alt=''
+                        />
+                    </div>
+                    <form className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="1"
+                            value={description}
+                            onChange={handleInput}
+                            ref={textareaRef}
+                            className="flex-grow w-full px-4 py-2 rounded-2xl mt-1 bg-gray-100 overflow-hidden
+                                focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
+                            placeholder="Write your comment here..."
+                            style={{resize: 'none'}} // Optional: Prevent manual resizing
+                        />
+                        
+                        <div className="flex items-center space-x-2 pb-2 px-3">
+                            <div className='text-gray-500 cursor-pointer'>
+                                <img className='h-6 w-6 object-cover'
+                                    src={require("../../../assets/icons/smile.png")}
+                                    alt=''
+                                />                                 
+                            </div>
+                            <div className='text-gray-500 cursor-pointer'>
+                                <img className='h-6 w-6 object-cover'
+                                    src={require("../../../assets/icons/camera.png")}
+                                    alt=''
+                                />                                 
+                            </div>                   
+                            <div className='flex-1'></div>
+                            {description ? (
+                                <button type="submit" className="text-white">
+                                    <img className='h-6 w-6 object-cover'
+                                        src={require("../../../assets/icons/send-blue.png")}
+                                        alt=''
+                                    />                            
+                                </button>                                 
+                            ) :(
+                                <div className="text-white">
+                                    <img className='h-6 w-6 object-cover'
+                                        src={require("../../../assets/icons/send-gray.png")}
+                                        alt=''
+                                    />                            
+                                </div>   
+                            )}
+                           
+                        </div>
+                    </form>            
+                </div>
               <div>
                   <Comment 
                       user = {post?.author}
                   />
-              </div>                    
-          </div>
-          <div className='flex-1 flex items-center justify-center fixed absolute bottom-0 w-full px-3 py-2 bg-white 
-                          shadow border-t-2 border-gray-200 z-51'>
-              <div className='h-11 w-11 mr-3'>
-                  <img className='h-full w-full object-cover rounded-full shadow'
-                      src={user?.avatar}
-                      alt=''
-                  />
-              </div>
-              <form className='w-11/12'>
-                  <textarea
-                      id="description"
-                      name="description"
-                      rows="1"
-                      // value={description}
-                      // onChange={(e) => setDescription(e.target.value)}
-                      className="w-full px-4 py-2 rounded-2xl mt-1 bg-gray-200 
-                          focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
-                      placeholder="Write your comment here..."
-                  />
-
-              </form>            
+              </div> 
+            <div className='ml-3'>
+                <p className='text-xs text-gray-500'>
+                There are no more comments.
+                </p>
+            </div>                                 
           </div>
       </div>
     </div>

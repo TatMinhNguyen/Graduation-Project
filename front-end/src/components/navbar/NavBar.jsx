@@ -13,7 +13,13 @@ const NavBar = ({user}) => {
             </h1>
         </div>
         <div className='w-1/3'>
-            <form className='flex-1 flex items-center justify-center'>
+            <form className='flex-1 flex items-center p-0.5 pl-2 mt-1 bg-gray-100 mx-auto rounded-3xl'>
+                <button>
+                    <img className='w-6 h-6'
+                        src = {require('../../assets/icons/search.png')}
+                        alt=''
+                    />                    
+                </button>
                 <input
                     type='text'
                     id='search'
@@ -21,8 +27,8 @@ const NavBar = ({user}) => {
                     placeholder='Search to Lionelsocial . . .'
                     // value={}
                     // onChange={}
-                    className='w-2/3 px-4 py-2 rounded-3xl mt-2 bg-gray-100
-                            focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300'
+                    className='flex-grow w-full pl-4 pr-1 py-2 rounded-3xl bg-gray-100 overflow-hidden
+                                focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100 bg-gray-100'
                 />
             </form>
         </div>

@@ -46,7 +46,7 @@ const GetAllPosts = ({user, posts}) => {
                             </p>
                         </div>
                     </div>
-                    <div>
+                    <div onClick={() => handleGetAPost(post?.postId)}>
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
                                 {post?.description ? (
