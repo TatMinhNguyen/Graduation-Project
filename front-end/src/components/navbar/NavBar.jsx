@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const NavBar = ({user}) => {
   return (
@@ -53,12 +54,13 @@ const NavBar = ({user}) => {
                         alt="" 
                     />
                 </div>
-                <div className='flex items-center justify-center cursor-pointer ml-3'>
-                    <img className='h-10 w-10 rounded-full'
+                <Link to={`/get-profile/${user?.userId}`} 
+                        className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'>
+                    <img className='h-full w-full object-cover rounded-full'
                         src={user?.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                         alt="User Avatar" 
                     />
-                </div>
+                </Link>
             </div>
 
         </div>

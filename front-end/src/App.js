@@ -8,6 +8,7 @@ import ForgotVerificationCode from './pages/register/verifyCode/ForgotVerificati
 import ForgotPassword from './pages/login/forgotPassword/ForgotPassword';
 import Home from './pages/home/Home';
 import GetAPost from './pages/home/getAPost/GetAPost';
+import Profile from './pages/profile/Profile';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/get-verify-code" element={<ForgotVerificationCode />} />
         <Route path="/reset-password" element={<ForgotPassword />} />
         <Route path="/get-post/:postId" element={<GetAPost />} />
+        <Route path='/get-profile/:userId' element={<Profile/>}/>
       </Routes>
     </Router>
   );

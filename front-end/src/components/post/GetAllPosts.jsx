@@ -23,30 +23,35 @@ const GetAllPosts = ({user, posts}) => {
         navigation(`/get-post/${postId}`)
     }
 
+    const handleGetUser = async(userId) => {
+        navigation(`/get-profile/${userId}`)
+    }
+
   return (
     <div>
         {posts?.map((post) => {
             return (
-                <div key={post.postId} 
+                <div key={post?.postId} 
                     className='bg-white mt-4 border border-white shadow rounded-md flex-1 items-center'
                 >
-                    <div className='flex-1 flex items-center mx-3 my-2'>
+                    <div onClick={() => handleGetUser(post?.author?.authorId)} 
+                        className='flex-1 flex items-center mx-3 my-2 cursor-pointer'>
                         <div className='w-10 h-10'>
                             <img className='h-full w-full object-cover rounded-full shadow'
-                                src= {post.author.authorAvatar}
+                                src= {post?.author?.authorAvatar}
                                 alt=''
                             />
                         </div>
                         <div className='ml-3'>
                             <h1 className='font-medium text-base'>
-                                {post.author.authorName}
+                                {post?.author?.authorName}
                             </h1>
                             <p className='text-xs text-gray-500'>
-                                {timeAgo(post.createdAt)}
+                                {timeAgo(post?.createdAt)}
                             </p>
                         </div>
                     </div>
-                    <div onClick={() => handleGetAPost(post?.postId)}>
+                    <div onClick={() => handleGetAPost(post?.postId)} className='cursor-pointer'>
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
                                 {post?.description ? (
