@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default: "https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png",
+      default: "https://ik.imagekit.io/minhnt204587/Avatar/user.png",
     },
     coverPicture: {
       type: String,

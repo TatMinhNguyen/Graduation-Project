@@ -124,6 +124,9 @@ const authController = {
                 userId : user._id,
                 username : user.username,
                 avatar : user.profilePicture,
+                friendRequested: user.friendRequested,
+                friendRequesting: user.friendRequesting,
+                friends: user.friends,
                 token : accessToken
             }
             res.status(200).json(result);

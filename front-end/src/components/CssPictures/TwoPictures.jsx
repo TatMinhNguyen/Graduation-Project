@@ -14,21 +14,25 @@ const TwoPictures = ({selectedImages}) => {
     // console.log('lightGallery has been initialized');
   };
   return (
-    <div className='flex h-[55vh]'>
+    <div className='flex h-[60vh]'>
       <LightGallery
         onInit={onInit}
         speed={500}
         plugins={[lgZoom]}
         elementClassNames="flex h-full w-full"
       >
-        <img className='w-1/2 pr-px h-full object-cover'
-            src={selectedImages[0]}
-            alt=''
-        />
-        <img className='w-1/2 pl-px h-full object-cover'
-            src={selectedImages[1]}
-            alt=''
-        /> 
+        <a href={selectedImages[0]} className='w-1/2'>
+          <img className='w-full pr-px h-full object-cover'
+              src={selectedImages[0]}
+              alt=''
+          />          
+        </a>
+        <a href={selectedImages[1]} className='w-1/2'>
+          <img className='w-full pl-px h-full object-cover'
+              src={selectedImages[1]}
+              alt=''
+          />          
+        </a>
       </LightGallery>         
     </div>
   )

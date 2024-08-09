@@ -12,9 +12,6 @@ const userController = {
                 const { password, 
                         verificationCode,
                         verificationCodeExpires,
-                        friendRequested,
-                        friendRequesting,
-
                     ...otherDetails 
                 } = user._doc;
 
@@ -36,6 +33,7 @@ const userController = {
         try {
             const address = req.body.address;
             const work = req.body.work;
+            const username = req.body.username;
 
             const user = await UserModel.findById(req.user.id);
 
@@ -49,6 +47,10 @@ const userController = {
             
             if(work){
                 user.work = work;
+            }
+
+            if(username){
+                user.username = username
             }
 
             await user.save();

@@ -89,6 +89,10 @@ const friendController = {
             if (currentUser.friendRequesting.includes(userId)) {
                 return res.status(400).json({ message: 'Bạn đã gửi lời mời kết bạn trước đó.' });
             }
+
+            if(currentUser.friends.includes(userId)) {
+                return res.status(400).json({message: "Bạn và người này đã là bạn bè"});
+            }
     
             // Kiểm tra xem người dùng mục tiêu có chặn người dùng hiện tại không
             if (targetUser.blocking.includes(currentUserId)) {
