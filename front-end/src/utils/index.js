@@ -13,17 +13,23 @@ export const timeAgo = (createdAt) => {
     const minutes = duration.minutes();
   
     if (years > 0) {
-      return `${years} năm trước`;
+      return `${years} year ago`;
     } else if (months > 0) {
-      return `${months} tháng trước`;
+      return `${months} month ago`;
     } else if (days > 0) {
-      return `${days} ngày trước`;
+      return `${days} day ago`;
     } else if (hours > 0) {
-      return `${hours} giờ trước`;
+      return `${hours} hour ago`;
     } else {
-      return `${minutes} phút trước`;
+      return `${minutes} minute ago`;
     }
 };
+
+export function formatToMonthYear(isoString) {
+  const date = new Date(isoString);
+  const options = { year: 'numeric', month: 'long' }; // Tùy chọn hiển thị tháng và năm
+  return date.toLocaleDateString('en-US', options);
+}
 
 export const timeAgoShort = (createdAt) => {
   const now = moment();

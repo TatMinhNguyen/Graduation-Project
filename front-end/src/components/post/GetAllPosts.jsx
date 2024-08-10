@@ -32,7 +32,7 @@ const GetAllPosts = ({user, posts}) => {
         {posts?.map((post) => {
             return (
                 <div key={post?.postId} 
-                    className='bg-white mt-4 border border-white shadow rounded-md flex-1 items-center'
+                    className='bg-white mt-4 mb-4 border border-white shadow rounded-md flex-1 items-center'
                 >
                     <div onClick={() => handleGetUser(post?.author?.authorId)} 
                         className='flex-1 flex items-center mx-3 my-2 cursor-pointer'>

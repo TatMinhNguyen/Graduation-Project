@@ -318,6 +318,7 @@ const postController = {
                     video: post.video,
                     comment: post.comment,
                     felt: post.felt,
+                    typeText: post.typeText,
                     createdAt: post.createdAt,
                     author: {
                         authorId: user._id,

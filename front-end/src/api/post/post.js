@@ -28,3 +28,16 @@ export const getAPost = async (token, postId) => {
         console.log(error);
     }
 };
+
+export const getUserPost = async (token, userId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/post/get-user-post/${userId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        // console.log(res.data)
+
+        return res.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
