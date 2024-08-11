@@ -34,23 +34,33 @@ const GetAllPosts = ({user, posts}) => {
                 <div key={post?.postId} 
                     className='bg-white mt-4 mb-4 border border-white shadow rounded-md flex-1 items-center'
                 >
-                    <div onClick={() => handleGetUser(post?.author?.authorId)} 
-                        className='flex-1 flex items-center mx-3 my-2 cursor-pointer'>
-                        <div className='w-10 h-10'>
-                            <img className='h-full w-full object-cover rounded-full shadow'
-                                src= {post?.author?.authorAvatar}
-                                alt=''
+                    <div className=' flex-1 flex items-center'>
+                        <div onClick={() => handleGetUser(post?.author?.authorId)} 
+                            className='flex mx-3 my-2 cursor-pointer'>
+                            <div className='w-10 h-10'>
+                                <img className='h-full w-full object-cover rounded-full shadow'
+                                    src= {post?.author?.authorAvatar}
+                                    alt=''
+                                />
+                            </div>
+                            <div className='ml-3'>
+                                <h1 className='font-medium text-base'>
+                                    {post?.author?.authorName}
+                                </h1>
+                                <p className='text-xs text-gray-500'>
+                                    {timeAgo(post?.createdAt)}
+                                </p>
+                            </div>
+                        </div>  
+                        <div className='flex-1'></div>
+                        <div className='mr-3 cursor-pointer'>
+                            <img className='w-6 h-6'
+                                src={require('../../assets/icons/menu.png')}
+                                alt="" 
                             />
-                        </div>
-                        <div className='ml-3'>
-                            <h1 className='font-medium text-base'>
-                                {post?.author?.authorName}
-                            </h1>
-                            <p className='text-xs text-gray-500'>
-                                {timeAgo(post?.createdAt)}
-                            </p>
-                        </div>
+                        </div>                      
                     </div>
+
                     <div onClick={() => handleGetAPost(post?.postId)} className='cursor-pointer'>
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
