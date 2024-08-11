@@ -273,38 +273,71 @@ const friendController = {
         }
     },
 
-    //get friend
-    getFriends: async(req, res) => {
+    // get friend
+    getFriends: async (req, res) => {
         try {
+            // Tìm user theo userId và chỉ lấy danh sách bạn bè
             const result = await UserModel.findById(req.params.userId).select('friends');
-
-            if(!result){
-                return res.status(404).json({ message: "userId invalid" })
+            // console.log(result);
+            if (!result) {
+                return res.status(404).json({ message: "userId invalid" });
             }
 
-            const friendId = result.friends;
-            const friends = await UserModel.find({ _id: {$in: friendId} }).select('id username profilePicture friendsCount')
+            const friendIds = result.friends;
+            // Tìm tất cả các bạn bè theo danh sách friendIds và chỉ lấy những trường cần thiết
+            const friends = await UserModel.find({ _id: { $in: friendIds } }).select('id username profilePicture friendsCount friends');
 
-            return res.status(200).json({ friends })
+            const mutualFriends = friends.map(user => {
+                // Lọc ra những bạn chung
+                const mutualFriends = user.friends.filter(friendId => friendIds.includes(friendId));
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    friendsCount: user.friendsCount,
+                    mutualFriends: mutualFriends.length,                    
+                };
+            });
+
+            return res.status(200).json(mutualFriends);
         } catch (error) {
-            return res.status(500).json({error: error.message})
+            return res.status(500).json({ error: error.message });
         }
     },
 
-    //get loi moi ket ban
-    getFriendsRequested: async(req, res) => {
+
+    // get friend requests
+    getFriendsRequested: async (req, res) => {
         try {
             const userId = req.user.id;
-            const result = await UserModel.findById(userId).select('friendRequested');
+            
+            // Tìm người dùng theo userId và chỉ lấy danh sách friendRequested
+            const result = await UserModel.findById(userId).select('friendRequested friends');
 
-            const friendId = result.friendRequested;
-            const friendsRequested = await UserModel.find({ _id: {$in: friendId} }).select('id username profilePicture friendsCount')
+            const friendRequestedIds = result.friendRequested;
+            const userFriends = result.friends; // Lấy danh sách bạn bè của người dùng hiện tại
 
-            return res.status(200).json({ friendsRequested })
+            // Tìm tất cả các bạn bè theo danh sách friendRequestedIds và chỉ lấy những trường cần thiết
+            const friendsRequested = await UserModel.find({ _id: { $in: friendRequestedIds } }).select('id username profilePicture friendsCount friends');
+
+            // Thêm kiểm tra bạn bè chung
+            const friendsRequestedWithMutual = friendsRequested.map(user => {
+                const mutualFriends = user.friends.filter(friendId => userFriends.includes(friendId));
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    friendsCount: user.friendsCount,
+                    mutualFriends: mutualFriends.length, // Số lượng bạn bè chung
+                };
+            });
+
+            return res.status(200).json({ friendsRequested: friendsRequestedWithMutual });
         } catch (error) {
-            return res.status(500).json({error: error.message})
+            return res.status(500).json({ error: error.message });
         }
     }
+
     
 }
 
