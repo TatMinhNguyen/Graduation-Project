@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        customBlue: '#0866FF',  // Định nghĩa màu xanh tùy chỉnh
+        customGreen: '#10B981', // Định nghĩa màu xanh lá tùy chỉnh
+      },
+    },
   },
   plugins: [
     function({ addUtilities }) {

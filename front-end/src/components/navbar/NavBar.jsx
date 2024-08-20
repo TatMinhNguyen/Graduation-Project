@@ -1,7 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const NavBar = ({user}) => {
+    const navigation = useNavigate();
   return (
     <div className='flex h-14 min-h-14 bg-white border border-white shadow'>
         <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>
@@ -36,7 +37,9 @@ const NavBar = ({user}) => {
         <div className='w-1/3 flex items-center'>
             <div className='flex-1'></div>  {/* Đây là phần tử đệm để đẩy các phần tử khác sang phải */}
             <div className='mr-5 flex items-center'>
-                <div className='h-10 w-10 bg-gray-200 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'>
+                <div className='h-10 w-10 bg-gray-200 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'
+                        onClick={() => navigation('/')}
+                >
                     <img className='h-6'
                         src={require("../../assets/icons/home-black.png")}
                         alt="" 
@@ -54,14 +57,14 @@ const NavBar = ({user}) => {
                         alt="" 
                     />
                 </div>
-                <Link to={`/get-profile/${user?.userId}`} 
+                <div onClick={() => window.location.href = `/get-profile/${user?.userId}`}
                         className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'>
                     <img className='h-full w-full object-cover rounded-full'
                         src={user?.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                         alt="User Avatar" 
                     />
-                </Link>
-            </div>
+                </div>
+          </div>
 
         </div>
 

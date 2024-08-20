@@ -332,7 +332,7 @@ const friendController = {
                 };
             });
 
-            return res.status(200).json({ friendsRequested: friendsRequestedWithMutual });
+            return res.status(200).json( friendsRequestedWithMutual );
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
