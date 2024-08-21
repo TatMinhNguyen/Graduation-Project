@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { getRequested } from '../../../api/friends/friends';
+import { acceptRequest, getRequested, refuseRequest } from '../../../api/friends/friends';
 
 const GetRequests = ({user}) => {
     const [data, setData] = useState([])
     // console.log(data)
+    const [clickedUsers, setClickedUsers] = useState({});
 
     const navigation = useNavigate();
 
@@ -12,6 +13,27 @@ const GetRequests = ({user}) => {
         try {
             const result = await getRequested(user?.token)
             setData(result)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleAccept = async (userId) => {
+        try {
+            await acceptRequest(user?.token, userId);
+            setClickedUsers(prev => ({
+                ...prev,
+                [userId]: true
+            }));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleRefuse = async (userId) => {
+        try {
+            await refuseRequest(user?.token, userId);
+            handleGetRequested()
         } catch (error) {
             console.log(error)
         }
@@ -49,18 +71,30 @@ const GetRequests = ({user}) => {
                                 </div>
                             </div>  
                             <div className='flex-1'></div>
-                            <div className='flex items-center'>
-                                <div className='mr-3 cursor-pointer bg-customBlue py-1.5 px-6 rounded-md'>
-                                    <p className='text-white font-medium text-sm'>
-                                        Confirm
+                            {clickedUsers[friend?._id] ? (
+                                <div className='flex items-center mr-3'>
+                                    <p className='text-sm text-gray-500'>
+                                        Request accepted
                                     </p>
+                                </div>
+                            ) : (
+                                <div className='flex items-center'>
+                                    <div className='mr-3 cursor-pointer bg-customBlue py-1.5 px-6 rounded-md'
+                                            onClick={() => handleAccept(friend?._id)}
+                                    >
+                                        <p className='text-white font-medium text-sm'>
+                                            Confirm
+                                        </p>
+                                    </div> 
+                                    <div className='mr-3 cursor-pointer bg-gray-300 py-1.5 px-6 rounded-md'
+                                            onClick={() => handleRefuse(friend?._id)}
+                                    >
+                                        <p className='text-black font-medium text-sm'>
+                                            Delete
+                                        </p>
+                                    </div>                                                               
                                 </div> 
-                                <div className='mr-3 cursor-pointer bg-gray-300 py-1.5 px-6 rounded-md'>
-                                    <p className='text-black font-medium text-sm'>
-                                        Delete
-                                    </p>
-                                </div>                                                               
-                            </div>                     
+                            )}                    
                         </div>
                     </div>
                 )

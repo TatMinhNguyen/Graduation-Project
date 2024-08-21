@@ -86,7 +86,7 @@ const friendController = {
             }
     
             // Kiểm tra xem đã gửi lời mời kết bạn trước đó chưa
-            if (currentUser.friendRequesting.includes(userId)) {
+            if (currentUser.friendRequested.includes(userId)) {
                 return res.status(400).json({ message: 'Bạn đã gửi lời mời kết bạn trước đó.' });
             }
 
@@ -287,7 +287,9 @@ const friendController = {
             // Tìm tất cả các bạn bè theo danh sách friendIds và chỉ lấy những trường cần thiết
             const friends = await UserModel.find({ _id: { $in: friendIds } }).select('id username profilePicture friendsCount friends');
 
-            const mutualFriends = friends.map(user => {
+            const mutualFriends = friends
+                .filter(friend => friend._id.toString() !== req.user.id)
+                .map(user => {
                 // Lọc ra những bạn chung
                 const mutualFriends = user.friends.filter(friendId => friendIds.includes(friendId));
                 return {
@@ -336,9 +338,55 @@ const friendController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
+    },
+
+    // Get mutual friends
+    getMutualFriends: async (req, res) => {
+        try {
+            const currentUserId = req.user.id; // Lấy ID của người dùng hiện tại 
+            const { userId } = req.params; // ID người dùng được chọn
+
+            // Tìm người dùng hiện tại
+            const currentUser = await UserModel.findById(currentUserId).select('friends');
+            if (!currentUser) {
+                return res.status(404).json({ message: 'Người dùng hiện tại không tồn tại.' });
+            }
+
+            // Tìm người dùng được chọn
+            const requesterUser = await UserModel.findById(userId).select('friends');
+            if (!requesterUser) {
+                return res.status(404).json({ message: 'Người dùng được chọn không tồn tại.' });
+            }
+
+            // Tìm bạn chung
+            const mutualFriendsIds = currentUser.friends.filter(friendId => 
+                requesterUser.friends.includes(friendId.toString())
+            );
+
+            // Lấy thông tin chi tiết của các bạn chung
+            const mutualFriends = await UserModel.find({
+                _id: { $in: mutualFriendsIds }
+            }).select('_id username profilePicture friendsCount friends');
+
+            // Thêm kiểm tra bạn bè chung
+            const friendsWithMutual = mutualFriends.map(user => {
+                const mutualFriends = user.friends.filter(friendId => currentUser.friends.includes(friendId));
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    friendsCount: user.friendsCount,
+                    mutualFriends: mutualFriends.length, // Số lượng bạn bè chung
+                };
+            });
+        
+
+            return res.status(200).json(friendsWithMutual);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    
 }
 
 module.exports = friendController;

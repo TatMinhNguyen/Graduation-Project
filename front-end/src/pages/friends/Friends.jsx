@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom"
 import GetFriends from './getFriends/GetFriends'
 import GetRequests from './getRequests/GetRequests'
 import GetSuggestions from './getSuggestions/GetSuggestions'
+import MutualFriends from './mutualFriends/MutualFriends'
 
 const Friends = () => {
     const userId = useOutletContext()
@@ -21,6 +22,10 @@ const Friends = () => {
 
     const handleGetSuggestions = () => {
         setOnClick('2')
+    }
+
+    const handleGetMutual = () => {
+        setOnClick('3')
     }
     return (
         <div className='bg-white border border-white shadow rounded-md mb-3'>
@@ -62,9 +67,11 @@ const Friends = () => {
                            Friends 
                         </p>
                     </div>
-                    <div className='w-1/2 flex-1 flex items-center justify-center my-2'>
+                    <div className='w-1/2 flex-1 flex items-center justify-center my-2'
+                            onClick={handleGetMutual}
+                    >
                         <p className={`cursor-pointer text-base font-medium 
-                            ${onClick === '1' ? 'text-customBlue border-b-2 border-b-customBlue' : 'text-gay-700'}`}
+                            ${onClick === '3' ? 'text-customBlue border-b-2 border-b-customBlue' : 'text-gay-700'}`}
                         >
                             Mutual friends
                         </p>
@@ -93,7 +100,10 @@ const Friends = () => {
                 </div>
             ) : (
                 <div>
-                    
+                    <MutualFriends
+                        user={user}
+                        userId={userId}
+                    />
                 </div>
             )}
 

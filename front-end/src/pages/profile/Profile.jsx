@@ -91,7 +91,7 @@ const Profile = () => {
                         />                        
                         </LightGallery>
                         <div className='ml-4'>
-                            <h1 className='text-3xl font-bold'>
+                            <h1 className='text-2xl font-bold'>
                                 {profile?.username}
                             </h1> 
                             <div className='w-1/2'>
@@ -149,7 +149,7 @@ const Profile = () => {
                                                     alt=''
                                                 /> 
                                                 <p className='font-medium text-md text-white'>
-                                                    Confirm request   
+                                                    Confirm   
                                                 </p>                                           
                                             </div>
                                             <div className='flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
@@ -158,7 +158,7 @@ const Profile = () => {
                                                     alt=''
                                                 /> 
                                                 <p className='font-medium text-md'>
-                                                    Refuse request   
+                                                    Refuse   
                                                 </p>                                           
                                             </div>
                                             <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>

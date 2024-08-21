@@ -26,4 +26,7 @@ router.get("/get-friends/:userId", middleware.verifyToken, friendController.getF
 //get lời mời kết bạn
 router.get("/get-requested", middleware.verifyToken, friendController.getFriendsRequested)
 
+//get mutual
+router.get("/get-mutual-friends/:userId", middleware.verifyToken, friendController.getMutualFriends)
+
 module.exports = router;
