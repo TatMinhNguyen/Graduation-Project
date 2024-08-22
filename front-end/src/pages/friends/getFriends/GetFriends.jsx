@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { cancelFriend, cancelRequest, getFriends, getRequested, requestFriends } from '../../../api/friends/friends';
+import { 
+    acceptRequest, cancelFriend, cancelRequest, getFriends, getRequested, refuseRequest, requestFriends 
+} from '../../../api/friends/friends';
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '../../../api/profile/profile';
 
@@ -36,6 +38,26 @@ const GetFriends = ({ userId, user }) => {
         }
     }
 
+    const handleAccept = async (userId) => {
+        try {
+            await acceptRequest(user?.token, userId);
+            handleGetRequested();
+            handleGetCurrentUser();
+            handleGetFriends();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleRefuse = async (userId) => {
+        try {
+            await refuseRequest(user?.token, userId);
+            handleGetRequested()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleAddFriend = async (userId) => {
         try {
             await requestFriends(user?.token, userId);
@@ -55,6 +77,7 @@ const GetFriends = ({ userId, user }) => {
                 ...prev,
                 [userId]: false
             }));
+            handleGetCurrentUser();
         } catch (error) {
             console.log(error);
         }
@@ -180,14 +203,14 @@ const GetFriends = ({ userId, user }) => {
                                     {requestUser?.some((user) => user?._id === friend?._id) ? (
                                         <div className='flex items-center'>
                                             <div className='mr-3 cursor-pointer bg-customBlue py-1.5 px-6 rounded-md '
-                                                    // onClick={() => handleAccept(friend?._id)}
+                                                    onClick={() => handleAccept(friend?._id)}
                                             >
                                                 <p className='text-white font-medium text-sm'>
                                                     Confirm
                                                 </p>
                                             </div> 
                                             <div className='mr-3 cursor-pointer bg-gray-300 py-1.5 px-6 rounded-md'
-                                                    // onClick={() => handleRefuse(friend?._id)}
+                                                    onClick={() => handleRefuse(friend?._id)}
                                             >
                                                 <p className='text-black font-medium text-sm'>
                                                     Delete

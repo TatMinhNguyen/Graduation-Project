@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 const NavBar = ({user}) => {
     const navigation = useNavigate();
   return (
-    <div className='flex h-14 min-h-14 bg-white border border-white shadow'>
+    <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
         <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>
             <img className='h-5/6'
                 src= {require("../../assets/images/logo.png")}
@@ -15,7 +15,7 @@ const NavBar = ({user}) => {
             </h1>
         </div>
         <div className='w-1/3'>
-            <form className='flex-1 flex items-center p-0.5 pl-2 mt-1 bg-gray-100 mx-auto rounded-3xl'>
+            <form className='flex-1 flex items-center p-0.5 pb-0 pl-2 mt-1.5 bg-gray-100 mx-auto rounded-3xl'>
                 <button>
                     <img className='w-6 h-6'
                         src = {require('../../assets/icons/search.png')}

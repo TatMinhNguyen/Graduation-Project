@@ -94,7 +94,7 @@ const Profile = () => {
                             <h1 className='text-2xl font-bold'>
                                 {profile?.username}
                             </h1> 
-                            <div className='w-1/2'>
+                            <div className=''>
                                 <p className='text-gray-500 justify-self-start font-normal cursor-pointer hover:text-gray-400 p-0'>
                                     {profile?.friendsCount} friends
                                 </p>                                 
