@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, } from "react-router-dom";
 import NavBar from '../../components/navbar/NavBar'
 import GetAllPosts from '../../components/post/GetAllPosts';
-import { getAllPosts } from '../../api/post/post';
+import { createPost, getAllPosts } from '../../api/post/post';
 import { getProfile } from '../../api/profile/profile';
 
 const Home = () => {
@@ -12,10 +12,16 @@ const Home = () => {
   // console.log(user)
   // console.log(posts)
 
+  const imageInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+
   const [showModal, setShowModal] = useState(false)
   const [profile, setProfile] = useState({})
   const [text, setText] = useState('');
-  // console.log(profile)
+  const [showFont, setShowFont] = useState(false)
+  const [images, setImages] = useState([])
+  const [video, setVideo] = useState(null)
+  const [typeText, setTypeText] = useState(true)
 
   // eslint-disable-next-line
   const [params, setParams] = useState({
@@ -34,6 +40,24 @@ const Home = () => {
     textarea.style.height = `${textarea.scrollHeight}px`; // Set the height to match the scroll height
   };
 
+  const handleImageClick = () => {
+    imageInputRef.current.click();
+  };
+
+  const handleVideoClick = () => {
+    videoInputRef.current.click();
+  };
+
+  const handleImageChange = (e) => {
+    const selectedImages = Array.from(e.target.files);
+    setImages(selectedImages);
+  };
+
+  const handleVideoChange = (e) => {
+    const selectedVideo = e.target.files[0];
+    setVideo(selectedVideo);
+  };
+
   const handleGetListPosts = async() => {
     try {
       await getAllPosts(user?.token, dispatch, params)
@@ -50,6 +74,39 @@ const Home = () => {
       console.error('Errors:', error);
     }
   }
+
+  const handleCreatePost = async(e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+  
+      if (text) {
+        formData.append('description', text);
+      }
+      if (images.length > 0) {
+        images.forEach((image, index) => {
+          formData.append(`images`, image);
+        });
+      }
+      if (video) {
+        formData.append('video', video);
+      }
+      formData.append('typeText', typeText); // Nếu typeText luôn có giá trị
+  
+      const result = await createPost(user?.token, formData);
+      console.log(result);
+
+      // Reset state after successful post
+      setText('');
+      setImages([]);
+      setVideo(null);
+      setShowModal(false);
+      // Refresh the post list
+      handleGetListPosts();
+    } catch (error) {
+      console.error('Errors:', error);
+    }
+  }  
 
   /* eslint-disable */
   useEffect(() => {
@@ -172,26 +229,64 @@ const Home = () => {
                     />
                   </div>
                   <div className="flex items-center mt-4">
-                    <button className="flex items-center">
-                      <img src={require('../../assets/icons/font.png')} alt="Aa" className="w-7 h-7"/>
+                    <button className="flex items-center "
+                            onClick={()=> setShowFont(true)}
+                    >
+                      <img src={require('../../assets/icons/text.png')} alt="Aa" className="w-9 h-9"/>
                     </button>
+                    {showFont && (
+                      <div className='flex'>
+                        <div onClick={()=>setTypeText(true)} className='bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300'>
+                          <p className='font-sans px-2 py-0.5 text-sm font-medium'>
+                            normal
+                          </p>
+                        </div>
+                        <div onClick={()=>setTypeText(false)} className='ml-2 bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300'>
+                          <p className='font-mono px-2 py-0.5 italic text-sm font-semibold'>
+                            special
+                          </p>
+                        </div>
+                      </div>                      
+                    )}
                     <div className="flex-1 flex justify-end space-x-2">
-                      <button className="flex items-center">
+                      <button onClick={handleImageClick} className="flex items-center">
                         <img src={require('../../assets/icons/photo.png')} alt="Location" className="w-9 h-9" />
                       </button>
-                      <button className="flex items-center">
+                      <button onClick={handleVideoClick} className="flex items-center">
                         <img src={require('../../assets/icons/clapperboard.png')} alt="GIF" className="w-8 h-8" />
                       </button>
+                      {/* Hidden inputs */}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        ref={imageInputRef} 
+                        style={{ display: 'none' }} 
+                        onChange={handleImageChange} 
+                        multiple 
+                      />
+                      <input 
+                        type="file" 
+                        accept="video/*" 
+                        ref={videoInputRef} 
+                        style={{ display: 'none' }} 
+                        onChange={handleVideoChange} 
+                      />
                     </div>
                   </div>
                 </div>
                 <div className="border-t p-4">
-                  <button
-                    className="w-full bg-blue-300 text-white py-2 px-4 rounded-lg"
-                    disabled
-                  >
-                    Post
-                  </button>
+                  {text || images.length > 0 || video ? (
+                    <button onClick={handleCreatePost} className="w-full bg-customBlue text-white py-2 px-4 rounded-lg">
+                      Post
+                    </button>
+                  ) : (
+                    <button
+                      className="w-full bg-blue-300 text-white py-2 px-4 rounded-lg"
+                      disabled
+                    >
+                      Post
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

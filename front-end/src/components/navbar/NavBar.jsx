@@ -1,8 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getProfile } from '../../api/profile/profile';
 
-const NavBar = ({user, profile}) => {
+const NavBar = ({user}) => {
     const navigation = useNavigate();
+    const [profile, setProfile] = useState({})
+
+    const handleGetProfile = async () => {
+        try {
+          const result = await getProfile(user?.token, user?.userId)
+          setProfile(result);
+        } catch (error) {
+          console.error('Errors:', error);
+        }
+    }
+
+    /* eslint-disable */
+    useEffect(() => {
+        handleGetProfile()
+    },[])
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
         <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>

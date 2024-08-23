@@ -41,3 +41,15 @@ export const getUserPost = async (token, userId) => {
         console.log(error);
     }
 };
+
+export const createPost = async (token, post) => {
+    try {
+        const res = await axios.post(`${apiUrl}/post/create-post`, post, {
+            headers: {token: `Bearer ${token}`}
+        })
+
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
