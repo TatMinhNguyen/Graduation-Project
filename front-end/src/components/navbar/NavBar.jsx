@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const NavBar = ({user}) => {
+const NavBar = ({user, profile}) => {
     const navigation = useNavigate();
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
@@ -60,7 +60,7 @@ const NavBar = ({user}) => {
                 <div onClick={() => window.location.href = `/get-profile/${user?.userId}`}
                         className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'>
                     <img className='h-full w-full object-cover rounded-full'
-                        src={user?.avatar || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
+                        src={profile?.profilePicture || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                         alt="User Avatar" 
                     />
                 </div>
