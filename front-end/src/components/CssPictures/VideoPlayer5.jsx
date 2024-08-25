@@ -105,7 +105,7 @@ export const VideoPlayer5 = ({url, selectedImages, extraImagesCount}) => {
                         plugins={[lgZoom]}
                         elementClassNames="flex h-full w-full"
                     >
-                        <a href={selectedImages[0]}>
+                        <a href={selectedImages[0]} className='flex'>
                             <div className='w-1/3 pr-px'>
                                 <img className='w-full h-full object-cover'
                                     src= {selectedImages[0]}
@@ -130,7 +130,7 @@ export const VideoPlayer5 = ({url, selectedImages, extraImagesCount}) => {
                                 </div> 
                             </div>                            
                         </a>
-
+                        {getItems()}
                      </LightGallery>             
                 </div>  
             )}         
