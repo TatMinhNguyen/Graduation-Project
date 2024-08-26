@@ -29,6 +29,10 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
     const dispatch = useDispatch();
     const textareaRef = useRef(null);
 
+    const handleShowFont = () => {
+        setShowFont(!showFont);
+    }
+
     const handleCloseModal = () => {
         isCloseModal()
         setText('');
@@ -115,8 +119,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           }
           formData.append('typeText', typeText); // Nếu typeText luôn có giá trị
       
-          const result = await createPost(user?.token, formData);
-          console.log(result);
+          await createPost(user?.token, formData);
     
           // Reset state after successful post
           isCloseModal(false);
@@ -270,30 +273,51 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
 
                     <div className="flex items-center mt-4">
                     <button className="flex items-center "
-                            onClick={()=> setShowFont(true)}
+                            onClick={handleShowFont}
                     >
-                        <img src={require('../../assets/icons/text.png')} alt="Aa" className="w-9 h-9"/>
+                        <img src={require('../../assets/icons/text.png')} alt="Aa" className="w-9 h-9 hover:opacity-70"/>
                     </button>
                     {showFont && (
                         <div className='flex'>
-                        <div onClick={()=>setTypeText(true)} className='bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300'>
-                            <p className='font-sans px-2 py-0.5 text-sm font-medium'>
-                            normal
-                            </p>
-                        </div>
-                        <div onClick={()=>setTypeText(false)} className='ml-2 bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300'>
-                            <p className='font-mono px-2 py-0.5 italic text-sm font-semibold'>
-                            special
-                            </p>
-                        </div>
+                            {typeText === true ? (
+                                <div onClick={()=>setTypeText(true)} className='bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300 border border-customBlue'>
+                                    <p className='font-sans px-2 py-0.5 text-sm font-medium'>
+                                        normal
+                                    </p>
+                                </div>
+                            ) : (
+                                <div onClick={()=>setTypeText(true)} className='bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300'>
+                                    <p className='font-sans px-2 py-0.5 text-sm font-medium'>
+                                        normal
+                                    </p>
+                                </div>
+                            )}
+                            {typeText === false ? (
+                                <div onClick={()=>setTypeText(false)} 
+                                    className='ml-2 bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300 border border-customBlue'
+                                >
+                                    <p className='font-mono px-2 py-0.5 italic text-sm font-semibold'>
+                                        special
+                                    </p>
+                                </div>                                
+                            ) : (
+                                <div onClick={()=>setTypeText(false)} 
+                                    className='ml-2 bg-gray-300 rounded-md cursor-pointer hover:bg-gray-300 '
+                                >
+                                    <p className='font-mono px-2 py-0.5 italic text-sm font-semibold'>
+                                        special
+                                    </p>
+                                </div>
+                            )}
+
                         </div>                      
                     )}
                     <div className="flex-1 flex justify-end space-x-2">
                         <button onClick={handleImageClick} className="flex items-center">
-                        <img src={require('../../assets/icons/photo.png')} alt="Location" className="w-9 h-9" />
+                            <img src={require('../../assets/icons/photo.png')} alt="Location" className="w-9 h-9 hover:opacity-70" />
                         </button>
                         <button onClick={handleVideoClick} className="flex items-center">
-                        <img src={require('../../assets/icons/clapperboard.png')} alt="GIF" className="w-8 h-8" />
+                            <img src={require('../../assets/icons/clapperboard.png')} alt="GIF" className="w-8 h-8 hover:opacity-70" />
                         </button>
                         {/* Hidden inputs */}
                         <input 

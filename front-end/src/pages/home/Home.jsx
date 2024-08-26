@@ -48,7 +48,7 @@ const Home = () => {
     if (entry.isIntersecting) {
       setParams((prevParams) => ({
         ...prevParams,
-        limit: prevParams.limit + 5, // Tăng số lượng bài viết mỗi khi cuộn tới cuối trang
+        limit: prevParams.limit + 20, // Tăng số lượng bài viết mỗi khi cuộn tới cuối trang
       }));
     }
   };

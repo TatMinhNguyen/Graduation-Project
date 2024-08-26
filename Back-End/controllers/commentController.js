@@ -187,7 +187,7 @@ const commentController = {
 
             const commenttPromises = res.paginatedResults.results;
 
-            const comments = commenttPromises.filter(comment => comment.postId = postId)
+            const comments = commenttPromises.filter(comment => comment.postId == postId)
             // await CommentModel.find({ postId: postId })
 
             if(!comments) {
