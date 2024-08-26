@@ -61,7 +61,9 @@ const GetAllPosts = ({user, posts}) => {
                         </div>                      
                     </div>
 
-                    <div onClick={() => handleGetAPost(post?.postId)} className='cursor-pointer'>
+                    <div  className='cursor-pointer'
+                        // onClick={() => handleGetAPost(post?.postId)}
+                    >
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
                                 {post?.description ? (

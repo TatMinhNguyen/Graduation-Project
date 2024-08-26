@@ -13,28 +13,33 @@ const middleware = {
         }
     },
     verifyToken : async(req, res, next) => {
-        //ACCESS TOKEN FROM HEADER
-          const token = req.headers.token;
-          
-          if (token) {
-            const isBlacklisted = await middleware.isTokenBlacklisted(token);
+        try {
+            // ACCESS TOKEN FROM HEADER
+            const token = req.headers.token;
+            
+            if (token) {
+                const isBlacklisted = await middleware.isTokenBlacklisted(token);
 
-            if (isBlacklisted) {
-                return res.status(403).json({ message: 'Token is blacklisted' });
+                if (isBlacklisted) {
+                    return res.status(403).json({ message: 'Token is blacklisted' });
+                }
+
+                const accessToken = token.split(" ")[1];
+                jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
+                    if (err) {
+                        return res.status(403).json("Token is not valid!");
+                    }
+                    req.user = user;
+                    next();
+                });
+            } else {
+                return res.status(401).json("You're not authenticated");
             }
-
-            const accessToken = token.split(" ")[1];
-            jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
-              if (err) {
-                res.status(403).json("Token is not valid!");
-              }
-              req.user = user;
-              next();
-            });
-          } else {
-            res.status(401).json("You're not authenticated");
-          }
+        } catch (error) {
+            return res.status(500).json("Internal Server Error");
+        }
     },
+
     paginatedResult: (model) => {
       return async (req, res, next) => {
         const page = parseInt(req.query.page);
