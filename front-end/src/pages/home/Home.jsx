@@ -117,7 +117,7 @@ const Home = () => {
           </div>
           <div className='h-16 bg-white mt-2 border border-white shadow rounded-md flex-1 flex items-center'>
             <Link className='ml-4 h-11 w-11' to={`/get-profile/${user?.userId}`}>
-              <img className='h-full w-full object-cover rounded-full'
+              <img className='h-full w-full object-cover rounded-full hover:opacity-90'
                 src={profile?.profilePicture || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
                 alt="User Avatar" 
               />              

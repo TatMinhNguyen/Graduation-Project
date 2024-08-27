@@ -26,3 +26,23 @@ export const createComment = async (token, comment) => {
         console.log(error)
     }
 }
+
+export const deleteComment = async (token, commentId) => {
+    try {
+        await axios.delete(`${apiUrl}/comment/delete-comment/${commentId}`, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const editcomment = async(token, comment, commentId) => {
+    try {
+        await axios.post(`${apiUrl}/comment/update-comment/${commentId}`, comment, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}

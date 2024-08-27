@@ -17,6 +17,7 @@ import VideoPlayer from '../../../components/CssPictures/VideoPlayer';
 import { Comment } from '../../../components/comment/Comment';
 import { createComment, getComments } from '../../../api/comment/comment';
 import { ImageComment } from '../../../components/CssPictures/ImageComment';
+import { getProfile } from '../../../api/profile/profile';
 
 const GetAPost = () => {
     const { postId } = useParams();
@@ -25,6 +26,8 @@ const GetAPost = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const [profile, setProfile] = useState({})
 
     const [post, setPost] = useState({})
     const [description, setDescription] = useState('');
@@ -37,6 +40,15 @@ const GetAPost = () => {
         navigate(-1);  // Quay lại trang trước đó
         URL.revokeObjectURL(imagePreview);
     };
+
+    const handleGetProfile = async () => {
+        try {
+          const result = await getProfile(user?.token, user?.userId)
+          setProfile(result);
+        } catch (error) {
+          console.error('Errors:', error);
+        }
+    }
 
     const handleGetComments = async() => {
       try {
@@ -89,7 +101,13 @@ const GetAPost = () => {
             formData.append('postId', postId);
 
             setDescription('')
-            setImage(null)            
+            setImage(null) 
+            setImagePreview(null)
+            
+            // Reset chiều cao của textarea
+            if (textareaRef.current) {
+                textareaRef.current.style.height = 'auto';
+            }
 
             await createComment(user?.token, formData)
 
@@ -117,12 +135,17 @@ const GetAPost = () => {
     useEffect(() => {
         handleGetPost();
         handleGetComments();
+        handleGetProfile();
     },[postId])
+
+    useEffect(() => {
+        window.scrollTo(0, 0); // Cuộn lên đầu trang khi component được render
+    }, []);
 
     // console.log(post)
 
   return (
-    <div className="fixed inset-0 z-50 flex-1 flex justify-center bg-black">
+    <div className="flex-1 flex justify-center bg-black">
         <div className='absolute left-0 top-0 p-3 bg-gray-500 m-3 rounded-full cursor-pointer hover:bg-gray-400'
                 onClick={handleGoBack}
         >
@@ -132,14 +155,14 @@ const GetAPost = () => {
                 className='w-5 h-5'
             />
         </div>
-        <div className="h-full w-1/2 relative bg-white shadow z-50 overflow-hidden">
-            <div className='py-2 h-[calc(100%)] overflow-y-auto p-0 overflow-x-hidden'>
+        <div className="h-full w-1/2 bg-white shadow z-50 ">
+            <div className='py-2 h-[calc(100%)] p-0 '>
                 <div>
                     <div className='flex-1 flex items-center mx-3 mb-2'>
                         <div className='w-10 h-10'>
-                            <img className='h-full w-full object-cover rounded-full shadow'
+                            <img className='h-full w-full object-cover rounded-full  hover:opacity-90'
                                 src= {post?.author?.authorAvatar}
-                                alt=''
+                                alt='Avatar'
                             />
                         </div>
                         <div className='ml-3'>
@@ -272,10 +295,10 @@ const GetAPost = () => {
                     </div>                    
                 </div>
                     <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white '>
-                        <div className='h-11 w-11 mr-3'>
+                        <div className='h-10 w-10 mr-3'>
                             <img className='h-full w-full object-cover rounded-full shadow'
-                                src={user?.avatar}
-                                alt=''
+                                src={profile?.profilePicture}
+                                alt='Avatar'
                             />
                         </div>
                         <form onSubmit={handleCreateComment} className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
@@ -358,9 +381,13 @@ const GetAPost = () => {
                 <div>
                     <Comment 
                         comments = {comments}
+                        user = {user}
+                        authorPost = {post?.author?.authorId}
+                        postId = {postId}
+                        profile = {profile?.profilePicture}
                     />
                 </div> 
-                <div className='ml-3'>
+                <div className='ml-3 mb-2'>
                     <p className='text-xs text-gray-500'>
                     There are no more comments.
                     </p>

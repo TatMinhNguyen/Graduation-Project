@@ -38,7 +38,7 @@ const GetAllPosts = ({user, posts}) => {
                         <div onClick={() => handleGetUser(post?.author?.authorId)} 
                             className='flex mx-3 my-2 cursor-pointer'>
                             <div className='w-10 h-10'>
-                                <img className='h-full w-full object-cover rounded-full shadow'
+                                <img className='h-full w-full object-cover rounded-full shadow hover:opacity-90'
                                     src= {post?.author?.authorAvatar}
                                     alt=''
                                 />
