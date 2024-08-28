@@ -32,6 +32,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   const [imagePreview, setImagePreview] = useState(null)
   const [imageId, setImageId] = useState('')
   // console.log(imagePreview)
+  const [imageUrl, setImageUrl] = useState('')
 
   const dispatch = useDispatch();
 
@@ -46,6 +47,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
     setImage(null);
     setImagePreview(null)
     setImageId(id)
+    setImageUrl('')
     URL.revokeObjectURL(imagePreview);
   }
 
@@ -117,7 +119,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
     setEditModal(true)
     setSelectedComment(commented)
     setDescription(content)
-    
+    setImageUrl(commented?.image?.url)
   }
 
   const handleCloseEdit = () => {
@@ -388,10 +390,10 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                                     placeholder="Write your comment here..."
                                     style={{resize: 'none'}} // Optional: Prevent manual resizing
                                 />
-                                {(imagePreview || comment?.image?.url) && (
+                                {(imagePreview || imageUrl) && (
                                     <div className='m-4 flex-1 flex'>
                                         <ImageComment
-                                            selectedImages = {imagePreview || comment?.image?.url}
+                                            selectedImages = {imagePreview || imageUrl}
                                         />
                                         <div className='w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300'
                                                 onClick={() => handleDeletePreView(comment?.image?.fileId)}

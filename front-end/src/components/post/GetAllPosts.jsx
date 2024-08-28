@@ -53,12 +53,17 @@ const GetAllPosts = ({user, posts}) => {
                             </div>
                         </div>  
                         <div className='flex-1'></div>
-                        <div className='mr-3 cursor-pointer'>
-                            <img className='w-6 h-6'
-                                src={require('../../assets/icons/menu.png')}
-                                alt="" 
-                            />
-                        </div>                      
+                        {user?.userId === post?.author?.authorId ? (
+                            <div className='mr-3 cursor-pointer p-1.5 rounded-full hover:bg-gray-100'>
+                                <img className='w-6 h-6'
+                                    src={require('../../assets/icons/menu.png')}
+                                    alt="" 
+                                />
+                            </div>                             
+                        ) : (
+                            ''
+                        )}
+                     
                     </div>
 
                     <div  className='cursor-pointer'
