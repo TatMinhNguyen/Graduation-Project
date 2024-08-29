@@ -53,3 +53,23 @@ export const createPost = async (token, post) => {
         console.log(error)
     }
 }
+
+export const updatePost = async (token, post, postId) => {
+    try {
+        await axios.post(`${apiUrl}/post/update-a-post/${postId}`, post, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const deletePost = async (token, postId) => {
+    try {
+        await axios.delete(`${apiUrl}/post/delete-post/${postId}`, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}

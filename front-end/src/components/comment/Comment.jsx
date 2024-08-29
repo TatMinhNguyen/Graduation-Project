@@ -15,7 +15,7 @@ import { ImageComment } from '../CssPictures/ImageComment';
 
 export const Comment = ({comments, user, authorPost, postId, profile}) => {
 
-  const [showModal, setShowModal] = useState(null); // Track the modal for a specific friend
+  const [showModal, setShowModal] = useState(null); 
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [isAbove, setIsAbove] = useState(false);
 
@@ -273,7 +273,8 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                   style={{
                       top: modalPosition.top,
                       left: modalPosition.left,
-                  }}>
+                  }}
+              >
                   <div className='relative'>
                       <div
                           className={`absolute transform rotate-45 w-3 h-3 bg-white border-gray-200 ${

@@ -117,9 +117,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           if (video) {
             formData.append('video', video);
           }
-          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị
-      
-          await createPost(user?.token, formData);
+          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị      
     
           // Reset state after successful post
           isCloseModal(false);
@@ -128,6 +126,8 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           setVideo(null);
           setImagePreviews([])
           setVideoPreview(null)
+
+          await createPost(user?.token, formData);
           
           // Refresh the post list
           handleGetListPosts();

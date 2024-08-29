@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { FivePictures } from '../CssPictures/FivePictures'
 import FourPictures from '../CssPictures/FourPictures'
@@ -12,12 +12,86 @@ import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useNavigate } from 'react-router-dom'
+import { deletePost, getAllPosts } from '../../api/post/post'
+import { useDispatch } from 'react-redux'
 
 const GetAllPosts = ({user, posts}) => {
-    // console.log(user)
-    // console.log(posts)
+    const [showModal, setShowModal] = useState(null);
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    const [isAbove, setIsAbove] = useState(false);
 
+    const [showDelete, setShowDelete] = useState(false)
+    const [selectedPost, setSelectedPost] = useState(null)
+  
+    const modalRef = useRef(null);
     const navigation = useNavigate();
+    const dispatch = useDispatch();
+
+    const handleThreeDotsClick = (event, post) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+    
+        if (rect.bottom > viewportHeight - 50) {
+            setIsAbove(true);
+            setModalPosition({
+                top: rect.top + window.scrollY - 90,
+                left: rect.left + window.scrollX - 50,
+            });
+        } else {
+            setIsAbove(false);
+            setModalPosition({
+                top: rect.bottom + window.scrollY + 5,
+                left: rect.left + window.scrollX - 120,
+            });
+        }
+    
+        setShowModal(post?.postId);
+    };
+
+    const handleClickOutside = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+            setShowModal(null);
+        }
+    };
+  
+    useEffect(() => {
+      if (showModal) {
+          document.addEventListener('mousedown', handleClickOutside);
+      } else {
+          document.removeEventListener('mousedown', handleClickOutside);
+      }
+  
+      return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [showModal]);
+
+    const handleDeletepost = async(postId) => {
+        const params = {
+            page: 1,
+            limit: 10
+        }
+        try {
+            setShowDelete(false)
+            setSelectedPost(null)
+
+            await deletePost(user?.token, postId)
+            await getAllPosts(user?.token, dispatch, params)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleShowComfirmDelete = (post) => {
+        setShowModal(null)
+        setShowDelete(true)
+        setSelectedPost(post)
+    }
+
+    const handleCancelDelete = () => {
+        setShowDelete(false)
+        setSelectedPost(null)    
+    }
 
     const handleGetAPost = async(postId) => {
         navigation(`/get-post/${postId}`)
@@ -54,7 +128,9 @@ const GetAllPosts = ({user, posts}) => {
                         </div>  
                         <div className='flex-1'></div>
                         {user?.userId === post?.author?.authorId ? (
-                            <div className='mr-3 cursor-pointer p-1.5 rounded-full hover:bg-gray-100'>
+                            <div className='mr-3 cursor-pointer p-1.5 rounded-full hover:bg-gray-100'
+                                    onClick={(e) => handleThreeDotsClick(e, post)}
+                            >
                                 <img className='w-6 h-6'
                                     src={require('../../assets/icons/menu.png')}
                                     alt="" 
@@ -63,7 +139,69 @@ const GetAllPosts = ({user, posts}) => {
                         ) : (
                             ''
                         )}
-                     
+                        {showModal === post?.postId && (
+                            <div
+                                ref={modalRef}
+                                className='absolute bg-white border border-gray-200 rounded shadow-2xl z-10'
+                                style={{
+                                    top: modalPosition.top,
+                                    left: modalPosition.left,
+                                }}                       
+                            >
+                                <div className='relative'>
+                                    <div
+                                        className={`absolute transform rotate-45 w-3 h-3 bg-white border-gray-200 ${
+                                            isAbove ? 'bottom-[-6px] border-b border-r' : 'top-[-6px] border-l border-t'
+                                        } left-[132px]`}>
+                                    </div>
+                                    <div className='py-2 px-1.5'>
+                                        <div className='flex hover:bg-gray-100 px-2 rounded'
+                                            // onClick={() => handleEditModal(comment, comment?.content)}
+                                        >
+                                            <img className='w-6 h-6 mr-3 mt-1'
+                                                src={require('../../assets/icons/edit1.png')}
+                                                alt=''
+                                            />
+                                            <p className='py-1 cursor-pointer text-black'>Edit post </p>
+                                        </div>
+                                        <div className='flex hover:bg-red-50 px-2 rounded'
+                                                onClick={() => handleShowComfirmDelete(post)}
+                                        >
+                                            <img className='w-6 h-6 mr-3 mt-1'
+                                                src={require('../../assets/icons/delete.png')}
+                                                alt=''
+                                            />
+                                            <p className='py-1 cursor-pointer text-red-600'>Delete post </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {showDelete && selectedPost?.postId === post?.postId && (
+                            <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
+                                <div className='w-1/3 bg-white p-4 rounded shadow-2xl border border-gray-100'>
+                                    <h2 className='flex justify-center text-lg italic font-semibold mb-2 pb-2 border-b border-gray-300'>
+                                        Delete {selectedPost?.author?.authorName}'s Post
+                                    </h2>
+                                    <p className='text-sm text-gray-600 mb-5'>
+                                        Are you sure you want to delete this post?
+                                    </p>
+                                    <div className='flex justify-end space-x-4'>
+                                        <button 
+                                            className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
+                                            onClick={handleCancelDelete}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
+                                            onClick={() => handleDeletepost(selectedPost?.postId)}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div  className='cursor-pointer'
