@@ -129,7 +129,7 @@ const postController = {
             if(videoUrl || videoId){               
                 let removeVideo = null;
 
-                if(videoUrl){
+                if(videoUrl && post.video){
                     removeVideo = post.video.fileId;
                 }
 
@@ -137,15 +137,20 @@ const postController = {
                     removeVideo = videoId;
                 }
 
-                // Xóa video trên ImageKit
-                const videoDeletionPromise = post.video ? imagekit.deleteFile(removeVideo)
-                : Promise.resolve(null);
+                if(removeVideo){
+                    // Xóa video trên ImageKit
+                    const videoDeletionPromise = post.video ? imagekit.deleteFile(removeVideo)
+                    : Promise.resolve(null);
 
-                // Chờ xóa tất cả các ảnh và video
-                await Promise.all([
-                    // ...imageDeletionPromises,
-                    videoDeletionPromise
-                ]);
+                    // const videoDeletionPromise = removeVideo ? imagekit.deleteFile(removeVideo) : Promise.resolve(null);
+
+                    // Chờ xóa tất cả các ảnh và video
+                    await Promise.all([
+                        // ...imageDeletionPromises,
+                        videoDeletionPromise
+                    ]);                    
+                }
+
 
                 //update DB
                 if(videoUrl){

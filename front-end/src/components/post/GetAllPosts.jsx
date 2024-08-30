@@ -14,14 +14,16 @@ import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useNavigate } from 'react-router-dom'
 import { deletePost, getAllPosts } from '../../api/post/post'
 import { useDispatch } from 'react-redux'
+import EditPost from './EditPost'
 
-const GetAllPosts = ({user, posts}) => {
+const GetAllPosts = ({user, posts, params, profile}) => {
     const [showModal, setShowModal] = useState(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [isAbove, setIsAbove] = useState(false);
 
     const [showDelete, setShowDelete] = useState(false)
     const [selectedPost, setSelectedPost] = useState(null)
+    const [editModal, setEditModal] = useState(false);
   
     const modalRef = useRef(null);
     const navigation = useNavigate();
@@ -67,10 +69,6 @@ const GetAllPosts = ({user, posts}) => {
     }, [showModal]);
 
     const handleDeletepost = async(postId) => {
-        const params = {
-            page: 1,
-            limit: 10
-        }
         try {
             setShowDelete(false)
             setSelectedPost(null)
@@ -92,6 +90,12 @@ const GetAllPosts = ({user, posts}) => {
         setShowDelete(false)
         setSelectedPost(null)    
     }
+
+    const handleEditModal = (post) =>{
+        setShowModal(null)
+        setEditModal(true)
+        setSelectedPost(post)
+      }
 
     const handleGetAPost = async(postId) => {
         navigation(`/get-post/${postId}`)
@@ -156,7 +160,7 @@ const GetAllPosts = ({user, posts}) => {
                                     </div>
                                     <div className='py-2 px-1.5'>
                                         <div className='flex hover:bg-gray-100 px-2 rounded'
-                                            // onClick={() => handleEditModal(comment, comment?.content)}
+                                            onClick={() => handleEditModal(post)}
                                         >
                                             <img className='w-6 h-6 mr-3 mt-1'
                                                 src={require('../../assets/icons/edit1.png')}
@@ -201,6 +205,19 @@ const GetAllPosts = ({user, posts}) => {
                                     </div>
                                 </div>
                             </div>
+                        )}
+                        {editModal && selectedPost?.postId === post?.postId && (
+                            <EditPost
+                                params = {params}
+                                user = {user}
+                                profile = {profile}
+                                postId = {selectedPost?.postId}
+                                text = {selectedPost?.description}
+                                oldImages = {selectedPost?.images}
+                                oldVideo = {selectedPost?.video}
+                                oldTypeText = {selectedPost?.typeText}
+                                isCloseModal = {() => setEditModal(false)}
+                            />
                         )}
                     </div>
 

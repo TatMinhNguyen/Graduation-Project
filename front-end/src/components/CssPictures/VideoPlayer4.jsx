@@ -47,22 +47,25 @@ export const VideoPlayer4 = ({url, selectedImages}) => {
                         elementClassNames="h-full w-full"
                     >
                     <a href={selectedImages[0]} className='flex-1 pb-px'>
-                        <img className='w-full h-full object-cover'
-                            src= {selectedImages[0]}
-                            alt=''
-                        />
-                    </a> 
-                    <a href={selectedImages[1]} className='flex-1 py-px'>
-                        <img className='w-full h-full object-cover'
-                            src= {selectedImages[1]}
-                            alt=''
-                        />
-                    </a> 
-                    <a href={selectedImages[2]} className='flex-1 pt-px'>
-                        <img className='w-full h-full object-cover'
-                            src= {selectedImages[2]}
-                            alt=''
-                        />
+                        <div className='flex-1 h-1/3 pb-px'>
+                            <img className='w-full h-full object-cover'
+                                src= {selectedImages[0]}
+                                alt=''
+                            />
+                        </div> 
+                        <div className='flex-1 h-1/3 py-px'>
+                            <img className='w-full h-full object-cover'
+                                src= {selectedImages[1]}
+                                alt=''
+                            />
+                        </div> 
+                        <div className='relative h-1/3 flex-1 pt-px'>
+                            <img className='opacity-50 w-full h-full object-cover'
+                                src={selectedImages[2]}
+                                alt=''
+                            />
+                                
+                        </div>
                     </a> 
                     </LightGallery>                                     
                 </div>

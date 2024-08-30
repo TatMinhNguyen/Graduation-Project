@@ -148,6 +148,8 @@ const Home = () => {
             <GetAllPosts
               posts = {posts}
               user = {user}
+              params = {params}
+              profile = {profile}
             />
           </div>
           <div ref={loadMoreRef} style={{ height: '20px' }} />

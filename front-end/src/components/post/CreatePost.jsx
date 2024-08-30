@@ -25,6 +25,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
     const [typeText, setTypeText] = useState(true)
     const [imagePreviews, setImagePreviews] = useState([]);
     const [videoPreview, setVideoPreview] = useState(null)
+    console.log(imagePreviews)
 
     const dispatch = useDispatch();
     const textareaRef = useRef(null);
@@ -64,8 +65,10 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
         setImages(selectedImages);
 
         // Tạo URL xem trước
-        const imageUrls = selectedImages.map((image) => URL.createObjectURL(image));
-        setImagePreviews(imageUrls);
+        if(selectedImages){
+            const imageUrls = selectedImages.map((image) => URL.createObjectURL(image));
+            setImagePreviews(imageUrls);            
+        }
 
         // Giải phóng các URL cũ
         imagePreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -75,8 +78,10 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
         const selectedVideo = e.target.files[0];
         setVideo(selectedVideo);
 
-        const videoUrl = URL.createObjectURL(selectedVideo);
-        setVideoPreview(videoUrl);
+        if(selectedVideo){
+            const videoUrl = URL.createObjectURL(selectedVideo);
+            setVideoPreview(videoUrl);            
+        }
 
         if (videoPreview) {
             URL.revokeObjectURL(videoPreview);
