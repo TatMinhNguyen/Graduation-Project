@@ -8,7 +8,7 @@ import 'lightgallery/css/lg-thumbnail.css';
 
 // import plugins if you need
 import lgZoom from 'lightgallery/plugins/zoom';
-import { useNavigate, useParams, Outlet  } from 'react-router-dom';
+import { useNavigate, useParams, Outlet, useLocation  } from 'react-router-dom';
 import { getProfile } from '../../api/profile/profile';
 import { useSelector } from 'react-redux';
 import NavBar from '../../components/navbar/NavBar';
@@ -18,7 +18,7 @@ const Profile = () => {
     const { userId } = useParams();
     const user = useSelector((state) => state.auth.login?.currentUser)
     const [profile, setProfile] = useState({})
-    const [onClick, setOnClick] = useState(true)
+    const location = useLocation(); 
 
     const navigation = useNavigate();
 
@@ -33,12 +33,10 @@ const Profile = () => {
 
     const handleGetPost = () => {
         navigation(`/get-profile/${userId}`)
-        setOnClick(true)
     }
 
     const handleGetFriends = () => {
         navigation(`/get-profile/${userId}/friends`)
-        setOnClick(false)
     }
 
     /* eslint-disable */
@@ -288,17 +286,17 @@ const Profile = () => {
                     </div>
                     <div className='w-2/3 ml-2'>
                         <div className='flex bg-white border border-white shadow rounded-md mb-3'>
-                            <div className='w-1/2  flex-1 flex items-center justify-center'
+                            <div className='w-1/2  flex-1 flex items-center justify-center '
                                     onClick={handleGetPost}
                             >
-                                <p className={`text-lg font-bold font-mono ${onClick ? 'border-b-4 border-b-customBlue pb-1' : 'pb-2'} mt-2 cursor-pointer`}>
+                                <p className={`text-lg font-bold font-mono mt-2 cursor-pointer ${location.pathname === `/get-profile/${userId}` ? 'border-b-4 border-b-customBlue pb-1' : 'pb-2'}`}>
                                     Posts
                                 </p>                                
                             </div>
-                            <div className='w-1/2 flex-1 flex items-center justify-center '
+                            <div className='w-1/2 flex-1 flex items-center justify-center r'
                                     onClick={handleGetFriends}
                             >
-                                <p className={`text-lg font-bold font-mono mt-2 cursor-pointer ${onClick ? ' pb-2' : 'border-b-4 border-b-customBlue pb-1'}`}>
+                                <p className={`text-lg font-bold font-mono mt-2 cursor-pointe ${location.pathname === `/get-profile/${userId}/friends` ? 'border-b-4 border-b-customBlue pb-1' : 'pb-2'}`}>
                                     Friends
                                 </p>                                
                             </div>

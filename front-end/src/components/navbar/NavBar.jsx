@@ -73,7 +73,7 @@ const NavBar = ({user}) => {
                         alt="" 
                     />
                 </div>
-                <div onClick={() => window.location.href = `/get-profile/${user?.userId}`}
+                <div onClick={() => navigation(`/get-profile/${user?.userId}`) }
                         className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'>
                     <img className='h-full w-full object-cover rounded-full hover:opacity-90'
                         src={profile?.profilePicture || 'https://ik.imagekit.io/minhnt204587/Avatar/icons8-user-94.png'}
