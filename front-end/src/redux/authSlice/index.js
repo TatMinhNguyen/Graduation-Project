@@ -4,7 +4,8 @@ const INIT =  {
     login:{
         currentUser: null,
     },
-    verificationCode: null
+    verificationCode: null,
+    profile:{}
 }
 
 const auth = createSlice({
@@ -13,6 +14,10 @@ const auth = createSlice({
     reducers: {
       setLogin: (state, action) => {
         state.login.currentUser = action.payload;
+        return state;
+      },
+      setProfile:(state, action) => {
+        state.profile = action.payload;
         return state;
       },
       setVerificationCode: (state, action) => {
@@ -33,7 +38,8 @@ export const {
     setLogOut,
     setLogin,
     setVerificationCode,
-    clearVerificationCode
+    clearVerificationCode,
+    setProfile,
   } = auth.actions
   
 export default auth.reducer

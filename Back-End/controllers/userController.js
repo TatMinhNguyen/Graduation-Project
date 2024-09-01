@@ -28,6 +28,31 @@ const userController = {
         }
     },
 
+    getMyProfileUser : async (req, res) => {
+        const id = req.user.id;
+    
+        try {
+            const user = await UserModel.findById(id);
+            if (user) {
+                const { password, 
+                        verificationCode,
+                        verificationCodeExpires,
+                    ...otherDetails 
+                } = user._doc;
+
+                if (!user.isVerify) {
+                    return res.status(404).json("Account Invalid");
+                }
+        
+                res.status(200).json(otherDetails);
+            } else {
+                return res.status(404).json("No such User");
+            }
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
+        }
+    },
+
     // Cập nhật trang cá nhân
     updateProfile: async(req, res) =>{
         try {

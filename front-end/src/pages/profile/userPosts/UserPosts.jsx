@@ -19,7 +19,7 @@ const UserPosts = () => {
     const userId = useOutletContext()
     const user = useSelector((state) => state.auth.login?.currentUser)
     const [posts, setPosts] = useState([]);
-    console.log(userId)
+    // console.log(userId)
 
     const navigation = useNavigate();
 

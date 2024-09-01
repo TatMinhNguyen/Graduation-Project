@@ -6,6 +6,7 @@ const upload = require("../middleware/multerConfig");
 
 //GET PROFILE
 router.get("/get-profile/:id", middleware.verifyToken, userController.getProfileUser)
+router.get("/get-my-profile", middleware.verifyToken, userController.getMyProfileUser)
 
 //UPDATE PROFILE
 router.post("/update-profile", middleware.verifyToken, userController.updateProfile)

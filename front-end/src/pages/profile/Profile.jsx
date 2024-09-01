@@ -9,23 +9,35 @@ import 'lightgallery/css/lg-thumbnail.css';
 // import plugins if you need
 import lgZoom from 'lightgallery/plugins/zoom';
 import { useNavigate, useParams, Outlet, useLocation  } from 'react-router-dom';
-import { getProfile } from '../../api/profile/profile';
-import { useSelector } from 'react-redux';
+import { getMyProfile, getProfile } from '../../api/profile/profile';
+import { useDispatch, useSelector } from 'react-redux';
 import NavBar from '../../components/navbar/NavBar';
 import { formatToMonthYear } from '../../utils';
+import ChangeAvatar from '../../components/changeProfile/ChangeAvatar';
+import ChangeBackground from '../../components/changeProfile/ChangeBackground';
 
 const Profile = () => {
     const { userId } = useParams();
     const user = useSelector((state) => state.auth.login?.currentUser)
+    const myProfile = useSelector((state) => state?.auth?.profile)
     const [profile, setProfile] = useState({})
     const location = useLocation(); 
 
+    const [showEditAvatar, setShowEditAvatar] = useState(false)
+    const [showEditCover, setShowEditCover] = useState(false)
+
     const navigation = useNavigate();
+    const dispatch = useDispatch();
+
+    const handleShowEditAvatar = () => {
+        setShowEditAvatar(true)
+    }
 
     const handleGetUser = async () => {
         try {
             const result = await getProfile(user?.token, userId)
             setProfile(result);
+            await getMyProfile(user?.token, dispatch)
         } catch (error) {
             console.log(error)
         }
@@ -52,6 +64,14 @@ const Profile = () => {
         // console.log('lightGallery has been initialized');
     };
 
+    let information = {}
+    if(user?.userId === userId) {
+        information = myProfile
+    }
+    else {
+        information = profile
+    }
+
     return (
         <div className='bg-gray-100 flex-1 flex items-center justify-center'>
             <div className='fixed top-0 w-full z-50'>
@@ -61,21 +81,42 @@ const Profile = () => {
             </div>
             <div className=' w-3/4  pt-11'>
                 <div className='w-full bg-white shadow rounded-xl'>
-                    <div>
+                    <div className='relative'>                          
                         <LightGallery
                             onInit={onInit}
                             speed={500}
                             plugins={[lgZoom]}
                             elementClassNames="flex h-full w-full"
                         >
-                        <img
+                            <img
                                 className='w-full h-[55vh] object-cover rounded-xl cursor-pointer shadow'
-                                src={profile?.coverPicture}
+                                src={information?.coverPicture}
                                 alt=''
                             />                        
-                        </LightGallery>    
+                        </LightGallery> 
+                        {userId === user?.userId && (
+                            <div 
+                                onClick={() => setShowEditCover(true)}
+                                className='absolute flex bottom-3 right-5 px-3 py-1.5 bg-white rounded-md shadow cursor-pointer hover:bg-gray-100'>
+                                <img
+                                    src={require('../../assets/icons/camera-black.png')}
+                                    alt=''
+                                    className='w-5 h-5 mt-0.5 opacity-90 hover:opacity-100'
+                                />   
+                                <p className='font-medium ml-2'>
+                                    Edit cover photo    
+                                </p> 
+                            </div>                            
+                        )} 
+                        {showEditCover && (
+                            <ChangeBackground
+                                avatar = {information?.coverPicture}
+                                user = {user}
+                                isCloseModal = {() => setShowEditCover(false)}
+                            />
+                        )}                      
                     </div>
-                    <div className='flex-1 flex items-center pb-3'>
+                    <div className='flex-1 flex items-center pb-3 relative z-10'>
                         <LightGallery
                             onInit={onInit}
                             speed={500}
@@ -84,17 +125,35 @@ const Profile = () => {
                         >
                         <img
                             className='w-44 h-44 object-cover rounded-full border-4 border-white ml-12 -mt-20 cursor-pointer'
-                            src={profile?.profilePicture}
+                            src={information?.profilePicture}
                             alt=''
                         />                        
                         </LightGallery>
+                        {userId === user?.userId && (
+                            <div className='-ml-12 mt-12 mr-2 p-1.5 rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200 border-2 border-white'
+                                    onClick={handleShowEditAvatar}
+                            >
+                                <img
+                                    src={require('../../assets/icons/camera-black.png')}
+                                    alt=''
+                                    className='w-6 h-6 '
+                                />
+                            </div>                            
+                        )}
+                        {showEditAvatar && (
+                            <ChangeAvatar
+                                avatar = {information?.profilePicture}
+                                user = {user}
+                                isCloseModal = {() => setShowEditAvatar(false)}
+                            />
+                        )}
                         <div className='ml-4'>
                             <h1 className='text-2xl font-bold'>
-                                {profile?.username}
+                                {information?.username}
                             </h1> 
                             <div className=''>
                                 <p className='text-gray-500 justify-self-start font-normal cursor-pointer hover:text-gray-400 p-0'>
-                                    {profile?.friendsCount} friends
+                                    {information?.friendsCount} friends
                                 </p>                                 
                             </div>                          
                         </div>
@@ -112,7 +171,7 @@ const Profile = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    {profile?.friendRequested?.includes(user?.userId) ? (
+                                    {information?.friendRequested?.includes(user?.userId) ? (
                                         <div className='flex'>
                                             <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
                                                 <img className='h-5 w-5 mr-1 mt-px'
@@ -139,7 +198,7 @@ const Profile = () => {
                                                 />                                                
                                             </div>                                            
                                         </div>  
-                                    ) : profile?.friendRequesting?.includes(user?.userId) ? (
+                                    ) : information?.friendRequesting?.includes(user?.userId) ? (
                                         <div className='flex'>
                                             <div className='flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'>
                                                 <img className='h-5 w-5 mr-1 mt-px'
@@ -175,7 +234,7 @@ const Profile = () => {
                                                 />                                                
                                             </div>                                           
                                         </div> 
-                                    ) : profile?.friends?.includes(user?.userId) ? (
+                                    ) : information?.friends?.includes(user?.userId) ? (
                                         <div className='flex'>
                                             <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
                                                 <img className='h-5 w-5 mr-1 mt-px'
@@ -247,13 +306,13 @@ const Profile = () => {
                                 alt=''
                                 className='w-5 h-5 mt-0.5'
                             />
-                            {!profile?.work || profile?.work == '' ? (
+                            {!information?.work || information?.work == '' ? (
                                 <p className='ml-3 text-gray-500'>
                                     No information about the job
                                 </p>
                             ) : (
                                 <p className='ml-3 text-gray-900'>
-                                    Works at {profile?.work}
+                                    Works at {information?.work}
                                 </p>                                
                             )}
                         </div>
@@ -263,13 +322,13 @@ const Profile = () => {
                                 alt=''
                                 className='w-5 h-5 mt-0.5'
                             />
-                            {!profile?.work || profile?.work == '' ? (
+                            {!information?.work || information?.work == '' ? (
                                 <p className='ml-3 text-gray-500'>
                                     No information about the address
                                 </p>
                             ) : (
                                 <p className='ml-3 text-gray-900 flex'>
-                                    Lives in <p className='font-medium ml-1.5'>{profile?.address}</p>
+                                    Lives in <p className='font-medium ml-1.5'>{information?.address}</p>
                                 </p>                                
                             )}
                         </div>
@@ -280,7 +339,7 @@ const Profile = () => {
                                 className='w-5 h-5 mt-0.5'
                             />
                             <p className='ml-3 text-gray-900'>
-                                Joined {formatToMonthYear(profile?.createdAt)} 
+                                Joined {formatToMonthYear(information?.createdAt)} 
                             </p>
                         </div>
                     </div>
@@ -296,7 +355,7 @@ const Profile = () => {
                             <div className='w-1/2 flex-1 flex items-center justify-center r'
                                     onClick={handleGetFriends}
                             >
-                                <p className={`text-lg font-bold font-mono mt-2 cursor-pointe ${location.pathname === `/get-profile/${userId}/friends` ? 'border-b-4 border-b-customBlue pb-1' : 'pb-2'}`}>
+                                <p className={`text-lg font-bold font-mono mt-2 cursor-pointer ${location.pathname === `/get-profile/${userId}/friends` ? 'border-b-4 border-b-customBlue pb-1' : 'pb-2'}`}>
                                     Friends
                                 </p>                                
                             </div>

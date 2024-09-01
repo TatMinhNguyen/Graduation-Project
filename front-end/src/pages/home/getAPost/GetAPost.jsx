@@ -73,8 +73,10 @@ const GetAPost = () => {
         const selectedImage = e.target.files[0];
         setImage(selectedImage);
 
-        const ImageUrl = URL.createObjectURL(selectedImage);
-        setImagePreview(ImageUrl);
+        if(selectedImage){
+            const ImageUrl = URL.createObjectURL(selectedImage);
+            setImagePreview(ImageUrl);            
+        }
 
         if (imagePreview) {
             URL.revokeObjectURL(imagePreview);

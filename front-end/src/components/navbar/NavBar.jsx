@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProfile } from '../../api/profile/profile';
+import { getMyProfile } from '../../api/profile/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
 const NavBar = ({user}) => {
+    const profile = useSelector((state) => state?.auth?.profile)
     const navigation = useNavigate();
-    const [profile, setProfile] = useState({})
+    const dispatch = useDispatch();
 
     const handleGetProfile = async () => {
         try {
-          const result = await getProfile(user?.token, user?.userId)
-          setProfile(result);
+            await getMyProfile(user?.token, dispatch)
         } catch (error) {
           console.error('Errors:', error);
         }
@@ -18,7 +19,7 @@ const NavBar = ({user}) => {
     /* eslint-disable */
     useEffect(() => {
         handleGetProfile()
-    },[])
+    },[user, dispatch])
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
         <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>

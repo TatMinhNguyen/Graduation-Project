@@ -4,15 +4,16 @@ import { Link, useNavigate, } from "react-router-dom";
 import NavBar from '../../components/navbar/NavBar'
 import GetAllPosts from '../../components/post/GetAllPosts';
 import { getAllPosts } from '../../api/post/post';
-import { getProfile } from '../../api/profile/profile';
+import { getMyProfile } from '../../api/profile/profile';
 import CreatePost from '../../components/post/CreatePost';
 
 const Home = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
   const posts = useSelector((state) => state.post.posts)
+  const profile = useSelector((state) => state?.auth?.profile)
 
   const [showModal, setShowModal] = useState(false)
-  const [profile, setProfile] = useState({})
+  // const [profile, setProfile] = useState({})
 
   // eslint-disable-next-line
   const [params, setParams] = useState({
@@ -33,8 +34,7 @@ const Home = () => {
 
   const handleGetProfile = async () => {
     try {
-      const result = await getProfile(user?.token, user?.userId)
-      setProfile(result);
+      await getMyProfile(user?.token,dispatch)
     } catch (error) {
       console.error('Errors:', error);
     }
