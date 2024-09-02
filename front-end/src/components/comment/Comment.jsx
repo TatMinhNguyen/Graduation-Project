@@ -1,14 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { convertNewlinesToBreaks, timeAgo} from '../../utils'
-import LightGallery from 'lightgallery/react';
 
-// import styles
-import 'lightgallery/css/lightgallery.css';
-import 'lightgallery/css/lg-zoom.css';
-import 'lightgallery/css/lg-thumbnail.css';
-
-// import plugins if you need
-import lgZoom from 'lightgallery/plugins/zoom';
 import { deleteComment, editcomment, getComments } from '../../api/comment/comment';
 import { useDispatch } from 'react-redux';
 import { ImageComment } from '../CssPictures/ImageComment';
@@ -56,10 +48,10 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   };
 
   const handleImageChange = (e) => {
-      const selectedImage = e.target.files[0];
-      setImage(selectedImage);
+      const selectedImage = e.target.files[0];     
 
       if(selectedImage) {
+        setImage(selectedImage);
         const ImageUrl = URL.createObjectURL(selectedImage);
         setImagePreview(ImageUrl);
       }
@@ -185,9 +177,6 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
     };
   }, [showModal]);
 
-  const onInit = () => {
-    // console.log('lightGallery has been initialized');
-  };
   return (
     <div className=''>
       {comments?.map((comment) => {
@@ -230,19 +219,9 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                       {convertNewlinesToBreaks(comment?.content)}
                     </p>                    
                   )}
-                  <div className='w-1/2 flex ml-1'>
-                    <LightGallery
-                      onInit={onInit}
-                      speed={500}
-                      plugins={[lgZoom]}
-                      elementClassNames="flex h-full w-full"
-                    >
-                      <img className='h-full w-full object-cover rounded-lg cursor-pointer mt-1'
-                          src={comment?.image?.url}
-                          alt=''
-                      /> 
-                     </LightGallery>            
-                  </div>                
+                  <ImageComment
+                    selectedImages = {comment?.image?.url}
+                  />
                 </div>
                 <div>
                     <p className='text-xs text-gray-500 px-3 mt-0.5'>
@@ -431,7 +410,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                                     />                                             
                                     <div className='flex-1'></div>
                                     {description || image ? (
-                                        <button type="submit" className="text-white">
+                                        <button type="submit" className="text-white" onClick={(e) => handleEditComment(e, comment?.commentId)}>
                                             <img className='h-6 w-6 object-cover'
                                                 src={require("../../assets/icons/send-blue.png")}
                                                 alt=''

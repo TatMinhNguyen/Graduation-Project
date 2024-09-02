@@ -1,14 +1,14 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setProfile } from "../../redux/authSlice";
+import { setProfile, setProfileDiff } from "../../redux/authSlice";
 
-export const getProfile = async (token, userId) => {
+export const getProfile = async (token, dispatch, userId) => {
     try {
         const res = await axios.get(`${apiUrl}/user/get-profile/${userId}`, {
             headers: { token: `Bearer ${token}` },
         });
         // console.log(res.data)
-
+        dispatch(setProfileDiff(res.data))
         return res.data;
     } catch (error) {
         console.log(error);
@@ -45,4 +45,14 @@ export const changeCover = async (token, image) => {
     } catch (error) {
         console.log(error)
     }
+}
+
+export const changeProfile = async(token, profile) => {
+    try {
+        await axios.post(`${apiUrl}/user/update-profile`, profile, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }    
 }

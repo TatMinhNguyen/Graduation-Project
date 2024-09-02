@@ -23,10 +23,10 @@ const ChangeBackground = ({isCloseModal, avatar, user}) => {
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        setImage(selectedImage);
+        const selectedImage = e.target.files[0];       
 
         if(selectedImage){
+            setImage(selectedImage);
             const ImageUrl = URL.createObjectURL(selectedImage);
             setImagePreview(ImageUrl);            
         }
@@ -107,11 +107,20 @@ const ChangeBackground = ({isCloseModal, avatar, user}) => {
                     >
                         Cancel
                     </button>
-                    <button className='mr-5 ml-2 my-4 text-white bg-customBlue px-5 py-1 rounded-md font-medium hover:bg-blue-700'
-                        onClick={handleChangeAvatar}
-                    >
-                        Save
-                    </button>
+                    {image != null ? (
+                        <button className='mr-5 ml-2 my-4 text-white bg-customBlue px-5 py-1 rounded-md font-medium hover:bg-blue-700'
+                            onClick={handleChangeAvatar}
+                        >
+                            Save
+                        </button>                        
+                    ) : (
+                        <button className='mr-5 ml-2 my-4 text-white bg-blue-300 px-5 py-1 rounded-md font-medium'
+                        disabled
+                        >
+                            Save
+                        </button>
+                    )}
+
                 </div>              
             </div>
         </div>

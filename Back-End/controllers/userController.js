@@ -66,13 +66,16 @@ const userController = {
                 return res.status(404).json({ message: 'User not found' });
             }
             
-            if(address){
-                user.address = address;
-            }
+            // if(address){
+            //     user.address = address;
+            // }
             
-            if(work){
-                user.work = work;
-            }
+            // if(work){
+            //     user.work = work;
+            // }
+
+            user.address = address;
+            user.work = work;
 
             if(username){
                 user.username = username

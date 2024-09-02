@@ -61,31 +61,29 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
     };
 
     const handleImageChange = (e) => {
-        const selectedImages = Array.from(e.target.files);
-        setImages(selectedImages);
-
-        // Tạo URL xem trước
+        const selectedImages = Array.from(e.target.files);     
+    
+        // Tạo URL xem trước và format lại thành mảng các object { url: "http:....." }
         if(selectedImages){
-            const imageUrls = selectedImages.map((image) => URL.createObjectURL(image));
-            setImagePreviews(imageUrls);            
+            setImages((prevImages) => [...prevImages, ...selectedImages]);
+            const imageUrls = selectedImages.map((image) => ({ url: URL.createObjectURL(image) }));
+            setImagePreviews((prevPreviews) => [...prevPreviews, ...imageUrls]);            
         }
-
+  
         // Giải phóng các URL cũ
-        imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
+        imagePreviews?.forEach((preview) => URL.revokeObjectURL(preview.url));
+    }; 
 
     const handleVideoChange = (e) => {
-        const selectedVideo = e.target.files[0];
-        setVideo(selectedVideo);
+        const selectedVideo = e.target.files[0];     
 
         if(selectedVideo){
+            setVideo(selectedVideo);
             const videoUrl = URL.createObjectURL(selectedVideo);
             setVideoPreview(videoUrl);            
         }
 
-        if (videoPreview) {
-            URL.revokeObjectURL(videoPreview);
-        }
+        URL.revokeObjectURL(videoPreview);
     };
 
     const handleDeletePreView = () => {

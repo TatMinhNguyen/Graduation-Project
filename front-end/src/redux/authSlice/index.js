@@ -5,7 +5,8 @@ const INIT =  {
         currentUser: null,
     },
     verificationCode: null,
-    profile:{}
+    profile:{},
+    profileDiff: {}
 }
 
 const auth = createSlice({
@@ -19,6 +20,13 @@ const auth = createSlice({
       setProfile:(state, action) => {
         state.profile = action.payload;
         return state;
+      },
+      setProfileDiff: (state, action) => {
+        state.profileDiff = action.payload
+        return state;
+      },
+      clearProfile: (state, action) => {
+        state.profileDiff = {}
       },
       setVerificationCode: (state, action) => {
         state.verificationCode = action.payload;
@@ -40,6 +48,8 @@ export const {
     setVerificationCode,
     clearVerificationCode,
     setProfile,
+    setProfileDiff,
+    clearProfile
   } = auth.actions
   
 export default auth.reducer

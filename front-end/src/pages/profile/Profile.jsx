@@ -15,16 +15,20 @@ import NavBar from '../../components/navbar/NavBar';
 import { formatToMonthYear } from '../../utils';
 import ChangeAvatar from '../../components/changeProfile/ChangeAvatar';
 import ChangeBackground from '../../components/changeProfile/ChangeBackground';
+import ChangeProfile from '../../components/changeProfile/ChangeProfile';
+import { acceptRequest, cancelFriend, cancelRequest, refuseRequest, requestFriends } from '../../api/friends/friends';
 
 const Profile = () => {
     const { userId } = useParams();
     const user = useSelector((state) => state.auth.login?.currentUser)
     const myProfile = useSelector((state) => state?.auth?.profile)
+    // const profile = useSelector((state) => state?.auth?.profileDiff)
     const [profile, setProfile] = useState({})
+    
     const location = useLocation(); 
-
     const [showEditAvatar, setShowEditAvatar] = useState(false)
     const [showEditCover, setShowEditCover] = useState(false)
+    const [showEditProfile, setShowEditProfile] = useState(false)
 
     const navigation = useNavigate();
     const dispatch = useDispatch();
@@ -35,9 +39,54 @@ const Profile = () => {
 
     const handleGetUser = async () => {
         try {
-            const result = await getProfile(user?.token, userId)
-            setProfile(result);
+            const result = await getProfile(user?.token, dispatch, userId)
+            setProfile(result)
             await getMyProfile(user?.token, dispatch)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleAccept = async () => {
+        try {
+            await acceptRequest(user?.token, userId)
+            // await getProfile(user?.token, dispatch, userId)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleRefuse = async () => {
+        try {
+            await refuseRequest(user?.token, userId)
+            // await getProfile(user?.token, dispatch, userId)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleCancelRequest = async () => {
+        try {
+            await cancelRequest(user?.token, userId)
+            // await getProfile(user?.token, dispatch, userId)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleRequestFriend = async () => {
+        try {
+            await requestFriends(user?.token, userId)
+            // await getProfile(user?.token, dispatch, userId)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleCancelFriend= async () => {
+        try {
+            await cancelFriend(user?.token, userId)
+            await getProfile(user?.token, dispatch, userId)
         } catch (error) {
             console.log(error)
         }
@@ -54,7 +103,7 @@ const Profile = () => {
     /* eslint-disable */
     useEffect(() => {
         handleGetUser();
-    },[userId])
+    },[userId, profile])
 
     useEffect(() => {
         window.scrollTo(0, 0); // Cuộn lên đầu trang khi component được render
@@ -160,7 +209,9 @@ const Profile = () => {
                         <div className='flex-1'></div>
                         <div>
                             {userId == user?.userId ? (
-                                <div className='flex-1 flex items-center cursor-pointer justify-center bg-gray-200 pl-2 pr-3 py-2 rounded-md mr-5'>
+                                <div className='flex-1 flex items-center cursor-pointer justify-center bg-gray-200 pl-2 pr-3 py-2 rounded-md mr-5'
+                                        onClick={() => setShowEditProfile(true)}
+                                >
                                     <img className='h-6 w-6 mr-1'
                                         src={require("../../assets/icons/edit.png")}
                                         alt=''
@@ -173,7 +224,9 @@ const Profile = () => {
                                 <div>
                                     {information?.friendRequested?.includes(user?.userId) ? (
                                         <div className='flex'>
-                                            <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
+                                            <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
+                                                onClick={handleCancelRequest}
+                                            >
                                                 <img className='h-5 w-5 mr-1 mt-px'
                                                     src={require("../../assets/icons/delete-friend.png")}
                                                     alt=''
@@ -200,7 +253,9 @@ const Profile = () => {
                                         </div>  
                                     ) : information?.friendRequesting?.includes(user?.userId) ? (
                                         <div className='flex'>
-                                            <div className='flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'>
+                                            <div className='flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'
+                                                onClick={handleAccept}
+                                            >
                                                 <img className='h-5 w-5 mr-1 mt-px'
                                                     src={require("../../assets/icons/add-friend-white.png")}
                                                     alt=''
@@ -209,7 +264,9 @@ const Profile = () => {
                                                     Confirm   
                                                 </p>                                           
                                             </div>
-                                            <div className='flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
+                                            <div className='flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
+                                                onClick={handleRefuse}
+                                            >
                                                 <img className='h-5 w-5 mr-1 mt-px'
                                                     src={require("../../assets/icons/delete-friend.png")}
                                                     alt=''
@@ -263,7 +320,9 @@ const Profile = () => {
                                         </div> 
                                     ) :(
                                         <div className='flex'>
-                                            <div className='flex-1 flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'>
+                                            <div className='flex-1 flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'
+                                                onClick={handleRequestFriend}
+                                            >
                                                 <img className='h-5 w-5 mr-1 mt-px'
                                                     src={require("../../assets/icons/add-friend-white.png")}
                                                     alt=''
@@ -294,6 +353,13 @@ const Profile = () => {
                             )}
                         </div>
                     </div>
+                    {showEditProfile && (
+                        <ChangeProfile
+                            user = {user}
+                            myProfile = {myProfile}
+                            isCloseModal = {() => setShowEditProfile(false)}
+                        />
+                    )}
                 </div>
                 <div className='mt-4 flex '>
                     <div className='w-1/3 bg-white mr-2 border border-white shadow rounded-md self-start'>
@@ -306,7 +372,7 @@ const Profile = () => {
                                 alt=''
                                 className='w-5 h-5 mt-0.5'
                             />
-                            {!information?.work || information?.work == '' ? (
+                            {information?.work === '' ? (
                                 <p className='ml-3 text-gray-500'>
                                     No information about the job
                                 </p>
@@ -322,7 +388,7 @@ const Profile = () => {
                                 alt=''
                                 className='w-5 h-5 mt-0.5'
                             />
-                            {!information?.work || information?.work == '' ? (
+                            {information?.address === '' ? (
                                 <p className='ml-3 text-gray-500'>
                                     No information about the address
                                 </p>

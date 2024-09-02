@@ -102,10 +102,10 @@ const commentController = {
                 comment.content = content
             }
 
-            if(imageUrl || imageId) {
+            if(imageUrl || imageId) { 
                 let removeImage = null;
 
-                if(imageUrl){
+                if(imageUrl && comment?.image){
                     removeImage = comment.image.fileId;
                 }
 
@@ -113,14 +113,16 @@ const commentController = {
                     removeImage = imageId;
                 }
 
-                // Xóa image trên ImageKit
-                const imageDeletionPromise = comment.image ? imagekit.deleteFile(removeImage)
-                : Promise.resolve(null);
+                if(removeImage){
+                    // Xóa image trên ImageKit
+                    const imageDeletionPromise = comment.image ? imagekit.deleteFile(removeImage)
+                    : Promise.resolve(null);
 
-                // Chờ xóa tất cả các ảnh 
-                await Promise.all([
-                    imageDeletionPromise
-                ]);
+                    // Chờ xóa tất cả các ảnh 
+                    await Promise.all([
+                        imageDeletionPromise
+                    ]);                    
+                }
 
                 //update DB
                 if(imageUrl){

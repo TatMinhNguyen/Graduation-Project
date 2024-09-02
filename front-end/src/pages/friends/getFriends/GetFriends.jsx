@@ -4,10 +4,12 @@ import {
 } from '../../../api/friends/friends';
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '../../../api/profile/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
 const GetFriends = ({ userId, user }) => {
+    const profile = useSelector((state) => state?.auth?.profileDiff)
     const [data, setData] = useState([]);
-    const navigation = useNavigate();
+    
     const [showModal, setShowModal] = useState(null); // Track the modal for a specific friend
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [isAbove, setIsAbove] = useState(false);
@@ -15,15 +17,17 @@ const GetFriends = ({ userId, user }) => {
 
     const [clickedUsers, setClickedUsers] = useState({});
 
-    const [profile, setProfile] = useState({})
     const [requestUser, setRequestUser] = useState([])
-    const [requesting, setRequesting] = useState()
+    
+    const requesting = profile.friendRequesting
+    const myMriend = profile.friends
+
+    const dispatch = useDispatch();
+    const navigation = useNavigate();
 
     const handleGetCurrentUser = async () => {
         try {
-            const result = await getProfile(user?.token, user?.userId)
-            setProfile(result.friends);
-            setRequesting(result.friendRequesting)
+            await getProfile(user?.token, dispatch, user?.userId)
         } catch (error) {
             console.log(error)
         }
@@ -191,7 +195,7 @@ const GetFriends = ({ userId, user }) => {
                                 </div>
                             </div>
                             <div className='flex-1'></div>
-                            {profile?.includes(friend?._id) ? (
+                            {myMriend?.includes(friend?._id) ? (
                                 <div className='mr-3 cursor-pointer flex items-center' onClick={(e) => handleThreeDotsClick(e, friend)}>
                                     <img className='w-6 h-6'
                                         src={require('../../../assets/icons/menu.png')}
@@ -276,7 +280,7 @@ const GetFriends = ({ userId, user }) => {
                                     </div>
                                 </div>
                             )}
-                            {confirmationModal && selectedFriend?._id === friend._id && (
+                            {confirmationModal && selectedFriend?._id === friend?._id && (
                                 <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
                                     <div className='w-2/5 bg-white p-4 rounded shadow-2xl border border-gray-100'>
                                         <h2 className='flex justify-center text-lg italic font-semibold mb-2 pb-2 border-b border-gray-300'>

@@ -51,11 +51,11 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
     };
 
     const handleImageChange = (e) => {
-        const selectedImages = Array.from(e.target.files);
-        setImages((prevImages) => [...prevImages, ...selectedImages]);
+        const selectedImages = Array.from(e.target.files);     
     
         // Tạo URL xem trước và format lại thành mảng các object { url: "http:....." }
         if(selectedImages){
+            setImages((prevImages) => [...prevImages, ...selectedImages]);
             const imageUrls = selectedImages.map((image) => ({ url: URL.createObjectURL(image) }));
             setImagePreviews((prevPreviews) => [...prevPreviews, ...imageUrls]);            
         }
@@ -65,17 +65,15 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
     };    
 
     const handleVideoChange = (e) => {
-        const selectedVideo = e.target.files[0];
-        setVideo(selectedVideo);
+        const selectedVideo = e.target.files[0];       
 
         if(selectedVideo){
+            setVideo(selectedVideo);
             const videoUrl = {url: URL.createObjectURL(selectedVideo)};
             setVideoPreview(videoUrl);            
         }
 
-        if (videoPreview) {
-            URL.revokeObjectURL(videoPreview?.url);
-        }
+        URL.revokeObjectURL(videoPreview?.url);
     };
 
     const handleDeletePreView = (videoId, imagesId) => {

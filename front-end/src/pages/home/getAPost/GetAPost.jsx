@@ -27,7 +27,7 @@ const GetAPost = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [profile, setProfile] = useState({})
+    const profile = useSelector((state) => state?.auth?.profile)
 
     const [post, setPost] = useState({})
     const [description, setDescription] = useState('');
@@ -40,15 +40,6 @@ const GetAPost = () => {
         navigate(-1);  // Quay lại trang trước đó
         URL.revokeObjectURL(imagePreview);
     };
-
-    const handleGetProfile = async () => {
-        try {
-          const result = await getProfile(user?.token, user?.userId)
-          setProfile(result);
-        } catch (error) {
-          console.error('Errors:', error);
-        }
-    }
 
     const handleGetComments = async() => {
       try {
@@ -70,10 +61,10 @@ const GetAPost = () => {
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        setImage(selectedImage);
+        const selectedImage = e.target.files[0];       
 
         if(selectedImage){
+            setImage(selectedImage);
             const ImageUrl = URL.createObjectURL(selectedImage);
             setImagePreview(ImageUrl);            
         }
@@ -137,7 +128,6 @@ const GetAPost = () => {
     useEffect(() => {
         handleGetPost();
         handleGetComments();
-        handleGetProfile();
     },[postId])
 
     useEffect(() => {
