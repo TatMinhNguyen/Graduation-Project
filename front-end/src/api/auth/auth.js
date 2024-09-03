@@ -5,7 +5,6 @@ import { apiUrl } from "../API_URL"
 export const loginUser = async (user, dispatch, navigate) => {
     try {
         const res = await axios.post(`${apiUrl}/auth/login`, user);
-        console.log(res.data)
 
         dispatch(setLogin(res.data));
         navigate("/");

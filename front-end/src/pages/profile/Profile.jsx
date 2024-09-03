@@ -30,6 +30,8 @@ const Profile = () => {
     const [showEditCover, setShowEditCover] = useState(false)
     const [showEditProfile, setShowEditProfile] = useState(false)
 
+    const [friendStatus, setFriendStatus] = useState('');
+
     const navigation = useNavigate();
     const dispatch = useDispatch();
 
@@ -41,6 +43,18 @@ const Profile = () => {
         try {
             const result = await getProfile(user?.token, dispatch, userId)
             setProfile(result)
+
+            // Xác định trạng thái quan hệ bạn bè
+            if (result.friends.includes(user?.userId)) {
+                setFriendStatus('friends');
+            } else if (result.friendRequesting.includes(user?.userId)) {
+                setFriendStatus('requested');
+            } else if (result.friendRequested.includes(user?.userId)) {
+                setFriendStatus('requesting');
+            } else {
+                setFriendStatus('none');
+            }
+            
             await getMyProfile(user?.token, dispatch)
         } catch (error) {
             console.log(error)
@@ -49,46 +63,46 @@ const Profile = () => {
 
     const handleAccept = async () => {
         try {
-            await acceptRequest(user?.token, userId)
-            // await getProfile(user?.token, dispatch, userId)
+            await acceptRequest(user?.token, userId);
+            setFriendStatus('friends');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     const handleRefuse = async () => {
         try {
-            await refuseRequest(user?.token, userId)
-            // await getProfile(user?.token, dispatch, userId)
+            await refuseRequest(user?.token, userId);
+            setFriendStatus('none');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     const handleCancelRequest = async () => {
         try {
-            await cancelRequest(user?.token, userId)
-            // await getProfile(user?.token, dispatch, userId)
+            await cancelRequest(user?.token, userId);
+            setFriendStatus('none');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     const handleRequestFriend = async () => {
         try {
-            await requestFriends(user?.token, userId)
-            // await getProfile(user?.token, dispatch, userId)
+            await requestFriends(user?.token, userId);
+            setFriendStatus('requesting');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     const handleCancelFriend= async () => {
         try {
-            await cancelFriend(user?.token, userId)
-            await getProfile(user?.token, dispatch, userId)
+            await cancelFriend(user?.token, userId);
+            setFriendStatus('none');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
@@ -103,7 +117,9 @@ const Profile = () => {
     /* eslint-disable */
     useEffect(() => {
         handleGetUser();
-    },[userId, profile])
+    },[userId, dispatch])
+
+    // console.log(profile)
 
     useEffect(() => {
         window.scrollTo(0, 0); // Cuộn lên đầu trang khi component được render
@@ -221,37 +237,20 @@ const Profile = () => {
                                     </p>
                                 </div>
                             ) : (
-                                <div>
-                                    {information?.friendRequested?.includes(user?.userId) ? (
-                                        <div className='flex'>
-                                            <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
-                                                onClick={handleCancelRequest}
-                                            >
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/delete-friend.png")}
-                                                    alt=''
-                                                /> 
-                                                <p className='font-medium text-md'>
-                                                    Cancel request   
-                                                </p>                                           
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/messenger-black.png")}
-                                                    alt=''
-                                                />
-                                                <p className='font-medium text-md'>
-                                                    Message
-                                                </p>                                            
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
-                                                <img className='h-6 w-6 mt-px'
-                                                    src={require("../../assets/icons/menu.png")}
-                                                    alt=''
-                                                />                                                
-                                            </div>                                            
-                                        </div>  
-                                    ) : information?.friendRequesting?.includes(user?.userId) ? (
+                                <div className='flex'>
+                                    {friendStatus === 'requesting' ? (                                       
+                                        <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
+                                            onClick={handleCancelRequest}
+                                        >
+                                            <img className='h-5 w-5 mr-1 mt-px'
+                                                src={require("../../assets/icons/delete-friend.png")}
+                                                alt=''
+                                            /> 
+                                            <p className='font-medium text-md'>
+                                                Cancel request   
+                                            </p>                                           
+                                        </div>                                                                                     
+                                    ) : friendStatus === 'requested' ? (
                                         <div className='flex'>
                                             <div className='flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'
                                                 onClick={handleAccept}
@@ -274,81 +273,46 @@ const Profile = () => {
                                                 <p className='font-medium text-md'>
                                                     Refuse   
                                                 </p>                                           
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/messenger-black.png")}
-                                                    alt=''
-                                                />
-                                                <p className='font-medium text-md'>
-                                                    Message
-                                                </p>                                            
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
-                                                <img className='h-6 w-6 mt-px'
-                                                    src={require("../../assets/icons/menu.png")}
-                                                    alt=''
-                                                />                                                
-                                            </div>                                           
+                                            </div>                                          
                                         </div> 
-                                    ) : information?.friends?.includes(user?.userId) ? (
-                                        <div className='flex'>
-                                            <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/friends.png")}
-                                                    alt=''
-                                                /> 
-                                                <p className='font-medium text-md'>
-                                                    Friends   
-                                                </p>                                           
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/messenger-black.png")}
-                                                    alt=''
-                                                />
-                                                <p className='font-medium text-md'>
-                                                    Message
-                                                </p>                                            
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
-                                                <img className='h-6 w-6 mt-px'
-                                                    src={require("../../assets/icons/menu.png")}
-                                                    alt=''
-                                                />                                                
-                                            </div>                                            
-                                        </div> 
-                                    ) :(
-                                        <div className='flex'>
-                                            <div className='flex-1 flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'
-                                                onClick={handleRequestFriend}
-                                            >
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/add-friend-white.png")}
-                                                    alt=''
-                                                /> 
-                                                <p className='font-medium text-md text-white'>
-                                                    Add friend   
-                                                </p>                                           
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
-                                                <img className='h-5 w-5 mr-1 mt-px'
-                                                    src={require("../../assets/icons/messenger-black.png")}
-                                                    alt=''
-                                                />
-                                                <p className='font-medium text-md'>
-                                                    Message
-                                                </p>                                            
-                                            </div>
-                                            <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
-                                                <img className='h-6 w-6 mt-px'
-                                                    src={require("../../assets/icons/menu.png")}
-                                                    alt=''
-                                                />                                                
-                                            </div>
-                                        </div>                                        
-                                    )
-                                    }
+                                    ) : friendStatus === 'friends' ? (
+                                        <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
+                                            <img className='h-5 w-5 mr-1 mt-px'
+                                                src={require("../../assets/icons/friends.png")}
+                                                alt=''
+                                            /> 
+                                            <p className='font-medium text-md'>
+                                                Friends   
+                                            </p>                                           
+                                        </div>                                            
+                                    ) : (
+                                        <div className='flex-1 flex items-center cursor-pointer bg-customBlue pl-3 pr-3 py-2 rounded-md mr-3'
+                                            onClick={handleRequestFriend}
+                                        >
+                                            <img className='h-5 w-5 mr-1 mt-px'
+                                                src={require("../../assets/icons/add-friend-white.png")}
+                                                alt=''
+                                            /> 
+                                            <p className='font-medium text-md text-white'>
+                                                Add friend   
+                                            </p>                                           
+                                        </div>                                       
+                                    )}
+                                    <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
+                                        <img className='h-5 w-5 mr-1 mt-px'
+                                            src={require("../../assets/icons/messenger-black.png")}
+                                            alt=''
+                                        />
+                                        <p className='font-medium text-md'>
+                                            Message
+                                        </p>                                            
+                                    </div>
+                                    <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
+                                        <img className='h-6 w-6 mt-px'
+                                            src={require("../../assets/icons/menu.png")}
+                                            alt=''
+                                        />                                                
+                                    </div> 
                                 </div>
                             )}
                         </div>

@@ -4,10 +4,9 @@ import {
 } from '../../../api/friends/friends';
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '../../../api/profile/profile';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const GetFriends = ({ userId, user }) => {
-    const profile = useSelector((state) => state?.auth?.profileDiff)
     const [data, setData] = useState([]);
     
     const [showModal, setShowModal] = useState(null); // Track the modal for a specific friend
@@ -19,15 +18,17 @@ const GetFriends = ({ userId, user }) => {
 
     const [requestUser, setRequestUser] = useState([])
     
-    const requesting = profile.friendRequesting
-    const myMriend = profile.friends
+    const [requesting, setRequesting] = useState({})
+    const [myFriend, setMyFriend] = useState({})
 
     const dispatch = useDispatch();
     const navigation = useNavigate();
 
     const handleGetCurrentUser = async () => {
         try {
-            await getProfile(user?.token, dispatch, user?.userId)
+            const res = await getProfile(user?.token, dispatch, user?.userId)
+            setRequesting(res.friendRequesting)
+            setMyFriend(res.friends)
         } catch (error) {
             console.log(error)
         }
@@ -195,13 +196,18 @@ const GetFriends = ({ userId, user }) => {
                                 </div>
                             </div>
                             <div className='flex-1'></div>
-                            {myMriend?.includes(friend?._id) ? (
-                                <div className='mr-3 cursor-pointer flex items-center' onClick={(e) => handleThreeDotsClick(e, friend)}>
-                                    <img className='w-6 h-6'
-                                        src={require('../../../assets/icons/menu.png')}
-                                        alt=""
-                                    />
-                                </div>                                
+                            {myFriend?.includes(friend?._id) ? (
+                                <>
+                                    {userId === user?.userId && (
+                                        <div className='mr-3 cursor-pointer flex items-center' onClick={(e) => handleThreeDotsClick(e, friend)}>
+                                            <img className='w-6 h-6'
+                                                src={require('../../../assets/icons/menu.png')}
+                                                alt=""
+                                            />
+                                        </div>                                        
+                                    )}
+                                </>
+                                
                             ) : (
                                 <div className='flex items-center'>
                                     {requestUser?.some((user) => user?._id === friend?._id) ? (

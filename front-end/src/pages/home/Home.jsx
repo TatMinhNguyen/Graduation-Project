@@ -13,7 +13,6 @@ const Home = () => {
   const profile = useSelector((state) => state?.auth?.profile)
 
   const [showModal, setShowModal] = useState(false)
-  // const [profile, setProfile] = useState({})
 
   // eslint-disable-next-line
   const [params, setParams] = useState({
@@ -111,7 +110,7 @@ const Home = () => {
             </div>
             <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
               <p className='text-lg font-bold py-2'>
-                Friends
+                Friends's
               </p>
             </div>
           </div>
