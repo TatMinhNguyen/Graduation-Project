@@ -4,6 +4,10 @@ const INIT =  {
     login:{
         currentUser: null,
     },
+    user: {
+      email: '',
+      password : ''
+    },
     verificationCode: null,
     profile:{},
     profileDiff: {}
@@ -38,6 +42,18 @@ const auth = createSlice({
       },
       clearVerificationCode: (state) => {
         state.verificationCode = null
+      },
+      setEmail : (state, action) => {
+        state.user.email = action.payload;
+        return state;
+      },
+      setPassword : (state, action) => {
+        state.user.password = action.payload;
+        return state;
+      },
+      clearUser : (state) => {
+        state.user.email = '';
+        state.user.password = ''
       }
     },
 })
@@ -49,7 +65,10 @@ export const {
     clearVerificationCode,
     setProfile,
     setProfileDiff,
-    clearProfile
+    clearProfile,
+    setEmail,
+    setPassword,
+    clearUser,
   } = auth.actions
   
 export default auth.reducer

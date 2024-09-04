@@ -1,22 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getMyProfile } from '../../api/profile/profile';
 import { useDispatch, useSelector } from 'react-redux';
+import { logOut } from '../../api/auth/auth';
+import ChangePassword from '../changeProfile/ChangePassword';
 
 const NavBar = ({user}) => {
     const profile = useSelector((state) => state?.auth?.profile)
 
+    const location = useLocation();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showChangePassword, setShowChangePassword] = useState(false)
+
     const navigation = useNavigate();
     const dispatch = useDispatch();
 
     const avatarRef = useRef(null);
+
+    const handleShowChangePassword = () => {
+        setShowChangePassword(true)
+        setIsModalOpen(false)
+    }
 
     const handleGetProfile = async () => {
         try {
             await getMyProfile(user?.token, dispatch)
         } catch (error) {
           console.error('Errors:', error);
+        }
+    }
+
+    const handleLogOut = async() => {
+        try {
+            await logOut(user?.token, dispatch, navigation)
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -42,6 +61,19 @@ const NavBar = ({user}) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
       }, [isModalOpen]);
+
+    useEffect(() => {
+        if (showChangePassword) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+  
+        // Cleanup khi component bị unmount
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [showChangePassword]);
 
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
@@ -77,28 +109,45 @@ const NavBar = ({user}) => {
         <div className='w-1/3 flex items-center'>
             <div className='flex-1'></div>  {/* Đây là phần tử đệm để đẩy các phần tử khác sang phải */}
             <div className='mr-5 flex items-center'>
-                <div className='h-10 w-10 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'
+                <div className={`h-10 w-10 ${location.pathname === `/` ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'}  flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
                         onClick={() => navigation('/')}
                 >
-                    <img className='h-6'
-                        src={require("../../assets/icons/home-black.png")}
-                        alt="" 
-                    />
+                    {location.pathname === `/` ? 
+                    (
+                        <img className='h-6'
+                            src={require("../../assets/icons/home-blue.png")}
+                            alt="" 
+                        />
+                    ) : (
+                        <img className='h-6'
+                            src={require("../../assets/icons/home-black.png")}
+                            alt="" 
+                        />
+                    )}
+
+                </div>
+                <div className={`h-10 w-10 ${location.pathname === `/messenger` ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'} flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
+                    onClick={() => navigation('/messenger')}
+                >
+                    {location.pathname === `/messenger` ? (
+                        <img className='h-6'
+                            src={require("../../assets/icons/messenger-blue.png")}
+                            alt="" 
+                        />
+                    ) : (
+                        <img className='h-6'
+                            src={require("../../assets/icons/messenger-black.png")}
+                            alt="" 
+                        />
+                    )}
                 </div>
                 <div className='h-10 w-10 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'>
                     <img className='h-6'
-                        src={require("../../assets/icons/messenger-black.png")}
-                        alt="" 
-                    />
-                </div>
-                <div className='h-10 w-10 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'>
-                    <img className='h-6'
-                        src={require("../../assets/icons/notification.png")}
+                        src={require("../../assets/icons/notification-black.png")}
                         alt="" 
                     />
                 </div>
                 <div className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'
-                    // onClick={() => navigation(`/get-profile/${user?.userId}`)}
                     onClick={() => setIsModalOpen(true)}
                 >
                     <img className='h-full w-full object-cover rounded-full hover:opacity-90'
@@ -136,7 +185,7 @@ const NavBar = ({user}) => {
                         </div>
                         <button
                             className='flex w-full px-2 py-1.5 text-left text-black hover:bg-gray-100 flex-1 flex items-center rounded-md mb-1'
-                            // onClick={() => navigate('/change-password')}
+                            onClick={handleShowChangePassword}
                         >
                             <div className='p-1.5 bg-gray-200 rounded-full mr-2'>
                                 <img
@@ -149,10 +198,7 @@ const NavBar = ({user}) => {
                         </button>
                         <button
                             className='flex w-full px-2 py-1.5 text-left text-black hover:bg-gray-100 flex-1 flex items-center rounded-md'
-                            onClick={() => {
-                                // Handle logout logic here
-                                console.log("Logout");
-                            }}>
+                            onClick={handleLogOut}>
                             <div className=' mr-2 p-2 bg-gray-200 rounded-full'>
                                 <img
                                     src={require('../../assets/icons/logout.png')}
@@ -164,7 +210,12 @@ const NavBar = ({user}) => {
                         </button>
                     </div>
                 )}
-
+                {showChangePassword && (
+                    <ChangePassword
+                        user={user}
+                        isCloseModal = {() => setShowChangePassword(false)}
+                    />
+                )}
           </div>
 
         </div>

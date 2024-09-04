@@ -11,6 +11,7 @@ import GetAPost from './pages/home/getAPost/GetAPost';
 import Profile from './pages/profile/Profile';
 import UserPosts from './pages/profile/userPosts/UserPosts';
 import Friends from './pages/friends/Friends';
+import Messenger from './pages/messenger/Messenger';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path='' element={<UserPosts />} />
           <Route path='friends' element={<Friends />} />
         </Route>
+        <Route path='/messenger' element = {<Messenger/>}/>
       </Routes>
     </Router>
   );

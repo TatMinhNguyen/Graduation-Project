@@ -5,9 +5,6 @@ const feelSchema = new mongoose.Schema(
         postId: {
             type: String,
         },
-        commentId: {
-            type: String,
-        },
         userId: {
             type: String,
             required: true

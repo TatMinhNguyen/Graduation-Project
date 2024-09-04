@@ -1,23 +1,30 @@
 import React, { useState } from 'react'
 
 import { Link, useNavigate, } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from '../../api/auth/auth';
 
 function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const currentEmail = useSelector((state) => state.auth.user.email)
+    const currentPassword = useSelector((state) => state.auth.user.password)
+
+    const [email, setEmail] = useState(currentEmail);
+    const [password, setPassword] = useState(currentPassword);
+
+    const [isEmailFocused, setIsEmailFocused] = useState(false);
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogin = async(e) => {
         e.preventDefault();
         try {
-            const user = {
+            const newUser = {
                 email : email,
                 password : password
             }
-            await loginUser(user, dispatch, navigate)
+            await loginUser(newUser, dispatch, navigate)
         } catch (error) {
             console.log(error)
         }
@@ -39,27 +46,47 @@ function Login() {
                             </h1>
                         </div>
                         <form className="p-4 px-[14vh]" on onSubmit={handleLogin}>
-                            <div className="mb-4 mt-[2vh]">
+                            <div className="relative mb-4 mt-[2vh]">
                                 <input
                                     type="text"
                                     id="email"
                                     name="email"
-                                    placeholder="Enter your email" 
+                                    placeholder=" "
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                    onFocus={() => setIsEmailFocused(true)}
+                                    onBlur={() => setIsEmailFocused(email !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
+                                <label
+                                    htmlFor="email"
+                                    className={`absolute left-3 transition-all ${
+                                    isEmailFocused || email !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-gray-500`}
+                                >
+                                    Enter your email
+                                </label>
                             </div>
-                            <div className="mb-[5vh]">
+                            <div className="relative mb-[5vh]">
                                 <input
                                     type="password"
                                     id="password"
                                     name="password"
-                                    placeholder="Enter your password"
+                                    placeholder=""
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                    onFocus={() => setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(password !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                                 />
+                                <label
+                                    htmlFor="password"
+                                    className={`absolute left-3 transition-all ${
+                                    isPasswordFocused || password !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-gray-500`}
+                                >
+                                    Enter your password
+                                </label>
                             </div>
                             <div className='flex-1 flex items-center justify-center'>
                                 <button type="submit" 

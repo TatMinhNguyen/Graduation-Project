@@ -3,11 +3,17 @@ import { useDispatch } from 'react-redux';
 
 import { Link, useNavigate, } from "react-router-dom";
 import { registerUser } from '../../api/auth/auth';
+import { setEmail, setPassword } from '../../redux/authSlice';
 
 const Register = () => {
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setCurrentEmail] = useState('');
+    const [password, setCurrentPassword] = useState('');
+
+    const [isEmailFocused, setIsEmailFocused] = useState(false);
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+    const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -20,6 +26,8 @@ const Register = () => {
                 password : password
             }
             await registerUser(newUser, dispatch, navigate)
+            dispatch(setEmail(newUser.email));
+            dispatch(setPassword(newUser.password));
         } catch (error) {
             console.log(error)
         }
@@ -42,38 +50,68 @@ const Register = () => {
                         </h1>
                     </div>
                     <form className="p-4 px-[14vh]" onSubmit={handleRegister}>
-                        <div className="mb-5 mt-[2vh]">
+                        <div className="relative mb-5 mt-[2vh]">
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
-                                placeholder="Enter your username" 
+                                placeholder="" 
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                onFocus={() => setIsUsernameFocused(true)}
+                                onBlur={() => setIsUsernameFocused(username !== "")}
+                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
+                            <label
+                                htmlFor="username"
+                                className={`absolute left-3 transition-all ${
+                                isUsernameFocused || username !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                } text-gray-500`}
+                            >
+                                Enter your username
+                            </label>                            
                         </div>
-                        <div className="mb-5 mt-[2vh]">
+                        <div className="relative mb-4 mt-[2vh]">
                             <input
                                 type="text"
                                 id="email"
                                 name="email"
-                                placeholder="Enter your email" 
+                                placeholder=" "
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                onChange={(e) => setCurrentEmail(e.target.value)}
+                                onFocus={() => setIsEmailFocused(true)}
+                                onBlur={() => setIsEmailFocused(email !== "")}
+                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
+                            <label
+                                htmlFor="email"
+                                className={`absolute left-3 transition-all ${
+                                isEmailFocused || email !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                } text-gray-500`}
+                            >
+                                Enter your email
+                            </label>
                         </div>
-                        <div className="mb-[5vh]">
+                        <div className="relative mb-[5vh]">
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
-                                placeholder="Enter your password"
+                                placeholder=""
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                onFocus={() => setIsPasswordFocused(true)}
+                                onBlur={() => setIsPasswordFocused(password !== "")}
+                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
                             />
+                            <label
+                                htmlFor="password"
+                                className={`absolute left-3 transition-all ${
+                                isPasswordFocused || password !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                } text-gray-500`}
+                            >
+                                Enter your password
+                            </label>
                         </div>
                         <div className='flex-1 flex items-center justify-center mb-6'>
                             <p className='text-center text-gray-500 text-sm'>
