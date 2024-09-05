@@ -29,6 +29,16 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const navigation = useNavigate();
     const dispatch = useDispatch();
 
+    const [hoveredPostId, setHoveredPostId] = useState(null);
+
+    const handleMouseEnter = (postId) => {
+        setHoveredPostId(postId);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredPostId(null);
+    };
+
     const handleThreeDotsClick = (event, post) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
@@ -320,27 +330,107 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                 </p>
                             </div> 
                         </div>
-                        <div className='flex-1 flex border-t border-gray-300 py-2 mx-3.5'>
-                            <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
-                                <img className='h-6 w-6 ml-2'
-                                    src={require("../../assets/icons/like.png")}
-                                    alt=''
-                                />
-                                <p className='text-gray-500 font-normal text-base ml-2 mr-12'>
-                                    Like
-                                </p>
+                        <div className='relative'>
+                            {/* Các nút hành động */}
+                            <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>
+                                <div
+                                    className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100`}
+                                    onMouseEnter={() => handleMouseEnter(post?.postId)}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    {post?.is_feel === '1' ? (
+                                        <div className='w-full flex items-center justify-center py-1'>
+                                            <img className='h-6 w-6 ml-2'
+                                                src={require("../../assets/icons/like-blue.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-customBlue font-normal text-base ml-2 mr-12'>
+                                                Like
+                                            </p>
+                                        </div>
+                                    ) : post?.is_feel === '2' ? (
+                                        <div className='w-full flex items-center justify-center py-1'>
+                                            <img className='h-6 w-6 ml-2'
+                                                src={require("../../assets/icons/love.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-red-500 font-normal text-base ml-2 mr-12'>
+                                                Love
+                                            </p>
+                                        </div>
+                                    ) : post?.is_feel === '3' ? (
+                                        <div className='w-full flex items-center justify-center py-1'>
+                                            <img className='h-6 w-6 ml-2'
+                                                src={require("../../assets/icons/haha.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
+                                                Haha
+                                            </p>
+                                        </div>
+                                    ) : post?.is_feel === '4' ? (
+                                        <div className='w-full flex items-center justify-center py-1'>
+                                            <img className='h-6 w-6 ml-2'
+                                                src={require("../../assets/icons/sad.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
+                                                Sad
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className='w-full flex items-center justify-center py-1'>
+                                            <img className='h-6 w-6 ml-2'
+                                                src={require("../../assets/icons/like.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-gray-500 font-normal text-base ml-2 mr-12'>
+                                                Like
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Nút comment */}
+                                <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100'
+                                    onClick={() => handleGetAPost(post?.postId)}
+                                >
+                                    <img className='h-5 w-5 ml-2'
+                                        src={require("../../assets/icons/comment.png")}
+                                        alt=''
+                                    />
+                                    <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
+                                        Comment
+                                    </p>
+                                </div>
                             </div>
-                            <div className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer`}
-                                onClick={() => handleGetAPost(post?.postId)}
-                            >
-                                <img className='h-5 w-5 ml-2'
-                                    src={require("../../assets/icons/comment.png")}
-                                    alt=''
-                                />
-                                <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
-                                    Comment
-                                </p>
-                            </div>                          
+
+                            {/* Modal hiển thị cảm xúc khi hover */}
+                            {hoveredPostId === post?.postId && (
+                                <div className='absolute bottom-full -mb-2 left-16 p-1 bg-white shadow-lg rounded-md z-10'
+                                    onMouseEnter={() => handleMouseEnter(post?.postId)}  
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <div className='flex justify-between'>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                            <img className='h-6 w-6' src={require("../../assets/icons/like-blue.png")} alt='Like' />
+                                            <p className='text-customBlue text-xs'>Like</p>
+                                        </div>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                            <img className='h-6 w-6' src={require("../../assets/icons/love.png")} alt='Love' />
+                                            <p className='text-red-500 text-xs'>Love</p>
+                                        </div>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                            <img className='h-6 w-6' src={require("../../assets/icons/haha.png")} alt='Haha' />
+                                            <p className='text-orange-400 text-xs'>Haha</p>
+                                        </div>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                            <img className='h-6 w-6' src={require("../../assets/icons/sad.png")} alt='Sad' />
+                                            <p className='text-orange-400 text-xs'>Sad</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -8,7 +8,7 @@ const feelController = {
     setFell: async (req, res) => {
         try {
             const userId = req.user.id;
-            const { postId, commentId, type } = req.body;
+            const { postId, type } = req.body;
 
             const user = await UserModel.findById(userId);
 
@@ -16,71 +16,129 @@ const feelController = {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            let target = null;
+            const post = await PostModel.findById(postId);
 
-            if (postId) {
-                target = await PostModel.findById(postId);
-
-                if (!target) {
-                    return res.status(404).json({ error: "Post not found" });
-                }
-            } else if (commentId) {
-                target = await CommentModel.findById(commentId);
-
-                if (!target) {
-                    return res.status(404).json({ error: "Comment not found" });
-                }
-            } else {
-                return res.status(400).json({ error: "postId or commentId must be provided" });
+            if(!post){
+                return res.status(404).json({ error: "Post not found" });
             }
+            
+            const newFelt = new FeelModel({
+                userId: userId,
+                postId: postId,
+                type: type
+            })
 
-            // Check if the user has already felt the post or comment
-            let existingFeel;
-            if (postId) {
-                existingFeel = await FeelModel.findOne({ userId, postId });
-            } else if (commentId) {
-                existingFeel = await FeelModel.findOne({ userId, commentId });
-            }
+            post.felt = post.felt + 1;
 
-            if (existingFeel) {
-                // User has already felt this post or comment, update the type
-                existingFeel.type = type;
-                await existingFeel.save();
-            } else {
-                // Increment the felt count
-                target.felt = (target.felt || 0) + 1;
-                await target.save();
+            await newFelt.save();
+            await post.save();
 
-                // Create a new feel record
-                const newFellData = {
-                    userId: userId,
-                    type: type,
-                };
-
-                if (postId) {
-                    newFellData.postId = postId;
-                } else if (commentId) {
-                    newFellData.commentId = commentId;
-                }
-
-                const newFell = new FeelModel(newFellData);
-                await newFell.save();
-            }
-
-            const result = {
-                author: {
-                    authorId: user.id,
-                    authorName: user.username,
-                    authorAvatar: user.profilePicture
-                },
-                newFell
-            };
-
-            return res.status(200).json(result);
+            return res.status(200).json({message: 'Success!'});
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
-    }
+    },
+
+    unFelt: async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const { postId } = req.params;
+    
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+    
+            const post = await PostModel.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+    
+            // Tìm xem người dùng đã like bài viết này chưa
+            const felt = await FeelModel.findOne({ userId: userId, postId: postId });
+            if (!felt) {
+                return res.status(400).json({ error: "You haven't liked this post yet" });
+            }
+    
+            // Xóa lượt like và cập nhật số lượng likes của bài viết
+            await FeelModel.deleteOne({ _id: felt._id });
+            post.felt = post.felt - 1;
+    
+            await post.save();
+    
+            return res.status(200).json({ message: 'Post unliked successfully!' });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    updateFelt: async(req, res) =>{
+        try {
+            const userId = req.user.id;
+            const { postId } = req.params; // Lấy postId từ params
+            const { type } = req.body; // Lấy type mới từ body
+    
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+    
+            const post = await PostModel.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+    
+            // Tìm xem lượt feel đã tồn tại chưa
+            const felt = await FeelModel.findOne({ userId: userId, postId: postId });
+            if (!felt) {
+                return res.status(400).json({ error: "You haven't felt this post yet" });
+            }
+    
+            // Cập nhật type cho feel
+            felt.type = type;
+    
+            await felt.save(); // Lưu lại cảm xúc đã cập nhật
+    
+            return res.status(200).json({ message: 'Feel updated successfully!' });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    getFelt: async(req, res) => {
+        try {
+            const postId = req.params.postId;
+
+            const feels = await FeelModel.find({ postId: postId})
+
+            if(!feels) {
+                return res.status(404).json({ error: "Feel not found" })
+            }
+
+            const userPromises = feels.map(feels => UserModel.findById(feels.userId));
+
+            const users = await Promise.all(userPromises);
+
+            const results = feels.map((feel, index) => {
+                const user = users[index];
+                return {
+                    feelId: feel._id,
+                    postId: feel.postId,
+                    type: feel.type,
+                    createdAt: feel.createdAt,
+                    author: {
+                        authorId: user._id,
+                        authorName: user.username,
+                        authorAvatar: user.profilePicture
+                    }
+                };
+            });
+
+            return res.status(200).json(results)
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
 }
 
 module.exports = feelController

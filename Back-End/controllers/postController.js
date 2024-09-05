@@ -1,3 +1,4 @@
+const FeelModel = require("../models/FeelModel");
 const PostModel = require("../models/PostModel")
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
@@ -232,6 +233,8 @@ const postController = {
     //Get all post
     getPosts: async (req, res) => {
         try {
+            const userId = req.user.id;
+
             // Tìm tất cả các bài viết
             const posts = res.paginatedResults.results;
 
@@ -241,8 +244,15 @@ const postController = {
             // Chờ tất cả các lời hứa hoàn thành
             const users = await Promise.all(userPromises);
 
+            // Tạo một mảng các lời hứa để lấy thông tin cảm xúc của userId đối với từng post
+            const feelPromises = posts.map(post => FeelModel.findOne({ userId: userId, postId: post._id }));
+
+            // Chờ tất cả các lời hứa hoàn thành
+            const feels = await Promise.all(feelPromises);
+
             const results = posts.map((post, index) => {
                 const user = users[index];
+                const feel = feels[index];
                 return {
                     postId: post._id,
                     description: post.description,
@@ -252,6 +262,7 @@ const postController = {
                     felt: post.felt,
                     typeText: post.typeText,
                     createdAt: post.createdAt,
+                    is_feel: feel ? feel.type : -1,
                     author: {
                         authorId: user._id,
                         authorName: user.username,

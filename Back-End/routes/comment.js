@@ -30,4 +30,10 @@ router.get(
 
 router.post("/set-feel", middleware.verifyToken, feelController.setFell)
 
+router.get("/get-feel/:postId", middleware.verifyToken, feelController.getFelt)
+
+router.delete("/delete-feel/:postId", middleware.verifyToken, feelController.unFelt)
+
+router.post("/update-feel/:postId", middleware.verifyToken, feelController.updateFelt)
+
 module.exports = router;
