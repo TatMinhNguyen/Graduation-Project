@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { deletePost, getAllPosts } from '../../api/post/post'
 import { useDispatch } from 'react-redux'
 import EditPost from './EditPost'
+import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
 
 const GetAllPosts = ({user, posts, params, profile}) => {
     const [showModal, setShowModal] = useState(null);
@@ -38,6 +39,40 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const handleMouseLeave = () => {
         setHoveredPostId(null);
     };
+
+    const handleLike = async(postId, type) => {
+        try {
+            const data = {
+                postId: postId,
+                type: type
+            }
+            await setFelt(user?.token, data)
+            await getAllPosts(user?.token, dispatch, params)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleUnLike = async (postId) => {
+        try {
+            await unFelt(user?.token, postId)
+            await getAllPosts(user?.token, dispatch, params)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleUpdateFelt = async(postId, type) => {
+        try {
+            const data = {
+                type: type
+            } 
+            await updateFelt(user?.token, data, postId) 
+            await getAllPosts(user?.token, dispatch, params)         
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleThreeDotsClick = (event, post) => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -339,7 +374,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     {post?.is_feel === '1' ? (
-                                        <div className='w-full flex items-center justify-center py-1'>
+                                        <div className='w-full flex items-center justify-center py-1'
+                                            onClick={() => handleUnLike(post?.postId)}
+                                        >
                                             <img className='h-6 w-6 ml-2'
                                                 src={require("../../assets/icons/like-blue.png")}
                                                 alt=''
@@ -349,7 +386,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             </p>
                                         </div>
                                     ) : post?.is_feel === '2' ? (
-                                        <div className='w-full flex items-center justify-center py-1'>
+                                        <div className='w-full flex items-center justify-center py-1'
+                                            onClick={() => handleUnLike(post?.postId)}
+                                        >
                                             <img className='h-6 w-6 ml-2'
                                                 src={require("../../assets/icons/love.png")}
                                                 alt=''
@@ -359,7 +398,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             </p>
                                         </div>
                                     ) : post?.is_feel === '3' ? (
-                                        <div className='w-full flex items-center justify-center py-1'>
+                                        <div className='w-full flex items-center justify-center py-1'
+                                            onClick={() => handleUnLike(post?.postId)}
+                                        >
                                             <img className='h-6 w-6 ml-2'
                                                 src={require("../../assets/icons/haha.png")}
                                                 alt=''
@@ -369,7 +410,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             </p>
                                         </div>
                                     ) : post?.is_feel === '4' ? (
-                                        <div className='w-full flex items-center justify-center py-1'>
+                                        <div className='w-full flex items-center justify-center py-1'
+                                            onClick={() => handleUnLike(post?.postId)}
+                                        >
                                             <img className='h-6 w-6 ml-2'
                                                 src={require("../../assets/icons/sad.png")}
                                                 alt=''
@@ -379,7 +422,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className='w-full flex items-center justify-center py-1'>
+                                        <div className='w-full flex items-center justify-center py-1'
+                                            onClick={() => handleLike(post?.postId, '1')}
+                                        >
                                             <img className='h-6 w-6 ml-2'
                                                 src={require("../../assets/icons/like.png")}
                                                 alt=''
@@ -408,23 +453,40 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                             {/* Modal hiển thị cảm xúc khi hover */}
                             {hoveredPostId === post?.postId && (
                                 <div className='absolute bottom-full -mb-2 left-16 p-1 bg-white shadow-lg rounded-md z-10'
+                                    onClick={()=> setHoveredPostId(null)}
                                     onMouseEnter={() => handleMouseEnter(post?.postId)}  
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     <div className='flex justify-between'>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                            onClick={() => post?.is_feel === -1 
+                                                ? handleLike(post?.postId, '1') 
+                                                : handleUpdateFelt(post?.postId, '1')}
+                                        >
                                             <img className='h-6 w-6' src={require("../../assets/icons/like-blue.png")} alt='Like' />
                                             <p className='text-customBlue text-xs'>Like</p>
                                         </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                            onClick={() => post?.is_feel === -1 
+                                                ? handleLike(post?.postId, '2') 
+                                                : handleUpdateFelt(post?.postId, '2')}
+                                        >
                                             <img className='h-6 w-6' src={require("../../assets/icons/love.png")} alt='Love' />
                                             <p className='text-red-500 text-xs'>Love</p>
                                         </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                            onClick={() => post?.is_feel === -1 
+                                                ? handleLike(post?.postId, '3') 
+                                                : handleUpdateFelt(post?.postId, '3')}
+                                        >
                                             <img className='h-6 w-6' src={require("../../assets/icons/haha.png")} alt='Haha' />
                                             <p className='text-orange-400 text-xs'>Haha</p>
                                         </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'>
+                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                            onClick={() => post?.is_feel === -1 
+                                                ? handleLike(post?.postId, '4') 
+                                                : handleUpdateFelt(post?.postId, '4')}
+                                        >
                                             <img className='h-6 w-6' src={require("../../assets/icons/sad.png")} alt='Sad' />
                                             <p className='text-orange-400 text-xs'>Sad</p>
                                         </div>
