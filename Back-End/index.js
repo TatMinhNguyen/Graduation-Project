@@ -12,6 +12,7 @@ const userRoute = require("./routes/user");
 const friendRoute = require("./routes/friend");
 const postRoute = require('./routes/post');
 const commentRoute = require("./routes/comment"); 
+const searchRoute = require('./routes/search');
 
 const path = require("path");
 const imagekit = require("./utils/imagekitConfig");
@@ -37,6 +38,7 @@ app.use("/api/user", userRoute);
 app.use("/api/friend", friendRoute);
 app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute)
+app.use('/api/search', searchRoute)
 
 app.listen(8000, () => {
     console.log("Server is running");

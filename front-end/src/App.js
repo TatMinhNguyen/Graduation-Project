@@ -12,6 +12,7 @@ import Profile from './pages/profile/Profile';
 import UserPosts from './pages/profile/userPosts/UserPosts';
 import Friends from './pages/friends/Friends';
 import Messenger from './pages/messenger/Messenger';
+import Search from './pages/search/Search';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path='friends' element={<Friends />} />
         </Route>
         <Route path='/messenger' element = {<Messenger/>}/>
+        <Route path="/search" element={<Search />} />
       </Routes>
     </Router>
   );
