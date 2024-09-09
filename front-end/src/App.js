@@ -13,6 +13,8 @@ import UserPosts from './pages/profile/userPosts/UserPosts';
 import Friends from './pages/friends/Friends';
 import Messenger from './pages/messenger/Messenger';
 import Search from './pages/search/Search';
+import SearchPosts from './components/search/SearchPosts';
+import SearchUsers from './components/search/SearchUsers';
 
 
 function App() {
@@ -31,7 +33,10 @@ function App() {
           <Route path='friends' element={<Friends />} />
         </Route>
         <Route path='/messenger' element = {<Messenger/>}/>
-        <Route path="/search" element={<Search />} />
+        <Route path="/search" element={<Search />} >
+          <Route path='posts' element={<SearchPosts/>}/>
+          <Route path='users' element={<SearchUsers/>}/>
+        </Route>
       </Routes>
     </Router>
   );

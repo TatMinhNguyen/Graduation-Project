@@ -23,7 +23,7 @@ const NavBar = ({user}) => {
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchInput.trim() !== "") {
-            navigation(`/search?q=${searchInput}`); // Điều hướng đến trang tìm kiếm với query parameter
+            navigation(`/search/posts?q=${searchInput}`); // Điều hướng đến trang tìm kiếm với query parameter
         }
     }
 

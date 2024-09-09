@@ -147,7 +147,7 @@ const GetAPost = () => {
                 className='w-5 h-5'
             />
         </div>
-        <div className="h-full w-1/2 bg-white shadow z-50 ">
+        <div className="h-full w-1/2 bg-white shadow z-50 min-h-screen">
             <div className='py-2 h-[calc(100%)] p-0 '>
                 <div>
                     <div className='flex-1 flex items-center mx-3 mb-2'>

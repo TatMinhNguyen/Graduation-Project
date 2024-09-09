@@ -140,7 +140,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
         setShowModal(null)
         setEditModal(true)
         setSelectedPost(post)
-      }
+    }
 
     const handleGetAPost = async(postId) => {
         navigation(`/get-post/${postId}`)
@@ -266,9 +266,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                         )}
                     </div>
 
-                    <div  className='cursor-pointer'
-                        // onClick={() => handleGetAPost(post?.postId)}
-                    >
+                    <div  className='cursor-pointer'>
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
                                 {post?.description ? (
