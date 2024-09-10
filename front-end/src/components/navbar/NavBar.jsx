@@ -23,7 +23,12 @@ const NavBar = ({user}) => {
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchInput.trim() !== "") {
-            navigation(`/search/posts?q=${searchInput}`); // Điều hướng đến trang tìm kiếm với query parameter
+            if(location.pathname === `/search/users`) {
+                navigation(`/search/users?q=${searchInput}`);
+            }
+            else {
+                navigation(`/search/posts?q=${searchInput}`);
+            }
         }
     }
 
@@ -96,7 +101,7 @@ const NavBar = ({user}) => {
             </h1>
         </div>
         <div className='w-1/3'>
-            <form className='flex-1 flex items-center p-0.5 pb-0 pl-2 mt-1.5 bg-gray-100 mx-auto rounded-3xl'
+            <form className='flex-1 flex items-center p-1 pb-0.5 pl-2 mt-1.5 bg-gray-100 mx-auto rounded-3xl'
                     onSubmit={handleSearch}
             >
                 <button>
@@ -112,8 +117,8 @@ const NavBar = ({user}) => {
                     placeholder='Search to Lionelsocial . . .'
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className='flex-grow w-full pl-4 pr-1 py-2 rounded-3xl bg-gray-100 overflow-hidden
-                                focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100 bg-gray-100'
+                    className='flex-grow w-full pl-4 pr-1 py-1.5 rounded-3xl bg-gray-100 overflow-hidden
+                                focus:outline-none'
                 />
             </form>
         </div>

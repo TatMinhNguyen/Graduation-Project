@@ -19,7 +19,7 @@ const searchController =  {
     
             // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
             const users = await UserModel.find(
-                { username: { $regex: searchRegex }, isVerify: true },
+                { username: { $regex: searchRegex }, isVerify: true, _id: { $nin: userId }, },
                 { 
                     _id: 1, 
                     username: 1, 
@@ -68,7 +68,7 @@ const searchController =  {
             const userResults = users.map(user => {
                 const mutualFriends = user.friends.filter(friendId => friends.includes(friendId));
                 return {
-                    _id: user._id,
+                    userId: user._id,
                     username: user.username,
                     profilePicture: user.profilePicture,
                     friendsCount: user.friendsCount,
