@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { deletePost } from '../../api/post/post'
 import { SixPictures } from '../CssPictures/SixPictures'
@@ -15,10 +15,25 @@ import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer2 } from '../CssPictures/VideoPlayer2'
 import VideoPlayer from '../CssPictures/VideoPlayer'
 import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
+import { search } from '../../api/search/search'
+import EditPost from '../post/EditPost'
 
 const SearchPosts = () => {
     const searchPosts = useSelector((state) => state.search.posts)
     const user = useSelector((state) => state.auth.login?.currentUser)
+    const profile = useSelector((state) => state?.auth?.profile)
+
+    const searchQuery = useOutletContext()
+    const params = {
+        q: searchQuery
+    }
+
+    const limit = {
+        page: 1,
+        limit: 10,   
+    }
+
+    const dispatch = useDispatch()
 
     const [showModal, setShowModal] = useState(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
@@ -42,7 +57,7 @@ const SearchPosts = () => {
     const handleUnLike = async (postId) => {
         try {
             await unFelt(user?.token, postId)
-            // await getAllPosts(user?.token, dispatch, params)
+            await search(user?.token, params, dispatch);
         } catch (error) {
             console.log(error)
         }
@@ -54,7 +69,7 @@ const SearchPosts = () => {
                 type: type
             } 
             await updateFelt(user?.token, data, postId) 
-            // await getAllPosts(user?.token, dispatch, params)         
+            await search(user?.token, params, dispatch);         
         } catch (error) {
             console.log(error)
         }
@@ -67,7 +82,7 @@ const SearchPosts = () => {
                 type: type
             }
             await setFelt(user?.token, data)
-            // await getAllPosts(user?.token, dispatch, params)
+            await search(user?.token, params, dispatch);
         } catch (error) {
             console.log(error)
         }
@@ -135,7 +150,7 @@ const SearchPosts = () => {
             setSelectedPost(null)
 
             await deletePost(user?.token, postId)
-            // await getAllPosts(user?.token, dispatch, params)
+            await search(user?.token, params, dispatch);
         } catch (error) {
             console.log(error)
         }
@@ -252,9 +267,9 @@ const SearchPosts = () => {
                                                 </div>
                                             </div>
                                         )}
-                                        {/* {editModal && selectedPost?.postId === post?.postId && (
+                                        {editModal && selectedPost?.postId === post?.postId && (
                                             <EditPost
-                                                params = {params}
+                                                params = {limit}
                                                 user = {user}
                                                 profile = {profile}
                                                 postId = {selectedPost?.postId}
@@ -264,7 +279,7 @@ const SearchPosts = () => {
                                                 oldTypeText = {selectedPost?.typeText}
                                                 isCloseModal = {() => setEditModal(false)}
                                             />
-                                        )} */}
+                                        )}
                                     </div>
                                     <div  className='cursor-pointer'>
                                         {post?.typeText === false ?(

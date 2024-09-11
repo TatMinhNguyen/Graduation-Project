@@ -15,7 +15,7 @@ const searchController =  {
             const searchRegex = new RegExp(escapedSearchInput, 'i'); // 'i' để không phân biệt chữ hoa/thường
     
             // Tìm tất cả các bài viết có description khớp với từ khóa tìm kiếm
-            const posts = await PostModel.find({ description: { $regex: searchRegex } });
+            const posts = await PostModel.find({ description: { $regex: searchRegex } }).sort({ createdAt: -1 });
     
             // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
             const users = await UserModel.find(
@@ -28,7 +28,7 @@ const searchController =  {
                     friendsCount: 1, 
                     isVerify: 1
                 }
-            );
+            ).sort({ createdAt: -1 });
 
             // Lấy danh sách bạn bè của người dùng đang đăng nhập
             const currentUser = await UserModel.findById(userId);
