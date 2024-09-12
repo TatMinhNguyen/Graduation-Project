@@ -12,9 +12,10 @@ import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useDispatch } from 'react-redux'
-import { getAllPosts, updatePost } from '../../api/post/post'
+import { getAllPosts, getUserPost, updatePost } from '../../api/post/post'
+import { search } from '../../api/search/search'
 
-const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId}) => {
+const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId, searchQuery}) => {
     const textareaRef = useRef(null);
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -122,10 +123,23 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             await updatePost(user?.token, formData, postId)
 
             await getAllPosts(user?.token, dispatch, params)
+            fetchSearchResults();
+            await getUserPost(user?.token, user?.userId, dispatch)
         } catch (error) {
             console.log(error)
         }
     }
+
+    const fetchSearchResults = async () => {
+        const params = {
+            q: searchQuery
+        }
+        try {
+            await search(user?.token, params, dispatch);
+        } catch (error) {
+            console.error("Error fetching search results:", error);
+        }
+    }; 
 
     const handleCloseModal = () => {
         isCloseModal()

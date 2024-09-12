@@ -57,6 +57,7 @@ const SearchPosts = () => {
     const handleUnLike = async (postId) => {
         try {
             await unFelt(user?.token, postId)
+            setHoveredPostId(null);
             await search(user?.token, params, dispatch);
         } catch (error) {
             console.log(error)
@@ -69,6 +70,7 @@ const SearchPosts = () => {
                 type: type
             } 
             await updateFelt(user?.token, data, postId) 
+            setHoveredPostId(null);
             await search(user?.token, params, dispatch);         
         } catch (error) {
             console.log(error)
@@ -82,6 +84,7 @@ const SearchPosts = () => {
                 type: type
             }
             await setFelt(user?.token, data)
+            setHoveredPostId(null);
             await search(user?.token, params, dispatch);
         } catch (error) {
             console.log(error)
@@ -272,6 +275,7 @@ const SearchPosts = () => {
                                                 params = {limit}
                                                 user = {user}
                                                 profile = {profile}
+                                                searchQuery = {searchQuery}
                                                 postId = {selectedPost?.postId}
                                                 text = {selectedPost?.description}
                                                 oldImages = {selectedPost?.images}

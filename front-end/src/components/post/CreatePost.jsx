@@ -25,7 +25,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
     const [typeText, setTypeText] = useState(true)
     const [imagePreviews, setImagePreviews] = useState([]);
     const [videoPreview, setVideoPreview] = useState(null)
-    console.log(imagePreviews)
+    // console.log(imagePreviews)
 
     const dispatch = useDispatch();
     const textareaRef = useRef(null);
@@ -227,19 +227,19 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
                         <>
                             {imagePreviews?.length > 5 ? (
                                 <SixPictures
-                                    selectedImages={imagePreviews?.map(img => img)} 
+                                    selectedImages={imagePreviews?.map(img => img.url)} 
                                     extraImagesCount={imagePreviews?.length - 4}
                                 />
                             ) : imagePreviews?.length === 5 ? (
-                                <FivePictures selectedImages={imagePreviews?.map(img => img)}/>
+                                <FivePictures selectedImages={imagePreviews?.map(img => img.url)}/>
                             ) : imagePreviews?.length === 4 ? (
-                                <FourPictures selectedImages={imagePreviews?.map(img => img)}/>
+                                <FourPictures selectedImages={imagePreviews?.map(img => img.url)}/>
                             ) : imagePreviews?.length === 3 ? (
-                                <ThreePictures selectedImages={imagePreviews?.map(img => img)}/>
+                                <ThreePictures selectedImages={imagePreviews?.map(img => img.url)}/>
                             ) : imagePreviews?.length === 2 ? (
-                                <TwoPictures selectedImages={imagePreviews?.map(img => img)}/>
+                                <TwoPictures selectedImages={imagePreviews?.map(img => img.url)}/>
                             ) : imagePreviews?.length === 1 ? (
-                                <OnePicture selectedImages={imagePreviews?.map(img => img)}/>
+                                <OnePicture selectedImages={imagePreviews?.map(img => img.url)}/>
                             ) : ('')}                        
                         </>
                         ) : (
@@ -247,23 +247,23 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
                             {imagePreviews?.length > 3 ? (
                                 <VideoPlayer5
                                     url = {videoPreview}
-                                    selectedImages = {imagePreviews?.map(img => img)}
+                                    selectedImages = {imagePreviews?.map(img => img.url)}
                                     extraImagesCount={imagePreviews?.length - 2}
                                 /> 
                             ) : imagePreviews?.length === 3 ? (
                                 <VideoPlayer4
                                     url = {videoPreview}
-                                    selectedImages = {imagePreviews?.map(img => img)}
+                                    selectedImages = {imagePreviews?.map(img => img.url)}
                                 />                                        
                             ) : imagePreviews?.length === 2 ? (
                                 <VideoPlayer3
                                     url = {videoPreview}
-                                    selectedImages = {imagePreviews?.map(img => img)}
+                                    selectedImages = {imagePreviews?.map(img => img.url)}
                                 />                                        
                             ) : imagePreviews?.length === 1 ? (
                                 <VideoPlayer2
                                     url = {videoPreview}
-                                    selectedImages = {imagePreviews?.map(img => img)}
+                                    selectedImages = {imagePreviews?.map(img => img.url)}
                                 />                                        
                             ) : (
                                 <VideoPlayer url = {videoPreview}/>

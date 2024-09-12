@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setAllPosts } from "../../redux/postSlice";
+import { setAllPosts, setUserPost } from "../../redux/postSlice";
 
 export const getAllPosts = async (token, dispatch, params) => {
     try {
@@ -29,13 +29,13 @@ export const getAPost = async (token, postId) => {
     }
 };
 
-export const getUserPost = async (token, userId) => {
+export const getUserPost = async (token, userId, dispatch) => {
     try {
         const res = await axios.get(`${apiUrl}/post/get-user-post/${userId}`, {
             headers: { token: `Bearer ${token}` },
         });
         // console.log(res.data)
-
+        dispatch(setUserPost(res.data))
         return res.data;
     } catch (error) {
         console.log(error);

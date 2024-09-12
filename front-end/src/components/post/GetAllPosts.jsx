@@ -47,6 +47,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                 type: type
             }
             await setFelt(user?.token, data)
+            setHoveredPostId(null);
             await getAllPosts(user?.token, dispatch, params)
         } catch (error) {
             console.log(error)
@@ -56,6 +57,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const handleUnLike = async (postId) => {
         try {
             await unFelt(user?.token, postId)
+            setHoveredPostId(null);
             await getAllPosts(user?.token, dispatch, params)
         } catch (error) {
             console.log(error)
@@ -68,6 +70,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                 type: type
             } 
             await updateFelt(user?.token, data, postId) 
+            setHoveredPostId(null);
             await getAllPosts(user?.token, dispatch, params)         
         } catch (error) {
             console.log(error)

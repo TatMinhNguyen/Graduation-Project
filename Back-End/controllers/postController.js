@@ -289,13 +289,16 @@ const postController = {
 
             const user = await UserModel.findById(post.userId)
 
+            const feel = await FeelModel.findOne({ userId: req.user.id, postId: post._id })
+
             const result = {
                 author: {
                     authorId: user.id,
                     authorName: user.username,
                     authorAvatar: user.profilePicture
                 },
-                post
+                post,
+                is_feel: feel ? feel.type : -1,
             }
     
             return res.status(201).json(result);
@@ -324,9 +327,16 @@ const postController = {
             
             // Chờ tất cả các lời hứa hoàn thành
             const users = await Promise.all(userPromises);
+
+            // Tạo một mảng các lời hứa để lấy thông tin cảm xúc của userId đối với từng post
+            const feelPromises = posts.map(post => FeelModel.findOne({ userId: req.user.id, postId: post._id }));
+
+            // Chờ tất cả các lời hứa hoàn thành
+            const feels = await Promise.all(feelPromises);
             
             const results = posts.map((post, index) => {
                 const user = users[index];
+                const feel = feels[index];
                 return {
                     postId: post._id,
                     description: post.description,
@@ -335,6 +345,7 @@ const postController = {
                     comment: post.comment,
                     felt: post.felt,
                     typeText: post.typeText,
+                    is_feel: feel ? feel.type : -1,
                     createdAt: post.createdAt,
                     author: {
                         authorId: user._id,
