@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import LightGallery from 'lightgallery/react';
 
 // import styles
@@ -32,8 +32,63 @@ const Profile = () => {
 
     const [friendStatus, setFriendStatus] = useState('');
 
+    const [modalUnfriend, setModalUnfriend] = useState(false)
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    const [isAbove, setIsAbove] = useState(false);
+    const [confirmationModal, setConfirmationModal] = useState(false);
+
     const navigation = useNavigate();
     const dispatch = useDispatch();
+    const modalRef = useRef(null);
+
+    const handleThreeDotsClick = (event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+    
+        if (rect.bottom < viewportHeight - 50) {
+            setIsAbove(true);
+            setModalPosition({
+                top: rect.top + window.scrollY - 60,
+                left: rect.left + window.scrollX + 20,
+            });
+        } else {
+            setIsAbove(false);
+            setModalPosition({
+                top: rect.bottom + window.scrollY + 12,
+                left: rect.left + window.scrollX + 20,
+            });
+        }
+    
+        setModalUnfriend(true);
+    };
+
+    const handleUnfriendClick = () => {
+        setConfirmationModal(true);
+        setModalUnfriend(false); // Close the options modal
+    };
+
+    const handleCancelUnfriend = () => {
+        setConfirmationModal(false);
+    };
+
+
+    const handleClickOutside = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+            setModalUnfriend(false);
+        }
+    };
+
+    useEffect(() => {
+        if (modalUnfriend) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, [modalUnfriend]);
 
     const handleShowEditAvatar = () => {
         setShowEditAvatar(true)
@@ -101,6 +156,7 @@ const Profile = () => {
         try {
             await cancelFriend(user?.token, userId);
             setFriendStatus('none');
+            setConfirmationModal(false)
         } catch (error) {
             console.log(error);
         }
@@ -276,9 +332,11 @@ const Profile = () => {
                                             </div>                                          
                                         </div> 
                                     ) : friendStatus === 'friends' ? (
-                                        <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'>
+                                        <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
+                                            onClick={handleThreeDotsClick}
+                                        >
                                             <img className='h-5 w-5 mr-1 mt-px'
-                                                src={require("../../assets/icons/friends.png")}
+                                                src={require("../../assets/icons/check.png")}
                                                 alt=''
                                             /> 
                                             <p className='font-medium text-md'>
@@ -323,6 +381,59 @@ const Profile = () => {
                             myProfile = {myProfile}
                             isCloseModal = {() => setShowEditProfile(false)}
                         />
+                    )}
+                    {modalUnfriend && (
+                        <div
+                            ref={modalRef}
+                            className='absolute bg-white border border-gray-200 rounded shadow-2xl z-10'
+                            style={{
+                                top: modalPosition.top,
+                                left: modalPosition.left,
+                            }}                        
+                        >
+                            <div className='relative'>
+                                <div
+                                    className={`absolute transform rotate-45 w-3 h-3 bg-white border-gray-300 ${
+                                        isAbove ? 'bottom-[-6px] border-b border-r' : 'top-[-6px] border-l border-t'
+                                    } left-[20px]`}>
+                                </div> 
+                                <div className=' py-2 px-1.5'>
+                                    <div className='flex hover:bg-gray-100 px-2 rounded pr-20'
+                                            onClick={() => handleUnfriendClick()}
+                                    >
+                                        <img className='w-6 h-6 mr-3 mt-1'
+                                            src={require('../../assets/icons/unfriend.png')}
+                                            alt=''
+                                        />
+                                        <p className='py-1 cursor-pointer font-base'>Unfriend </p>
+                                    </div>                                     
+                                </div>                                                             
+                            </div>
+                        </div>
+                    )}
+                    {confirmationModal && (
+                        <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
+                            <div className='w-2/5 bg-white p-4 rounded shadow-2xl border border-gray-100'>
+                                <h2 className='flex justify-center text-lg italic font-semibold mb-2 pb-2 border-b border-gray-300'>
+                                    Unfriend {information?.username}
+                                </h2>
+                                <p className='text-sm text-gray-600 mb-5'>
+                                    Are you sure you want to remove {information?.username} as your friend ?
+                                </p>
+                                <div className='flex justify-end space-x-4'>
+                                    <button 
+                                        className='bg-gray-200 px-4 py-2 rounded' 
+                                        onClick={handleCancelUnfriend}>
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        className='bg-red-600 text-white px-4 py-2 rounded' 
+                                        onClick={() => handleCancelFriend()}>
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>                       
                     )}
                 </div>
                 <div className='mt-4 flex '>

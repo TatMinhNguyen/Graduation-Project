@@ -4,6 +4,7 @@ import { convertNewlinesToBreaks, timeAgo} from '../../utils'
 import { deleteComment, editcomment, getComments } from '../../api/comment/comment';
 import { useDispatch } from 'react-redux';
 import { ImageComment } from '../CssPictures/ImageComment';
+import LoadingSpinner from '../spinner/LoadingSpinner';
 
 export const Comment = ({comments, user, authorPost, postId, profile}) => {
 
@@ -25,6 +26,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   const [imageId, setImageId] = useState('')
   // console.log(imagePreview)
   const [imageUrl, setImageUrl] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const dispatch = useDispatch();
 
@@ -83,15 +85,18 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   };
 
   const handleDeleteComment = async(commentId) => {
+    setLoading(true)
     try {
+      await deleteComment(user?.token, commentId)
+
       setConfirmModal(false)
       setSelectedComment(null)
-
-      await deleteComment(user?.token, commentId)
 
       await getComments(user?.token, dispatch, postId)
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -124,6 +129,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
 
   const handleEditComment = async(e, commentId) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const formData = new FormData();
       
@@ -137,6 +143,8 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
         formData.append('imageId', imageId)
       }
 
+      await editcomment(user?.token, formData, commentId)
+
       // setDescription('')
       setImage(null) 
       setImagePreview(null)
@@ -148,14 +156,13 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
           textareaRef.current.style.height = 'auto';
       }
 
-      await editcomment(user?.token, formData, commentId)
-
       await getComments(user?.token, dispatch, postId)
     } catch (error) {
       console.log(error)
     }finally {
       // Giải phóng các URL sau khi không cần sử dụng nữa
       URL.revokeObjectURL(imagePreview);
+      setLoading(false)
     }
   }
 
@@ -307,19 +314,26 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                         <p className='text-sm text-gray-600 mb-5'>
                             Are you sure you want to delete this comment?
                         </p>
-                        <div className='flex justify-end space-x-4'>
-                            <button 
-                                className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
-                                onClick={handleCancelDelete}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
-                                onClick={() => handleDeleteComment(selectedComment?.commentId)}>
-                                Delete
-                            </button>
-                        </div>
+                        {loading ? (
+                          <div className='flex justify-center'>
+                            <LoadingSpinner/>
+                          </div>
+                        ):(
+                          <div className='flex justify-end space-x-4'>
+                              <button 
+                                  className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
+                                  onClick={handleCancelDelete}
+                              >
+                                  Cancel
+                              </button>
+                              <button 
+                                  className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
+                                  onClick={() => handleDeleteComment(selectedComment?.commentId)}>
+                                  Delete
+                              </button>
+                          </div>
+                        )}
+
                     </div>
                 </div>
             )}
@@ -409,22 +423,30 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
                                         onChange={handleImageChange} 
                                     />                                             
                                     <div className='flex-1'></div>
-                                    {description || image ? (
-                                        <button type="submit" className="text-white" onClick={(e) => handleEditComment(e, comment?.commentId)}>
-                                            <img className='h-6 w-6 object-cover'
-                                                src={require("../../assets/icons/send-blue.png")}
-                                                alt=''
-                                            />                            
-                                        </button>                                 
-                                    ) :(
-                                        <div className="text-white">
-                                            <img className='h-6 w-6 object-cover'
-                                                src={require("../../assets/icons/send-gray.png")}
-                                                alt=''
-                                            />                            
-                                        </div>   
+                                    {loading ? (
+                                      <div>
+                                        <LoadingSpinner/>
+                                      </div>
+                                    ):(
+                                      <>
+                                        {description || image ? (
+                                            <button type="submit" className="text-white" onClick={(e) => handleEditComment(e, comment?.commentId)}>
+                                                <img className='h-6 w-6 object-cover'
+                                                    src={require("../../assets/icons/send-blue.png")}
+                                                    alt=''
+                                                />                            
+                                            </button>                                 
+                                        ) :(
+                                            <div className="text-white">
+                                                <img className='h-6 w-6 object-cover'
+                                                    src={require("../../assets/icons/send-gray.png")}
+                                                    alt=''
+                                                />                            
+                                            </div>   
+                                        )}                                      
+                                      </>
                                     )}
-                                
+                               
                                 </div>
                             </form>            
                           </div>

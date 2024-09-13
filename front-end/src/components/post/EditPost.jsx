@@ -14,6 +14,7 @@ import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useDispatch } from 'react-redux'
 import { getAllPosts, getUserPost, updatePost } from '../../api/post/post'
 import { search } from '../../api/search/search'
+import LoadingSpinner from '../spinner/LoadingSpinner'
 
 const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId, searchQuery}) => {
     const textareaRef = useRef(null);
@@ -21,6 +22,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
     const videoInputRef = useRef(null);
     const dispatch = useDispatch();
     
+    const [loading, setLoading] = useState(false);
 
     const [description, setDescription] = useState(text);
     const [images, setImages] = useState(oldImages)
@@ -92,6 +94,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
 
     const handleUpdatePost = async(e) => {
         e.preventDefault();
+        setLoading(true)
         try {
             const formData = new FormData();
       
@@ -116,17 +119,23 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             }
             formData.append('typeText', typeText);
 
+            await updatePost(user?.token, formData, postId)
+
             isCloseModal();
             setImagesId([]);
             setVideoId('');
 
-            await updatePost(user?.token, formData, postId)
-
             await getAllPosts(user?.token, dispatch, params)
             fetchSearchResults();
             await getUserPost(user?.token, user?.userId, dispatch)
+
         } catch (error) {
             console.log(error)
+        }
+        finally{
+            imagePreviews?.forEach((url) => URL.revokeObjectURL(url.url));
+            URL.revokeObjectURL(videoPreview?.url);   
+            setLoading(false)         
         }
     }
 
@@ -351,19 +360,18 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
                 </div>
             </div>
             <div className="border-t p-4">
-                {description || images.length > 0 || video ? (
-                <button  className="w-full bg-customBlue text-white py-2 px-4 rounded-lg"
-                    onClick={handleUpdatePost}
-                >
-                    Save
-                </button>
+                {loading ? (
+                    <div className="flex justify-center">
+                        <LoadingSpinner/>
+                    </div>
                 ) : (
-                <button
-                    className="w-full bg-blue-300 text-white py-2 px-4 rounded-lg"
-                    disabled
-                >
-                    Save
-                </button>
+                    <button
+                        onClick={handleUpdatePost}
+                        className={`w-full text-white py-2 px-4 rounded-lg ${description || images.length > 0 || video ? 'bg-customBlue' : 'bg-blue-300'}`}
+                        disabled={!(description || images.length > 0 || video)}
+                    >
+                        Post
+                    </button>
                 )}
             </div>
         </div>

@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { changeProfile, getMyProfile } from '../../api/profile/profile'
 import { useDispatch } from 'react-redux'
+import LoadingSpinner from '../spinner/LoadingSpinner'
 
 const ChangeProfile = ({user, isCloseModal, myProfile}) => {
     const [username, setUsername] = useState(myProfile?.username)
     const [work, setWork] = useState(myProfile?.work)
     const [address, setAddress] = useState(myProfile?.address)
+
+    const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -14,6 +17,7 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
     }
 
     const handleChangeProfile = async() => {
+        setLoading(true)
         const profile = {
             username: username,
             work: work,
@@ -27,6 +31,8 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
             await getMyProfile(user?.token, dispatch)
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
   return (
@@ -96,7 +102,7 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
                         className="w-1/2 bg-gray-00 rounded-md focus:outline-none"
                     />
                 </div>
-                <div className='flex'>
+                <div className='flex mt-2'>
                     <img
                         src={require('../../assets/icons/address.png')}
                         alt=''
@@ -146,6 +152,11 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
                     )}
                 </div>              
             </div>
+            {loading && (
+                <div className='fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-55'>
+                    <LoadingSpinner/>
+                </div>
+            )}
         </div>
     </div>
   )

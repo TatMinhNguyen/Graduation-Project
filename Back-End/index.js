@@ -18,7 +18,12 @@ const path = require("path");
 const imagekit = require("./utils/imagekitConfig");
 
 mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log('CONNECTED TO MONGO DB!'));
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Failed to connect to MongoDB', err);
+  });
 
 app.use(cors());
 app.use(cookieParser());

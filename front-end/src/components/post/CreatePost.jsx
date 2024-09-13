@@ -13,10 +13,13 @@ import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useDispatch } from 'react-redux'
 import { createPost, getAllPosts } from '../../api/post/post'
+import LoadingSpinner from '../spinner/LoadingSpinner'
 
 const CreatePost = ({user, params, isCloseModal, profile }) => {
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
+
+    const [loading, setLoading] = useState(false);
   
     const [text, setText] = useState('');
     const [showFont, setShowFont] = useState(false)
@@ -41,7 +44,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
         setVideo(null);
         setImagePreviews([])
         setVideoPreview(null)
-        imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+        imagePreviews.forEach((url) => URL.revokeObjectURL(url.url));
         URL.revokeObjectURL(videoPreview);
     };
     
@@ -71,7 +74,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
         }
   
         // Giải phóng các URL cũ
-        imagePreviews?.forEach((preview) => URL.revokeObjectURL(preview.url));
+        // imagePreviews?.forEach((preview) => URL.revokeObjectURL(preview.url));
     }; 
 
     const handleVideoChange = (e) => {
@@ -91,7 +94,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
         setVideo(null);
         setImagePreviews([])
         setVideoPreview(null)
-        imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+        imagePreviews.forEach((url) => URL.revokeObjectURL(url.url));
         URL.revokeObjectURL(videoPreview);
     }
 
@@ -106,6 +109,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
     
     const handleCreatePost = async(e) => {
         e.preventDefault();
+        setLoading(true);
         try {
           const formData = new FormData();
       
@@ -120,8 +124,10 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           if (video) {
             formData.append('video', video);
           }
-          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị      
-    
+          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị    
+
+          await createPost(user?.token, formData);
+
           // Reset state after successful post
           isCloseModal(false);
           setText('');
@@ -129,8 +135,6 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           setVideo(null);
           setImagePreviews([])
           setVideoPreview(null)
-
-          await createPost(user?.token, formData);
           
           // Refresh the post list
           handleGetListPosts();
@@ -138,8 +142,9 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           console.error('Errors:', error);
         }finally {
           // Giải phóng các URL sau khi không cần sử dụng nữa
-          imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+          imagePreviews.forEach((url) => URL.revokeObjectURL(url.url));
           URL.revokeObjectURL(videoPreview);
+          setLoading(false);
         }
     } 
 
@@ -342,17 +347,18 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
                     </div>
                 </div>
                 <div className="border-t p-4">
-                    {text || images.length > 0 || video ? (
-                    <button onClick={handleCreatePost} className="w-full bg-customBlue text-white py-2 px-4 rounded-lg">
-                        Post
-                    </button>
+                    {loading ? (
+                        <div className="flex justify-center">
+                            <LoadingSpinner/>
+                        </div>
                     ) : (
-                    <button
-                        className="w-full bg-blue-300 text-white py-2 px-4 rounded-lg"
-                        disabled
-                    >
-                        Post
-                    </button>
+                        <button
+                            onClick={handleCreatePost}
+                            className={`w-full text-white py-2 px-4 rounded-lg ${text || images.length > 0 || video ? 'bg-customBlue' : 'bg-blue-300'}`}
+                            disabled={!(text || images.length > 0 || video)}
+                        >
+                            Post
+                        </button>
                     )}
                 </div>
             </div>

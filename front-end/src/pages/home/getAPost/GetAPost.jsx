@@ -18,6 +18,7 @@ import { Comment } from '../../../components/comment/Comment';
 import { createComment, getComments } from '../../../api/comment/comment';
 import { ImageComment } from '../../../components/CssPictures/ImageComment';
 import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction';
+import LoadingSpinner from '../../../components/spinner/LoadingSpinner';
 
 const GetAPost = () => {
     const { postId } = useParams();
@@ -37,6 +38,8 @@ const GetAPost = () => {
     const imageInputRef = useRef(null);
     // console.log(post) 
     const [hoveredPostId, setHoveredPostId] = useState(null);
+
+    const [loading, setLoading] = useState(false)
 
     const handleMouseEnter = (postId) => {
         setHoveredPostId(postId);
@@ -129,6 +132,7 @@ const GetAPost = () => {
 
     const handleCreateComment = async(e) => {
         e.preventDefault();
+        setLoading(true)
         try {
             const formData = new FormData();
       
@@ -140,6 +144,8 @@ const GetAPost = () => {
             }
             formData.append('postId', postId);
 
+            await createComment(user?.token, formData)
+
             setDescription('')
             setImage(null) 
             setImagePreview(null)
@@ -147,9 +153,7 @@ const GetAPost = () => {
             // Reset chiều cao của textarea
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
-            }
-
-            await createComment(user?.token, formData)
+            }            
 
             handleGetComments();
             handleGetPost();
@@ -158,6 +162,7 @@ const GetAPost = () => {
         } finally {
             // Giải phóng các URL sau khi không cần sử dụng nữa
             URL.revokeObjectURL(imagePreview);
+            setLoading(false)
           }
     }
 
@@ -506,22 +511,29 @@ const GetAPost = () => {
                                     onChange={handleImageChange} 
                                 />                                             
                                 <div className='flex-1'></div>
-                                {description || image ? (
-                                    <button type="submit" className="text-white">
-                                        <img className='h-6 w-6 object-cover'
-                                            src={require("../../../assets/icons/send-blue.png")}
-                                            alt=''
-                                        />                            
-                                    </button>                                 
-                                ) :(
-                                    <div className="text-white">
-                                        <img className='h-6 w-6 object-cover'
-                                            src={require("../../../assets/icons/send-gray.png")}
-                                            alt=''
-                                        />                            
-                                    </div>   
-                                )}
-                            
+                                {loading ? (
+                                    <div>
+                                        <LoadingSpinner/>
+                                    </div>
+                                ):(
+                                    <>
+                                        {description || image ? (
+                                            <button type="submit" className="text-white">
+                                                <img className='h-6 w-6 object-cover'
+                                                    src={require("../../../assets/icons/send-blue.png")}
+                                                    alt=''
+                                                />                            
+                                            </button>                                 
+                                        ) :(
+                                            <div className="text-white">
+                                                <img className='h-6 w-6 object-cover'
+                                                    src={require("../../../assets/icons/send-gray.png")}
+                                                    alt=''
+                                                />                            
+                                            </div>   
+                                        )}                                    
+                                    </>
+                                )}                          
                             </div>
                         </form>            
                     </div>

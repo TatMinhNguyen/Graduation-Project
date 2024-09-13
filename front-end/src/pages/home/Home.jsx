@@ -90,7 +90,7 @@ const Home = () => {
       };
   }, [showModal]);
   return (
-    <div className='bg-gray-100'>
+    <div className='bg-gray-100 min-h-screen'>
       <div className='fixed top-0 w-full z-50'>
         <NavBar 
           user={user}

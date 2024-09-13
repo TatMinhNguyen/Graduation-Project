@@ -16,6 +16,7 @@ import { deletePost, getUserPost } from '../../../api/post/post'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction'
 import EditPost from '../../../components/post/EditPost'
+import LoadingSpinner from '../../../components/spinner/LoadingSpinner'
 
 const UserPosts = () => {
     const userId = useOutletContext()
@@ -28,6 +29,8 @@ const UserPosts = () => {
     const [showModal, setShowModal] = useState(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [isAbove, setIsAbove] = useState(false);
+
+    const [loading, setLoading] = useState(false);
 
     const [showDelete, setShowDelete] = useState(false)
     const [selectedPost, setSelectedPost] = useState(null)
@@ -129,14 +132,18 @@ const UserPosts = () => {
     }, [showModal]);
 
     const handleDeletepost = async(postId) => {
+        setLoading(true)
         try {
+            await deletePost(user?.token, postId)
+
             setShowDelete(false)
             setSelectedPost(null)
 
-            await deletePost(user?.token, postId)
             handleGetUserPost();
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -268,19 +275,25 @@ const UserPosts = () => {
                                                 <p className='text-sm text-gray-600 mb-5'>
                                                     Are you sure you want to delete this post?
                                                 </p>
-                                                <div className='flex justify-end space-x-4'>
-                                                    <button 
-                                                        className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
-                                                        onClick={handleCancelDelete}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button 
-                                                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
-                                                        onClick={() => handleDeletepost(selectedPost?.postId)}>
-                                                        Delete
-                                                    </button>
-                                                </div>
+                                                {loading ? (
+                                                    <div className='flex justify-center'>
+                                                        <LoadingSpinner/>
+                                                    </div>
+                                                ):(
+                                                    <div className='flex justify-end space-x-4'>
+                                                        <button 
+                                                            className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
+                                                            onClick={handleCancelDelete}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
+                                                            onClick={() => handleDeletepost(selectedPost?.postId)}>
+                                                            Delete
+                                                        </button>
+                                                    </div>                                        
+                                                )}
                                             </div>
                                         </div>
                                     )}

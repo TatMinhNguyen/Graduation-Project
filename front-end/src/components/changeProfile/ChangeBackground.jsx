@@ -1,11 +1,13 @@
 import React, { useRef, useState } from 'react'
 import { changeCover, getMyProfile } from '../../api/profile/profile';
 import { useDispatch } from 'react-redux';
+import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const ChangeBackground = ({isCloseModal, avatar, user}) => {
     const [image, setImage] = useState(null)
     const imageInputRef = useRef(null);
     const [imagePreview, setImagePreview] = useState(avatar)
+    const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -38,6 +40,7 @@ const ChangeBackground = ({isCloseModal, avatar, user}) => {
 
     const handleChangeAvatar = async(e) => {
         e.preventDefault();
+        setLoading(true)
         try {
             const formData = new FormData();
             if (image) {
@@ -52,6 +55,8 @@ const ChangeBackground = ({isCloseModal, avatar, user}) => {
             await getMyProfile(user?.token, dispatch)
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
   return (
@@ -120,9 +125,13 @@ const ChangeBackground = ({isCloseModal, avatar, user}) => {
                             Save
                         </button>
                     )}
-
                 </div>              
             </div>
+            {loading && (
+                <div className='fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-55'>
+                    <LoadingSpinner/>
+                </div>
+            )}
         </div>
     </div>
   )
