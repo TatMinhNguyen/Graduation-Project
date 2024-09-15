@@ -17,6 +17,12 @@ const Register = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const isPasswordValid = (password) => {
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        return password.length >= 6 && hasLetter && hasNumber;
+    };
+
     const handleRegister = async(e) => {
         e.preventDefault();
         try {
@@ -60,7 +66,7 @@ const Register = () => {
                                 onChange={(e) => setUsername(e.target.value)}
                                 onFocus={() => setIsUsernameFocused(true)}
                                 onBlur={() => setIsUsernameFocused(username !== "")}
-                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
                             />
                             <label
                                 htmlFor="username"
@@ -81,7 +87,7 @@ const Register = () => {
                                 onChange={(e) => setCurrentEmail(e.target.value)}
                                 onFocus={() => setIsEmailFocused(true)}
                                 onBlur={() => setIsEmailFocused(email !== "")}
-                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
+                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
                             />
                             <label
                                 htmlFor="email"
@@ -92,27 +98,62 @@ const Register = () => {
                                 Enter your email
                             </label>
                         </div>
-                        <div className="relative mb-[5vh]">
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder=""
-                                value={password}
-                                onChange={(e) => setCurrentPassword(e.target.value)}
-                                onFocus={() => setIsPasswordFocused(true)}
-                                onBlur={() => setIsPasswordFocused(password !== "")}
-                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-300"
-                            />
-                            <label
-                                htmlFor="password"
-                                className={`absolute left-3 transition-all ${
-                                isPasswordFocused || password !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
-                                } text-gray-500`}
-                            >
-                                Enter your password
-                            </label>
-                        </div>
+                        {isPasswordValid(password) === true || password === '' ? (
+                            <div className="relative mb-[5vh]">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder=""
+                                    value={password}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    onFocus={() => setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(password !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
+                                />
+                                <label
+                                    htmlFor="password"
+                                    className={`absolute left-3 transition-all ${
+                                    isPasswordFocused || password !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-gray-500`}
+                                >
+                                    Enter your password
+                                </label>
+                            </div>                            
+                        ) : (
+                            <div className="relative mb-[5vh]">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder=""
+                                    value={password}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    onFocus={() => setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(password !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-red-500 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-red-500"
+                                />
+                                <label
+                                    htmlFor="password"
+                                    className={`absolute left-3 transition-all ${
+                                    isPasswordFocused || password !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-red-500`}
+                                >
+                                    Enter your password
+                                </label>
+                                <div className='mt-2 flex'>
+                                    <img
+                                        src={require("../../assets/icons/warning.png")}
+                                        alt=''
+                                        className='w-4 h-4 mt-[0px] mr-1'
+                                    />
+                                    <p className='text-xs text-red-500'>
+                                        It should be at least 6 characters and include a combination of numbers and letters.
+                                    </p>
+                                </div>
+                            </div>                            
+                        )}
+
                         <div className='flex-1 flex items-center justify-center mb-6'>
                             <p className='text-center text-gray-500 text-sm'>
                                 By clicking Sign Up, you agree to our Terms, Privacy Policy and Cookies Policy. 
