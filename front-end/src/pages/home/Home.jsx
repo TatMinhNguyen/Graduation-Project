@@ -6,6 +6,8 @@ import GetAllPosts from '../../components/post/GetAllPosts';
 import { getAllPosts } from '../../api/post/post';
 import { getMyProfile } from '../../api/profile/profile';
 import CreatePost from '../../components/post/CreatePost';
+import RightBar from '../../components/rightbar/RightBar';
+import LeftBar from '../../components/leftbar/LeftBar';
 
 const Home = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -96,9 +98,9 @@ const Home = () => {
           user={user}
         />
       </div>
-      <div className='flex h-full pt-16'>
+      <div className='flex h-full pt-20'>
         <div className='' style={{ flex: '30%' }}>
-
+          <LeftBar/>
         </div>
         <div className='' style={{ flex: '40%' }}>
           <div className='h-12 bg-white border border-white shadow rounded-md flex-1 flex items-center'>
@@ -153,7 +155,7 @@ const Home = () => {
           <div ref={loadMoreRef} style={{ height: '20px' }} />
         </div>
         <div className='' style={{ flex: '30%' }}>
-
+          <RightBar/>
         </div>
       </div>
     </div>
