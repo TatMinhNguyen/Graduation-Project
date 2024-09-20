@@ -1,5 +1,6 @@
 const CommentModel = require("../models/CommentModel");
 const FeelModel = require("../models/FeelModel");
+const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
 
@@ -32,6 +33,19 @@ const feelController = {
 
             await newFelt.save();
             await post.save();
+
+            if(userId !== post.userId) {
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: post.userId,
+                    type: 'set_feel',
+                    postId: post._id,
+                    type_felt: newFelt.type,
+                    message: `${user.username} đã bày tỏ cảm xúc bài viết của bạn.`
+                })
+
+                await notification.save();                
+            }
 
             return res.status(200).json({message: 'Success!'});
         } catch (error) {
@@ -98,6 +112,19 @@ const feelController = {
             felt.type = type;
     
             await felt.save(); // Lưu lại cảm xúc đã cập nhật
+
+            if(userId !== post.userId) {
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: post.userId,
+                    type: 'update_feel',
+                    postId: post._id,
+                    type_felt: felt.type,
+                    message: `${user.username} đã cập nhật cảm xúc bài viết của bạn.`
+                })
+
+                await notification.save();                
+            }
     
             return res.status(200).json({ message: 'Feel updated successfully!' });
         } catch (error) {

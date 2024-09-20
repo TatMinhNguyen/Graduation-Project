@@ -1,4 +1,5 @@
 const CommentModel = require("../models/CommentModel");
+const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
@@ -49,6 +50,19 @@ const commentController = {
 
             await newComment.save();
             await post.save();
+
+            if(userId !== post.userId) {
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: post.userId,
+                    type: 'set_comment',
+                    postId: post._id,
+                    commentId: newComment._id,
+                    message: `${user.username} đã bình luận bài viết của bạn.`
+                })
+
+                await notification.save();                
+            }
 
             const result = {
                 author: {

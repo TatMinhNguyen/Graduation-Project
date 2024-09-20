@@ -1,4 +1,5 @@
 const FeelModel = require("../models/FeelModel");
+const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel")
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
@@ -53,6 +54,16 @@ const postController = {
             });
     
             await newPost.save();
+
+            const notification = new NotificationModel({
+                sender: userId,
+                receiver: user.friends,
+                type: 'create_post',
+                postId: newPost._id,
+                message: `${user.username} đã đăng một bài viết mới.`
+            })
+
+            await notification.save();
 
             const result = {
                 author: {

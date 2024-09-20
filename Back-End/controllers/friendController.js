@@ -1,3 +1,4 @@
+const NotificationModel = require("../models/NotificationModel");
 const UserModel = require("../models/UserModel");
 
 const friendController = {
@@ -104,6 +105,17 @@ const friendController = {
     
             // Thêm ID của người dùng hiện tại vào danh sách friendRequested của người dùng mục tiêu
             targetUser.friendRequested.push(currentUserId);
+
+            // Tạo thông báo cho người dùng mục tiêu
+            const notification = new NotificationModel({
+                sender: currentUserId,
+                receiver: [userId],              
+                type: 'friend_request',          
+                message: `${currentUser.username} đã gửi lời mời kết bạn.` 
+            });
+
+            // Lưu thông báo vào cơ sở dữ liệu
+            await notification.save();
     
             // Lưu thay đổi vào cơ sở dữ liệu
             await currentUser.save();
@@ -184,6 +196,16 @@ const friendController = {
             // Tăng số lượng bạn bè của cả hai người dùng
             currentUser.friendsCount += 1;
             requesterUser.friendsCount += 1;
+
+            const notification = new NotificationModel({
+                sender: currentUserId,
+                receiver: [userId],              
+                type: 'friend_accept',          
+                message: `${currentUser.username} đã chấp nhận lời mời kết bạn.` 
+            });
+
+            // Lưu thông báo vào cơ sở dữ liệu
+            await notification.save();
 
             // Lưu các thay đổi vào cơ sở dữ liệu
             await currentUser.save();
