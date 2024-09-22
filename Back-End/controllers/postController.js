@@ -2,6 +2,7 @@ const FeelModel = require("../models/FeelModel");
 const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel")
 const UserModel = require("../models/UserModel");
+const { sendNotification } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 const postController = {
@@ -64,6 +65,14 @@ const postController = {
             })
 
             await notification.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            sendNotification(user.friends, populatedNotification)
 
             const result = {
                 author: {

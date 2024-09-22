@@ -3,6 +3,7 @@ const FeelModel = require("../models/FeelModel");
 const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
+const { sendNotification } = require("../socket/socket");
 
 const feelController = {
     //Set feel
@@ -44,7 +45,16 @@ const feelController = {
                     message: `${user.username} đã bày tỏ cảm xúc bài viết của bạn.`
                 })
 
-                await notification.save();                
+                await notification.save();   
+                
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                // Gửi thông báo realtime qua socket
+                sendNotification([post.userId], populatedNotification); 
             }
 
             return res.status(200).json({message: 'Success!'});
@@ -123,7 +133,16 @@ const feelController = {
                     message: `${user.username} đã cập nhật cảm xúc bài viết của bạn.`
                 })
 
-                await notification.save();                
+                await notification.save();   
+                
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                // Gửi thông báo realtime qua socket
+                sendNotification([post.userId], populatedNotification); 
             }
     
             return res.status(200).json({ message: 'Feel updated successfully!' });

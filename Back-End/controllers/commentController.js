@@ -2,6 +2,7 @@ const CommentModel = require("../models/CommentModel");
 const NotificationModel = require("../models/NotificationModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
+const { sendNotification } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 const commentController = {
@@ -61,7 +62,16 @@ const commentController = {
                     message: `${user.username} đã bình luận bài viết của bạn.`
                 })
 
-                await notification.save();                
+                await notification.save(); 
+                
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                // Gửi thông báo realtime qua socket
+                sendNotification([post.userId], populatedNotification); 
             }
 
             const result = {
@@ -87,6 +97,8 @@ const commentController = {
             const {content, imageId} = req.body;
 
             const comment = await CommentModel.findById(commentId);
+
+            const post = await PostModel.findById(comment.postId);
 
             if(!comment) {
                 return res.status(404).json({ error: "Comment not found" })
@@ -147,6 +159,28 @@ const commentController = {
             }
 
             await comment.save();
+
+            if(userId !== post.userId) {
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: post.userId,
+                    type: 'update_comment',
+                    postId: post._id,
+                    commentId: comment._id,
+                    message: `A đã cập nhật bình luận bài viết của bạn.`
+                })
+
+                await notification.save(); 
+                
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                // Gửi thông báo realtime qua socket
+                sendNotification([post.userId], populatedNotification); 
+            }
 
             return res.status(200).json({ message: "Update Success"});
         } catch (error) {

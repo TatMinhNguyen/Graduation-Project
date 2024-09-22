@@ -1,5 +1,6 @@
 const NotificationModel = require("../models/NotificationModel");
 const UserModel = require("../models/UserModel");
+const { sendNotification } = require("../socket/socket");
 
 const friendController = {
 
@@ -120,6 +121,15 @@ const friendController = {
             // Lưu thay đổi vào cơ sở dữ liệu
             await currentUser.save();
             await targetUser.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            // Gửi thông báo realtime qua socket
+            sendNotification([userId], populatedNotification);            
     
             return res.status(200).json({ message: 'Lời mời kết bạn đã được gửi.' });
         } catch (error) {
@@ -210,6 +220,15 @@ const friendController = {
             // Lưu các thay đổi vào cơ sở dữ liệu
             await currentUser.save();
             await requesterUser.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            // Gửi thông báo realtime qua socket
+            sendNotification([userId], populatedNotification); 
 
             return res.status(200).json({ message: 'Lời mời kết bạn đã được chấp nhận.' });
         } catch (error) {

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 
 const http = require('http');  
-const { Server } = require('socket.io');
+const { socketConfig } = require('./socket/socket');
 
 const app = express();
 dotenv.config();
@@ -23,15 +23,7 @@ const path = require("path");
 const imagekit = require("./utils/imagekitConfig");
 
 // Tạo HTTP server từ Express
-const server = http.createServer(app);  // Thay app.listen bằng server.listen
-
-// Tích hợp Socket.IO với server
-const io = new Server(server, {
-  cors: {
-    origin: "*",  // Hoặc bạn có thể chỉ định các domain cụ thể được phép kết nối WebSocket
-    methods: ["GET", "POST"]
-  }
-});
+const server = http.createServer(app);
 
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => {
@@ -45,7 +37,6 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
-// Endpoint để phục vụ file tĩnh
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/authentication', (req, res) => {
@@ -63,22 +54,8 @@ app.use('/api/search', searchRoute)
 app.use('/api/chat', chatRoute)
 app.use('/api/notification', notificationRoute)
 
-// Lắng nghe sự kiện kết nối từ Socket.IO
-io.on('connection', (socket) => {
-  console.log(`User connected ${socket.id}`);
-
-  // Nhận và gửi dữ liệu qua WebSocket
-  socket.on('message', (msg) => {
-    console.log('Message received:', msg);
-    // Phát lại tin nhắn cho tất cả các client
-    io.emit('message', msg);
-  });
-
-  // Xử lý ngắt kết nối
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
+// Cấu hình Socket.IO
+socketConfig(server);  // Gọi hàm cấu hình Socket.IO từ file socket.js
 
 // Chạy server trên cổng 8000
 server.listen(process.env.PORT || 8000, () => {
