@@ -40,7 +40,6 @@ const Home = () => {
       console.error('Errors:', error);
     }
   }
-  
 
   const loadMoreRef = useRef(null);
 

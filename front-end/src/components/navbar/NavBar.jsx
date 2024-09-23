@@ -4,6 +4,7 @@ import { getMyProfile } from '../../api/profile/profile';
 import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from '../../api/auth/auth';
 import ChangePassword from '../changeProfile/ChangePassword';
+import socket from '../../socket';
 
 const NavBar = ({user}) => {
     const profile = useSelector((state) => state?.auth?.profile)
@@ -19,6 +20,25 @@ const NavBar = ({user}) => {
     const dispatch = useDispatch();
 
     const avatarRef = useRef(null);
+
+    useEffect(() => {
+        // Kiểm tra xem có kết nối thành công hay không
+        socket.on("connect", () => {
+          console.log("Connected to server via WebSocket");
+        });
+
+        socket.on("notification", (newNotification) => {
+          console.log("New notification:", newNotification);
+          // Cập nhật state thông báo
+        //   setNotifications((prev) => [newNotification, ...prev]);
+        }); 
+      
+        return () => {
+          socket.off("connect");
+        };
+    }, []);
+
+         
 
     const handleSearch = (e) => {
         e.preventDefault();

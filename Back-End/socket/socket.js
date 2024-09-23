@@ -2,39 +2,50 @@ const { Server } = require('socket.io');
 
 let io;
 
+let userSocketMap = {}; 
+
 const socketConfig = (server) => {
   // Tạo một instance của Socket.IO
   io = new Server(server, {
     cors: {
       origin: "http://localhost:3000",  // Bạn có thể giới hạn các domain nếu cần
-      methods: ["GET", "POST"],
+      methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     }
   });
 
   // Sự kiện kết nối
   io.on('connection', (socket) => {
-    console.log(`User connected ${socket.id}`);
+    console.log(`User connected with socket ID: ${socket.id}`);
 
-    // Sự kiện gửi tin nhắn
-    socket.on('message', (msg) => {
-      console.log('Message received:', msg);
-      // Phát lại tin nhắn cho tất cả các client
-      io.emit('message', msg);
+    socket.on('register', (userId) => {
+      userSocketMap[userId] = socket.id;  // Ánh xạ userId từ DB với socket.id
+      console.log(`User ${userId} is mapped to socket ID ${socket.id}`);
     });
 
     // Ngắt kết nối
     socket.on('disconnect', () => {
-      console.log('User disconnected');
+      console.log(`User disconnected: ${socket.id}`);
+      // Xóa ánh xạ khi người dùng ngắt kết nối
+      for (let userId in userSocketMap) {
+        if (userSocketMap[userId] === socket.id) {
+          delete userSocketMap[userId];
+          console.log(`Socket ID ${socket.id} removed for user ${userId}`);
+        }
+      }
     });
   });
 };
 
 const sendNotification = (receiverIds, notification) => {
-  // Gửi thông báo đến những người nhận cụ thể
   receiverIds.forEach(userId => {
-    // console.log(`Sending notification to user: ${userId}`, notification);
-    io.to(userId).emit('notification', notification);
+    const socketId = userSocketMap[userId];  // Lấy socket.id từ ánh xạ userId
+    if (socketId) {
+      io.to(socketId).emit('notification', notification);  // Gửi thông báo tới client
+      console.log(`Notification sent to userId ${userId} with socket ID ${socketId}`);
+    } else {
+      console.log(`User ${userId} is not connected`);
+    }
   });
 };
 

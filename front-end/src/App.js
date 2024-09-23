@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Login from './pages/login/Login';
@@ -15,9 +15,18 @@ import Messenger from './pages/messenger/Messenger';
 import Search from './pages/search/Search';
 import SearchPosts from './components/search/SearchPosts';
 import SearchUsers from './components/search/SearchUsers';
-
+import { useSelector } from 'react-redux';
+import socket from './socket';
 
 function App() {
+  const user = useSelector((state) => state.auth.login?.currentUser)
+
+  useEffect(() => {
+    if (user?.userId) {  // userId từ DB
+      socket.emit('register', user.userId); 
+    }
+  }, [user]);
+
   return (
     <Router>
       <Routes>
