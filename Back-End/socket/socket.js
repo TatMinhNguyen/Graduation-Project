@@ -6,8 +6,9 @@ const socketConfig = (server) => {
   // Tạo một instance của Socket.IO
   io = new Server(server, {
     cors: {
-      origin: "*",  // Bạn có thể giới hạn các domain nếu cần
-      methods: ["GET", "POST"]
+      origin: "http://localhost:3000",  // Bạn có thể giới hạn các domain nếu cần
+      methods: ["GET", "POST"],
+      credentials: true,
     }
   });
 
@@ -32,6 +33,7 @@ const socketConfig = (server) => {
 const sendNotification = (receiverIds, notification) => {
   // Gửi thông báo đến những người nhận cụ thể
   receiverIds.forEach(userId => {
+    // console.log(`Sending notification to user: ${userId}`, notification);
     io.to(userId).emit('notification', notification);
   });
 };
