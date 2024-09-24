@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from '../../api/auth/auth';
 
 function Login() {
-    const currentEmail = useSelector((state) => state.auth.user.email)
-    const currentPassword = useSelector((state) => state.auth.user.password)
+    const currentEmail = useSelector((state) => state.auth.user?.email)
+    const currentPassword = useSelector((state) => state.auth.user?.password)
 
     const [email, setEmail] = useState(currentEmail);
     const [password, setPassword] = useState(currentPassword);

@@ -52,7 +52,7 @@ const auth = createSlice({
         return state;
       },
       clearUser : (state) => {
-        state.user.email = '';
+        state.user.email = ''
         state.user.password = ''
       }
     },

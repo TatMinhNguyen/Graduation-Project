@@ -23,6 +23,15 @@ const Register = () => {
         return password.length >= 6 && hasLetter && hasNumber;
     };
 
+    const isUsernameValid = (username) => {
+        return username.length >=5 && username.length <= 20;
+    }
+
+    const isEmailValid = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    };    
+
     const handleRegister = async(e) => {
         e.preventDefault();
         try {
@@ -56,48 +65,117 @@ const Register = () => {
                         </h1>
                     </div>
                     <form className="p-4 px-[14vh]" onSubmit={handleRegister}>
-                        <div className="relative mb-5 mt-[2vh]">
-                            <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                placeholder="" 
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                onFocus={() => setIsUsernameFocused(true)}
-                                onBlur={() => setIsUsernameFocused(username !== "")}
-                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
-                            />
-                            <label
-                                htmlFor="username"
-                                className={`absolute left-3 transition-all ${
-                                isUsernameFocused || username !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
-                                } text-gray-500`}
-                            >
-                                Enter your username
-                            </label>                            
-                        </div>
-                        <div className="relative mb-4 mt-[2vh]">
-                            <input
-                                type="text"
-                                id="email"
-                                name="email"
-                                placeholder=" "
-                                value={email}
-                                onChange={(e) => setCurrentEmail(e.target.value)}
-                                onFocus={() => setIsEmailFocused(true)}
-                                onBlur={() => setIsEmailFocused(email !== "")}
-                                className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
-                            />
-                            <label
-                                htmlFor="email"
-                                className={`absolute left-3 transition-all ${
-                                isEmailFocused || email !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
-                                } text-gray-500`}
-                            >
-                                Enter your email
-                            </label>
-                        </div>
+                        {isUsernameValid(username) === true || username === '' ? (
+                            <div className="relative mb-5 mt-[2vh]">
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    placeholder="" 
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    onFocus={() => setIsUsernameFocused(true)}
+                                    onBlur={() => setIsUsernameFocused(username !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
+                                />
+                                <label
+                                    htmlFor="username"
+                                    className={`absolute left-3 transition-all ${
+                                    isUsernameFocused || username !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-gray-500`}
+                                >
+                                    Enter your username
+                                </label>                            
+                            </div>                            
+                        ) : (
+                            <div className="relative mb-5 mt-[2vh]">
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    placeholder="" 
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    onFocus={() => setIsUsernameFocused(true)}
+                                    onBlur={() => setIsUsernameFocused(username !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-red-500 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-red-500"
+                                />
+                                <label
+                                    htmlFor="username"
+                                    className={`absolute left-3 transition-all ${
+                                    isUsernameFocused || username !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-red-500`}
+                                >
+                                    Enter your username
+                                </label> 
+                                <div className='mt-2 flex'>
+                                    <img
+                                        src={require("../../assets/icons/warning.png")}
+                                        alt=''
+                                        className='w-4 h-4 mt-[0px] mr-1'
+                                    />
+                                    <p className='text-xs text-red-500'>
+                                        Username must be at least 5 characters and no more than 20 characters.
+                                    </p>
+                                </div>                           
+                            </div>
+                        )}
+                        {isEmailValid(email) || email === '' ? (
+                            <div className="relative mb-4 mt-[2vh]">
+                                <input
+                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    placeholder=" "
+                                    value={email}
+                                    onChange={(e) => setCurrentEmail(e.target.value)}
+                                    onFocus={() => setIsEmailFocused(true)}
+                                    onBlur={() => setIsEmailFocused(email !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-gray-200 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-500"
+                                />
+                                <label
+                                    htmlFor="email"
+                                    className={`absolute left-3 transition-all ${
+                                    isEmailFocused || email !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-gray-500`}
+                                >
+                                    Enter your email
+                                </label>
+                            </div>                            
+                        ) : (
+                            <div className="relative mb-4 mt-[2vh]">
+                                <input
+                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    placeholder=" "
+                                    value={email}
+                                    onChange={(e) => setCurrentEmail(e.target.value)}
+                                    onFocus={() => setIsEmailFocused(true)}
+                                    onBlur={() => setIsEmailFocused(email !== "")}
+                                    className="w-full px-3 pt-3.5 pb-1 border border-red-500 rounded-md focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-red-500"
+                                />
+                                <label
+                                    htmlFor="email"
+                                    className={`absolute left-3 transition-all ${
+                                    isEmailFocused || email !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
+                                    } text-red-500`}
+                                >
+                                    Enter your email
+                                </label>
+                                <div className='mt-2 flex'>
+                                    <img
+                                        src={require("../../assets/icons/warning.png")}
+                                        alt=''
+                                        className='w-4 h-4 mt-[0px] mr-1'
+                                    />
+                                    <p className='text-xs text-red-500'>
+                                        Must enter correct email format.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         {isPasswordValid(password) === true || password === '' ? (
                             <div className="relative mb-[5vh]">
                                 <input

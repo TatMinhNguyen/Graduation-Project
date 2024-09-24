@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from '../../api/auth/auth';
 import ChangePassword from '../changeProfile/ChangePassword';
 import socket from '../../socket';
+import { getNotification } from '../../api/notification/notification';
 
 const NavBar = ({user}) => {
     const profile = useSelector((state) => state?.auth?.profile)
@@ -15,6 +16,8 @@ const NavBar = ({user}) => {
     const [showChangePassword, setShowChangePassword] = useState(false)
 
     const [searchInput, setSearchInput] = useState("");
+    const [notifications, setNotifications] = useState([])
+    console.log(notifications)
 
     const navigation = useNavigate();
     const dispatch = useDispatch();
@@ -30,7 +33,7 @@ const NavBar = ({user}) => {
         socket.on("notification", (newNotification) => {
           console.log("New notification:", newNotification);
           // Cập nhật state thông báo
-        //   setNotifications((prev) => [newNotification, ...prev]);
+          setNotifications((prev) => [newNotification, ...prev]);
         }); 
       
         return () => {
@@ -38,7 +41,14 @@ const NavBar = ({user}) => {
         };
     }, []);
 
-         
+    const handleGetNotifications = async () => {
+        try {
+            const result = await getNotification(user?.token)
+            setNotifications(result)
+        } catch (error) {
+            console.log(error)
+        }
+    }     
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -76,6 +86,7 @@ const NavBar = ({user}) => {
     /* eslint-disable */
     useEffect(() => {
         handleGetProfile()
+        handleGetNotifications();
     },[user, dispatch])
 
     const handleClickOutside = (event) => {
