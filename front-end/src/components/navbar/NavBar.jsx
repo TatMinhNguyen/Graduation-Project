@@ -6,6 +6,7 @@ import { logOut } from '../../api/auth/auth';
 import ChangePassword from '../changeProfile/ChangePassword';
 import socket from '../../socket';
 import { getNotification } from '../../api/notification/notification';
+import GetNotifications from '../notification/GetNotifications';
 
 const NavBar = ({user}) => {
     const profile = useSelector((state) => state?.auth?.profile)
@@ -13,16 +14,19 @@ const NavBar = ({user}) => {
     const location = useLocation();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showModalNotification, setShowModalNotification] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false)
 
     const [searchInput, setSearchInput] = useState("");
     const [notifications, setNotifications] = useState([])
-    console.log(notifications)
 
     const navigation = useNavigate();
     const dispatch = useDispatch();
 
     const avatarRef = useRef(null);
+    const notificationRef = useRef(null)
+
+    const scountNotifications = notifications?.filter((noti) => noti.read === false)
 
     useEffect(() => {
         // Kiểm tra xem có kết nối thành công hay không
@@ -95,6 +99,12 @@ const NavBar = ({user}) => {
         }
     };
 
+    const handleClickOutsideNoti = (e) => {
+        if (notificationRef.current && ! notificationRef.current.contains(e.target)) {
+            setShowModalNotification(false);
+        }
+    }
+
     useEffect(() => {
         if (isModalOpen) {
             document.addEventListener('mousedown', handleClickOutside);
@@ -105,7 +115,19 @@ const NavBar = ({user}) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-      }, [isModalOpen]);
+    }, [isModalOpen]);
+
+    useEffect(() => {
+        if (showModalNotification) {
+            document.addEventListener('mousedown', handleClickOutsideNoti);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutsideNoti);
+        }
+    
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutsideNoti);
+        };
+    }, [showModalNotification]);
 
     useEffect(() => {
         if (showChangePassword) {
@@ -188,12 +210,45 @@ const NavBar = ({user}) => {
                         />
                     )}
                 </div>
-                <div className='h-10 w-10 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'>
-                    <img className='h-6'
-                        src={require("../../assets/icons/notification-black.png")}
-                        alt="" 
-                    />
+                <div className=''>
+                    <div className='absolute bg-red-600 w-5 h-5 rounded-full right-16 top-1'>
+                        {scountNotifications?.length <= 99 ? (
+                            <p className='text-white text-[12px] ml-[3px] mt-[1.5px] text-medium'>
+                                {scountNotifications?.length}
+                        </p>
+                        ) : (
+                            <p className='text-white text-[10px] ml-[3px] mt-[1.5px] text-medium'>
+                                99+
+                            </p>
+                        )}
+                    </div>
+                    {showModalNotification ? (
+                        <div className='h-10 w-10 bg-blue-100 hover:bg-blue-200 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'
+                            // onClick={() => setShowModalNotification(false)}
+                        >
+                            <img className='h-6'
+                                src={require("../../assets/icons/notification-blue.png")}
+                                alt="" 
+                            />
+                        </div>
+                    ) : (
+                        <div className='h-10 w-10 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'
+                            onClick={() => setShowModalNotification(true)}
+                        >
+                            <img className='h-6'
+                                src={require("../../assets/icons/notification-black.png")}
+                                alt="" 
+                            />
+                        </div>
+                    )}                    
                 </div>
+                {showModalNotification && (
+                    <div ref={notificationRef} className='absolute w-1/4 top-full mt-1 right-2 bg-white border border-white rounded-md shadow-xl z-50 p-3'>
+                        <GetNotifications
+                            notifications = {notifications}
+                        />
+                    </div>
+                )}
                 <div className='flex items-center justify-center cursor-pointer ml-3 h-10 w-10'
                     onClick={() => setIsModalOpen(true)}
                 >

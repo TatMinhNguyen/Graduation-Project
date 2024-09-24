@@ -7,7 +7,7 @@ const Messenger = () => {
     // const profile = useSelector((state) => state?.auth?.profile)
   return (
     <div className='bg-gray-100 min-h-screen overflow-y-scroll '>
-        <div className='w-full z-50 '>
+        <div className='fixed top-0 w-[calc(100vw-15px)] z-50'>
             <NavBar 
                 user={user}
             />
