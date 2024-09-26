@@ -112,7 +112,7 @@ const friendController = {
                 sender: currentUserId,
                 receiver: [userId],              
                 type: 'friend_request',          
-                message: `${currentUser.username} đã gửi lời mời kết bạn.` 
+                message: `has sent you a friend request.` 
             });
 
             // Lưu thông báo vào cơ sở dữ liệu
@@ -211,7 +211,7 @@ const friendController = {
                 sender: currentUserId,
                 receiver: [userId],              
                 type: 'friend_accept',          
-                message: `${currentUser.username} đã chấp nhận lời mời kết bạn.` 
+                message: `has accepted your friend request.` 
             });
 
             // Lưu thông báo vào cơ sở dữ liệu

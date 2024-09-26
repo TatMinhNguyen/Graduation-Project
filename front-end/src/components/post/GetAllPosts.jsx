@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux'
 import EditPost from './EditPost'
 import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import GetFeft from '../comment/GetFeft'
 
 const GetAllPosts = ({user, posts, params, profile}) => {
     const [showModal, setShowModal] = useState(null);
@@ -28,6 +29,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const [showDelete, setShowDelete] = useState(false)
     const [selectedPost, setSelectedPost] = useState(null)
     const [editModal, setEditModal] = useState(false);
+    const [showFelter, setShowFelter] = useState(false)
   
     const modalRef = useRef(null);
     const navigation = useNavigate();
@@ -149,6 +151,11 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const handleEditModal = (post) =>{
         setShowModal(null)
         setEditModal(true)
+        setSelectedPost(post)
+    }
+
+    const handleShowGetFelt = (post) => {
+        setShowFelter(true)
         setSelectedPost(post)
     }
 
@@ -280,8 +287,8 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                 isCloseModal = {() => setEditModal(false)}
                             />
                         )}
-                    </div>
 
+                    </div>
                     <div  className='cursor-pointer'>
                         {post?.typeText === false ?(
                             <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
@@ -353,18 +360,20 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                     <div className=''>
                         <div className='flex mt-2 mb-2'>
                             <div className='w-1/2 flex-1 flex items-center '>
-                                <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
-                                    src={require("../../assets/icons/like-blue1.png")}
-                                    alt=''
-                                />
-                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                    src={require("../../assets/icons/love.png")}
-                                    alt=''
-                                />
-                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                    src={require("../../assets/icons/haha.png")}
-                                    alt=''
-                                />
+                                <div className='cursor-pointer flex' onClick={() => handleShowGetFelt(post)}>
+                                    <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
+                                        src={require("../../assets/icons/like-blue1.png")}
+                                        alt=''
+                                    />
+                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                        src={require("../../assets/icons/love.png")}
+                                        alt=''
+                                    />
+                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                        src={require("../../assets/icons/haha.png")}
+                                        alt=''
+                                    /> 
+                                </div>
                                 <p className='text-gray-500 font-normal text-base ml-1'>
                                     {post?.felt}
                                 </p>
@@ -379,6 +388,14 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                 </p>
                             </div> 
                         </div>
+                        {showFelter && selectedPost?.postId === post?.postId && (
+                            <div className=''>
+                                <GetFeft
+                                    postId={selectedPost?.postId}
+                                    isCloseModal = {() => setShowFelter(false)}
+                                />                                    
+                            </div>
+                        )}                            
                         <div className='relative'>
                             {/* Các nút hành động */}
                             <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>

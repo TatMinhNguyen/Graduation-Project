@@ -211,17 +211,19 @@ const NavBar = ({user}) => {
                     )}
                 </div>
                 <div className=''>
-                    <div className='absolute bg-red-600 w-5 h-5 rounded-full right-16 top-1'>
-                        {scountNotifications?.length <= 99 ? (
-                            <p className='text-white text-[12px] ml-[3px] mt-[1.5px] text-medium'>
-                                {scountNotifications?.length}
-                        </p>
-                        ) : (
-                            <p className='text-white text-[10px] ml-[3px] mt-[1.5px] text-medium'>
-                                99+
+                    {scountNotifications.length > 0 && (
+                        <div className='absolute bg-red-600 w-5 h-5 rounded-full right-16 top-1'>
+                            {scountNotifications?.length <= 99 ? (
+                                <p className={`text-white text-[12px] ${scountNotifications?.length < 10 ? 'ml-[6.5px]' : 'ml-[3px]'}  mt-[1.5px] text-medium`}>
+                                    {scountNotifications?.length}
                             </p>
-                        )}
-                    </div>
+                            ) : (
+                                <p className='text-white text-[10px] ml-[3px] mt-[1.5px] text-medium'>
+                                    99+
+                                </p>
+                            )}
+                        </div>                        
+                    )}
                     {showModalNotification ? (
                         <div className='h-10 w-10 bg-blue-100 hover:bg-blue-200 flex items-center justify-center rounded-3xl ml-3 cursor-pointer'
                             // onClick={() => setShowModalNotification(false)}
@@ -243,7 +245,9 @@ const NavBar = ({user}) => {
                     )}                    
                 </div>
                 {showModalNotification && (
-                    <div ref={notificationRef} className='absolute w-1/4 top-full mt-1 right-2 bg-white border border-white rounded-md shadow-xl z-50 p-3'>
+                    <div ref={notificationRef} 
+                        className='absolute w-1/5 top-full mt-1 right-2 bg-white border border-white rounded-md shadow-xl z-50 p-3 px-0.5 max-h-[90vh] overflow-y-auto'
+                    >
                         <GetNotifications
                             notifications = {notifications}
                         />

@@ -59,7 +59,7 @@ const commentController = {
                     type: 'set_comment',
                     postId: post._id,
                     commentId: newComment._id,
-                    message: `${user.username} đã bình luận bài viết của bạn.`
+                    message: `commented on your post.`
                 })
 
                 await notification.save(); 
@@ -167,7 +167,7 @@ const commentController = {
                     type: 'update_comment',
                     postId: post._id,
                     commentId: comment._id,
-                    message: `A đã cập nhật bình luận bài viết của bạn.`
+                    message: `has updated the comment on your post.`
                 })
 
                 await notification.save(); 

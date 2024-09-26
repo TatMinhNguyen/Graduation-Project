@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction'
 import EditPost from '../../../components/post/EditPost'
 import LoadingSpinner from '../../../components/spinner/LoadingSpinner'
+import GetFeft from '../../../components/comment/GetFeft'
 
 const UserPosts = () => {
     const userId = useOutletContext()
@@ -25,6 +26,8 @@ const UserPosts = () => {
     const profile = useSelector((state) => state?.auth?.profile)
     // const [posts, setPosts] = useState([]);
     // console.log(userId)
+
+    const [showFelter, setShowFelter] = useState(false)
 
     const [showModal, setShowModal] = useState(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
@@ -382,18 +385,20 @@ const UserPosts = () => {
                                 <div className=''>
                                     <div className='flex mt-2 mb-2'>
                                         <div className='w-1/2 flex-1 flex items-center '>
-                                            <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
-                                                src={require("../../../assets/icons/like-blue1.png")}
-                                                alt=''
-                                            />
-                                            <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                                src={require("../../../assets/icons/love.png")}
-                                                alt=''
-                                            />
-                                            <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                                src={require("../../../assets/icons/haha.png")}
-                                                alt=''
-                                            />
+                                            <div className='cursor-pointer flex' onClick={()=> setShowFelter(true)}>
+                                                <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
+                                                    src={require("../../../assets/icons/like-blue1.png")}
+                                                    alt=''
+                                                />
+                                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                    src={require("../../../assets/icons/love.png")}
+                                                    alt=''
+                                                />
+                                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                    src={require("../../../assets/icons/haha.png")}
+                                                    alt=''
+                                                />
+                                            </div>
                                             <p className='text-gray-500 font-normal text-base ml-1'>
                                                 {post?.felt}
                                             </p>
@@ -408,6 +413,12 @@ const UserPosts = () => {
                                             </p>
                                         </div> 
                                     </div>
+                                    {showFelter && (
+                                        <GetFeft
+                                            postId={selectedPost?.postId}
+                                            isCloseModal = {() => setShowFelter(false)}
+                                        />
+                                    )}
                                     <div className='relative'>
                                         {/* Các nút hành động */}
                                         <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>

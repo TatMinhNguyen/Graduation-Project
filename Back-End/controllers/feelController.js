@@ -42,7 +42,7 @@ const feelController = {
                     type: 'set_feel',
                     postId: post._id,
                     type_felt: newFelt.type,
-                    message: `${user.username} đã bày tỏ cảm xúc bài viết của bạn.`
+                    message: `expressed his feelings about your post.`
                 })
 
                 await notification.save();   
@@ -130,7 +130,7 @@ const feelController = {
                     type: 'update_feel',
                     postId: post._id,
                     type_felt: felt.type,
-                    message: `${user.username} đã cập nhật cảm xúc bài viết của bạn.`
+                    message: `updated his feelings about your post.`
                 })
 
                 await notification.save();   
@@ -154,19 +154,38 @@ const feelController = {
     getFelt: async(req, res) => {
         try {
             const postId = req.params.postId;
-
-            const feels = await FeelModel.find({ postId: postId})
-
+            const currentUserId = req.user.id; 
+    
+            const feels = await FeelModel.find({ postId: postId });
+    
             if(!feels) {
-                return res.status(404).json({ error: "Feel not found" })
+                return res.status(404).json({ error: "Feel not found" });
             }
-
-            const userPromises = feels.map(feels => UserModel.findById(feels.userId));
-
+    
+            // Lấy danh sách bạn bè của người dùng hiện tại
+            const currentUser = await UserModel.findById(currentUserId).select('friends');
+            if (!currentUser) {
+                return res.status(404).json({ error: "Current user not found" });
+            }
+            
+            const currentUserFriendIds = currentUser.friends.map(friendId => friendId.toString()); // Chuyển đổi thành chuỗi
+    
+            // Lấy thông tin người dùng tham gia reaction
+            const userPromises = feels.map(feel => UserModel.findById(feel.userId).select('username profilePicture friends'));
             const users = await Promise.all(userPromises);
-
-            const results = feels.map((feel, index) => {
+    
+            const results = await Promise.all(feels.map(async (feel, index) => {
                 const user = users[index];
+    
+                // Lấy danh sách bạn bè của người dùng tham gia reaction
+                const userFriendIds = user.friends.map(friendId => friendId.toString()); // Chuyển thành mảng chuỗi
+    
+                // Tính số lượng bạn chung
+                const mutualFriendsCount = userFriendIds.filter(friendId => currentUserFriendIds.includes(friendId)).length;
+                // console.log('currentUserFriendIds', currentUserFriendIds);
+                // console.log('userFriendIds', userFriendIds);
+                // console.log('mutualFriendsCount', mutualFriendsCount);
+    
                 return {
                     feelId: feel._id,
                     postId: feel.postId,
@@ -175,16 +194,18 @@ const feelController = {
                     author: {
                         authorId: user._id,
                         authorName: user.username,
-                        authorAvatar: user.profilePicture
-                    }
+                        authorAvatar: user.profilePicture,
+                    },
+                    mutualFriendsCount: mutualFriendsCount,  // Trả về số lượng bạn chung
                 };
-            });
-
-            return res.status(200).json(results)
+            }));
+    
+            return res.status(200).json(results);
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
-    },
+    }
+    
 }
 
 module.exports = feelController

@@ -17,6 +17,7 @@ import VideoPlayer from '../CssPictures/VideoPlayer'
 import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
 import { search } from '../../api/search/search'
 import EditPost from '../post/EditPost'
+import GetFeft from '../comment/GetFeft'
 
 const SearchPosts = () => {
     const searchPosts = useSelector((state) => state.search.posts)
@@ -42,6 +43,8 @@ const SearchPosts = () => {
     const [selectedPost, setSelectedPost] = useState(null)
     const [editModal, setEditModal] = useState(false);
     const [hoveredPostId, setHoveredPostId] = useState(null);
+
+    const [showFelter, setShowFelter] = useState(false)
 
     const navigation = useNavigate();
     const modalRef = useRef(null);
@@ -356,18 +359,20 @@ const SearchPosts = () => {
                                     <div className=''>
                                         <div className='flex mt-2 mb-2'>
                                             <div className='w-1/2 flex-1 flex items-center '>
-                                                <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
-                                                    src={require("../../assets/icons/like-blue1.png")}
-                                                    alt=''
-                                                />
-                                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                                    src={require("../../assets/icons/love.png")}
-                                                    alt=''
-                                                />
-                                                <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                                    src={require("../../assets/icons/haha.png")}
-                                                    alt=''
-                                                />
+                                                <div className='cursor-pointer flex' onClick={()=> setShowFelter(true)}>
+                                                    <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
+                                                        src={require("../../assets/icons/like-blue1.png")}
+                                                        alt=''
+                                                    />
+                                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                        src={require("../../assets/icons/love.png")}
+                                                        alt=''
+                                                    />
+                                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                        src={require("../../assets/icons/haha.png")}
+                                                        alt=''
+                                                    /> 
+                                                </div>
                                                 <p className='text-gray-500 font-normal text-base ml-1'>
                                                     {post?.felt}
                                                 </p>
@@ -382,6 +387,12 @@ const SearchPosts = () => {
                                                 </p>
                                             </div> 
                                         </div>
+                                        {showFelter && (
+                                            <GetFeft
+                                                postId={selectedPost?.postId}
+                                                isCloseModal = {() => setShowFelter(false)}
+                                            />
+                                        )}
                                         <div className='relative'>
                                             {/* Các nút hành động */}
                                             <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>

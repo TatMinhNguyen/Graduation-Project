@@ -154,11 +154,11 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
                 <div className="flex justify-between items-center border-b p-4">
                     <h3 className="text-xl font-bold flex-1 flex items-center justify-center">Create post</h3>
                     <button onClick={handleCloseModal} className="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 flex items-center justify-center">
-                    <img  
-                        src={require('../../assets/icons/close.png')}
-                        alt='Earth'
-                        className='w-5 h-5 '
-                    />
+                        <img  
+                            src={require('../../assets/icons/close.png')}
+                            alt='Earth'
+                            className='w-5 h-5 '
+                        />
                     </button>
                 </div>
                 <div className="p-4">

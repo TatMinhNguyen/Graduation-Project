@@ -61,7 +61,7 @@ const postController = {
                 receiver: user.friends,
                 type: 'create_post',
                 postId: newPost._id,
-                message: `${user.username} đã đăng một bài viết mới.`
+                message: `posted a new article.`
             })
 
             await notification.save();
