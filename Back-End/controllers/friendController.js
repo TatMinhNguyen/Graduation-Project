@@ -317,22 +317,23 @@ const friendController = {
     // get friend
     getFriends: async (req, res) => {
         try {
-            // Tìm user theo userId và chỉ lấy danh sách bạn bè
             const result = await UserModel.findById(req.params.userId).select('friends');
-            // console.log(result);
             if (!result) {
                 return res.status(404).json({ message: "userId invalid" });
             }
 
+            const currentUser = await UserModel.findById(req.user.id).select('friends')
+            const friendsCurrentId = currentUser.friends
+
             const friendIds = result.friends;
             // Tìm tất cả các bạn bè theo danh sách friendIds và chỉ lấy những trường cần thiết
             const friends = await UserModel.find({ _id: { $in: friendIds } }).select('id username profilePicture friendsCount friends');
-
+            
             const mutualFriends = friends
                 .filter(friend => friend._id.toString() !== req.user.id)
                 .map(user => {
                 // Lọc ra những bạn chung
-                const mutualFriends = user.friends.filter(friendId => friendIds.includes(friendId));
+                const mutualFriends = user.friends.filter(friendId => friendsCurrentId.includes(friendId));
                 return {
                     _id: user._id,
                     username: user.username,

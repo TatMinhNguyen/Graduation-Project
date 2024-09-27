@@ -50,6 +50,11 @@ const UserPosts = () => {
 
     const [hoveredPostId, setHoveredPostId] = useState(null);
 
+    const handleShowGetFelt = (post) => {
+        setShowFelter(true)
+        setSelectedPost(post)
+    }
+
     const handleMouseEnter = (postId) => {
         setHoveredPostId(postId);
     };
@@ -185,6 +190,19 @@ const UserPosts = () => {
         handleGetUserPost();
     },[userId])
 
+
+    useEffect(() => {
+        if (editModal || showFelter) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+  
+        // Cleanup khi component bị unmount
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [editModal, showFelter]);
     return (
         <div>
             {posts?.length === 0 ? (
@@ -385,7 +403,7 @@ const UserPosts = () => {
                                 <div className=''>
                                     <div className='flex mt-2 mb-2'>
                                         <div className='w-1/2 flex-1 flex items-center '>
-                                            <div className='cursor-pointer flex' onClick={()=> setShowFelter(true)}>
+                                            <div className='cursor-pointer flex' onClick={()=> handleShowGetFelt(post)}>
                                                 <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
                                                     src={require("../../../assets/icons/like-blue1.png")}
                                                     alt=''
@@ -413,7 +431,7 @@ const UserPosts = () => {
                                             </p>
                                         </div> 
                                     </div>
-                                    {showFelter && (
+                                    {showFelter && selectedPost?.postId === post?.postId && (
                                         <GetFeft
                                             postId={selectedPost?.postId}
                                             isCloseModal = {() => setShowFelter(false)}

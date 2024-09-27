@@ -37,7 +37,7 @@ const GetAPost = () => {
     const [imagePreview, setImagePreview] = useState(null)
     const textareaRef = useRef(null); 
     const imageInputRef = useRef(null);
-    // console.log(post) 
+    console.log(post) 
     const [hoveredPostId, setHoveredPostId] = useState(null);
     const [showFelter, setShowFelter] = useState(false)
 
@@ -321,7 +321,7 @@ const GetAPost = () => {
                         </div>
                         {showFelter && (
                             <GetFeft
-                                postId={post?.postId}
+                                postId={post?.post?._id}
                                 isCloseModal = {() => setShowFelter(false)}
                             />
                         )}

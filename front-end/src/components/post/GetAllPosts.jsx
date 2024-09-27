@@ -167,6 +167,18 @@ const GetAllPosts = ({user, posts, params, profile}) => {
         navigation(`/get-profile/${userId}`)
     }
 
+    useEffect(() => {
+        if (editModal || showFelter) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+  
+        // Cleanup khi component bị unmount
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [editModal, showFelter]);
   return (
     <div>
         {posts?.map((post) => {

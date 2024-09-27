@@ -156,7 +156,7 @@ const feelController = {
             const postId = req.params.postId;
             const currentUserId = req.user.id; 
     
-            const feels = await FeelModel.find({ postId: postId });
+            const feels = await FeelModel.find({ postId: postId }).sort({ createdAt: -1 });;
     
             if(!feels) {
                 return res.status(404).json({ error: "Feel not found" });
