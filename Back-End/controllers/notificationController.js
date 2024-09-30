@@ -23,6 +23,21 @@ const notificationController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
+    },
+    checkNotification: async(req, res) => {
+        try {
+            const notificationId = req.params.notificationId;
+
+            const notification = await NotificationModel.findById(notificationId)
+
+            notification.read = true
+
+            await notification.save();
+
+            return res.status(200).json({message: 'Checked Notification'})
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 }
 

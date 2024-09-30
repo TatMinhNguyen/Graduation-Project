@@ -1,20 +1,24 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { timeAgo } from '../../utils';
-// import socket from '../../socket';
+import { useNavigate } from 'react-router-dom';
+import { checkNotification } from '../../api/notification/notification';
+import { useSelector } from 'react-redux';
 
 const GetNotifications = ({notifications}) => {
 
-    useEffect(() => {
-        // socket.on("notification", (newNotification) => {
-        //   console.log("New notification:", newNotification);
-        //   // Cập nhật state thông báo
-        // //   setNotifications((prev) => [newNotification, ...prev]);
-        // }); 
-      
-        // return () => {
-        //   socket.off("notification");
-        // };
-    }, []);
+    const user = useSelector((state) => state.auth.login?.currentUser)
+
+    const navigation = useNavigate()
+
+    const handleGetAPost = async(postId, notiId) => {
+        navigation(`/get-post/${postId}`)
+        await checkNotification(user?.token, notiId)
+    }
+
+    const handleGetUser = async(userId, notiId) => {
+        navigation(`/get-profile/${userId}`)
+        await checkNotification(user?.token, notiId)
+    }
     return (
         <div>
             <div className='absolute top-[-8px] right-[79px] transform rotate-45 w-3 h-3 bg-white border-l border-t border-gray-200'>
@@ -41,7 +45,12 @@ const GetNotifications = ({notifications}) => {
                 <div className='mt-3'>
                     {notifications?.map((notification) => {
                         return (
-                            <div key={notification._id}>
+                            <div key={notification?._id} 
+                                onClick={()=> 
+                                    {notification?.type === 'friend_request' || notification?.type === 'friend_accept' ? 
+                                        (handleGetUser(notification?.sender?._id, notification?._id)) : (handleGetAPost(notification?.postId?._id, notification?._id))
+                                    }}
+                            >
                                 <div className={`flex mx-1 my-1 cursor-pointer hover:bg-gray-200 rounded-md p-1.5 py-1 ${notification?.read === false ? '' : 'opacity-60'}`}>
                                     <div className='w-11 h-11 mr-3 mt-1'>
                                         <img className='h-full w-full object-cover rounded-full shadow hover:opacity-90'

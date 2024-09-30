@@ -158,7 +158,7 @@ const GetFeft = ({isCloseModal , postId}) => {
                                                 </div>
                                             </div> 
                                             <div className='flex-1'></div>
-                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1 hover:bg-blue-200'
+                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-2 hover:bg-blue-200'
                                                 onClick={() => handleGetUser(user?.author?.authorId)}
                                             >
                                             <p className='text-customBlue font-medium text-[14px]'>
@@ -229,7 +229,7 @@ const GetFeft = ({isCloseModal , postId}) => {
                                                 </div>
                                             </div> 
                                             <div className='flex-1'></div>
-                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1 hover:bg-blue-200'
+                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-2 hover:bg-blue-200'
                                                 onClick={() => handleGetUser(user?.author?.authorId)}
                                             >
                                             <p className='text-customBlue font-medium text-[14px]'>
@@ -300,7 +300,7 @@ const GetFeft = ({isCloseModal , postId}) => {
                                                 </div>
                                             </div> 
                                             <div className='flex-1'></div>
-                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1 hover:bg-blue-200'
+                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-2 hover:bg-blue-200'
                                                 onClick={() => handleGetUser(user?.author?.authorId)}
                                             >
                                             <p className='text-customBlue font-medium text-[14px]'>
@@ -371,7 +371,7 @@ const GetFeft = ({isCloseModal , postId}) => {
                                                 </div>
                                             </div> 
                                             <div className='flex-1'></div>
-                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1 hover:bg-blue-200'
+                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-2 hover:bg-blue-200'
                                                 onClick={() => handleGetUser(user?.author?.authorId)}
                                             >
                                             <p className='text-customBlue font-medium text-[14px]'>
@@ -442,7 +442,7 @@ const GetFeft = ({isCloseModal , postId}) => {
                                                 </div>
                                             </div> 
                                             <div className='flex-1'></div>
-                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1 hover:bg-blue-200'
+                                            <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-2 hover:bg-blue-200'
                                                 onClick={() => handleGetUser(user?.author?.authorId)}
                                             >
                                             <p className='text-customBlue font-medium text-[14px]'>

@@ -12,3 +12,13 @@ export const getNotification = async(token) => {
         console.log(error)
     }
 }
+
+export const checkNotification = async(token, notificationId) => {
+    try {
+        await axios.post(`${apiUrl}/notification/check-notification/${notificationId}`, {}, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}

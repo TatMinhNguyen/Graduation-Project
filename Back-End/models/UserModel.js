@@ -77,7 +77,9 @@ const userSchema = new mongoose.Schema(
     isVerify: {
       type: Boolean,
       default: false
-    }
+    },
+    isBan: {type: Boolean, default: false},
+    isAdmin : {type : Boolean, default: false}
   },
   { timestamps: true }  
 );
