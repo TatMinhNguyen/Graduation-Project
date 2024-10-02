@@ -29,7 +29,8 @@ const friendController = {
             const suggestedUsers = await UserModel.find(
                 { 
                     _id: { $nin: excludeUsers }, // Loại bỏ các người dùng đã xác định
-                    isVerify: true // Chỉ lấy những người dùng đã xác thực
+                    isVerify: true, // Chỉ lấy những người dùng đã xác thực
+                    isAdmin: { $ne: true }
                 },
                 { 
                     _id: 1, 

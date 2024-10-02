@@ -53,7 +53,7 @@ const Search = () => {
                 />
             </div>
             <div className='flex h-full pt-16'>
-                <div className='w-1/4 bg-white fixed h-full -mt-3 shadow-xl px-4 py-4'>
+                <div className='w-1/4 bg-white fixed h-full -mt-3 shadow-2xl px-4 py-4'>
                     <h1 className='font-bold text-2xl border-b border-gray-300 pb-3'>
                         Search results
                     </h1>

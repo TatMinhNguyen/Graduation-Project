@@ -205,18 +205,14 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                             </div>
                         </div>  
                         <div className='flex-1'></div>
-                        {user?.userId === post?.author?.authorId ? (
-                            <div className='mr-3 cursor-pointer p-1.5 rounded-full hover:bg-gray-100'
-                                    onClick={(e) => handleThreeDotsClick(e, post)}
-                            >
-                                <img className='w-6 h-6'
-                                    src={require('../../assets/icons/menu.png')}
-                                    alt="" 
-                                />
-                            </div>                             
-                        ) : (
-                            ''
-                        )}
+                        <div className='mr-3 cursor-pointer p-1.5 rounded-full hover:bg-gray-100'
+                                onClick={(e) => handleThreeDotsClick(e, post)}
+                        >
+                            <img className='w-6 h-6'
+                                src={require('../../assets/icons/menu.png')}
+                                alt="" 
+                            />
+                        </div>                             
                         {showModal === post?.postId && (
                             <div
                                 ref={modalRef}
@@ -232,26 +228,41 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             isAbove ? 'bottom-[-6px] border-b border-r' : 'top-[-6px] border-l border-t'
                                         } left-[132px]`}>
                                     </div>
-                                    <div className='py-2 px-1.5'>
-                                        <div className='flex hover:bg-gray-100 px-2 rounded'
-                                            onClick={() => handleEditModal(post)}
-                                        >
-                                            <img className='w-6 h-6 mr-3 mt-1'
-                                                src={require('../../assets/icons/edit1.png')}
-                                                alt=''
-                                            />
-                                            <p className='py-1 cursor-pointer text-black'>Edit post </p>
+                                    {user?.userId === post?.author?.authorId ? (
+                                        <div className='py-2 px-1.5'>
+                                            <div className='flex hover:bg-gray-100 px-2 rounded'
+                                                onClick={() => handleEditModal(post)}
+                                            >
+                                                <img className='w-5 h-5 mr-3 mt-1'
+                                                    src={require('../../assets/icons/edit1.png')}
+                                                    alt=''
+                                                />
+                                                <p className='py-1 font-medium cursor-pointer text-black'>Edit post </p>
+                                            </div>
+                                            <div className='flex hover:bg-red-50 px-2 rounded'
+                                                    onClick={() => handleShowComfirmDelete(post)}
+                                            >
+                                                <img className='w-5 h-5 mr-3 mt-1'
+                                                    src={require('../../assets/icons/delete.png')}
+                                                    alt=''
+                                                />
+                                                <p className='py-1 font-medium cursor-pointer text-red-600'>Delete post </p>
+                                            </div>
                                         </div>
-                                        <div className='flex hover:bg-red-50 px-2 rounded'
-                                                onClick={() => handleShowComfirmDelete(post)}
-                                        >
-                                            <img className='w-6 h-6 mr-3 mt-1'
-                                                src={require('../../assets/icons/delete.png')}
-                                                alt=''
-                                            />
-                                            <p className='py-1 cursor-pointer text-red-600'>Delete post </p>
+                                    ) : (
+                                        <div className='py-2 px-1.5'>
+                                            <div className='flex hover:bg-gray-100 px-2 rounded'
+                                                // onClick={() => handleEditModal(post)}
+                                            >
+                                                <img className='w-5 h-5 mr-3 mt-2'
+                                                    src={require('../../assets/icons/report-post.png')}
+                                                    alt=''
+                                                />
+                                                <p className='py-1 font-medium cursor-pointer text-black'>Report post </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+
                                 </div>
                             </div>
                         )}

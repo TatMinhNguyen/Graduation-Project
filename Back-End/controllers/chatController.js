@@ -37,7 +37,8 @@ const chatController = {
             // Lấy danh sách các đoạn chat mà user có tham gia
             let chats = await ChatModel.find({
                 members: { $in: [req.user.id] }
-            }).sort({ createdAt: -1 });
+            }).sort({ 
+                updatedAt: -1 });
     
             // Duyệt qua từng đoạn chat
             const updatedChats = await Promise.all(
