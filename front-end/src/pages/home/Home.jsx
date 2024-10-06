@@ -98,10 +98,12 @@ const Home = () => {
         />
       </div>
       <div className='flex h-full pt-20'>
-        <div className='' style={{ flex: '30%' }}>
-          <LeftBar/>
+        <div className='fixed ml-3' style={{ flex: '30%' }}>
+          <LeftBar
+            profile={profile}
+          />
         </div>
-        <div className='' style={{ flex: '40%' }}>
+        <div className='ml-[30%]' style={{ flex: '40%' }}>
           <div className='h-12 bg-white border border-white shadow rounded-md flex-1 flex items-center'>
             <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer'>
               <p className='text-lg font-bold py-2 border-b-4 border-b-blue-500'>

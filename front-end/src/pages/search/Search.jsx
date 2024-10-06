@@ -72,7 +72,7 @@ const Search = () => {
                                 </div>
                                 <p className='font-medium ml-3'>Posts</p>
                             </div>
-                            <div className='flex-1 flex items-center p-2 bg-gray-100 rounded-md mt-0.5 cursor-pointer'
+                            <div className='flex-1 flex items-center p-2 bg-gray-100 hover:bg-gray-200 rounded-md mt-0.5 cursor-pointer'
                                 onClick={() => navigate(`/search/users?q=${searchQuery}`)}
                             >
                                 <div className='p-2 rounded-full bg-gray-300'>
@@ -87,7 +87,7 @@ const Search = () => {
                         </div>                        
                     ) : (
                         <div>
-                            <div className='flex-1 flex items-center p-2 bg-gray-100 rounded-md cursor-pointer'
+                            <div className='flex-1 flex items-center p-2 bg-gray-100 hover:bg-gray-200 rounded-md cursor-pointer'
                                 onClick={() => navigate(`/search/posts?q=${searchQuery}`)}
                             >
                                 <div className='p-2 rounded-full bg-gray-300'>

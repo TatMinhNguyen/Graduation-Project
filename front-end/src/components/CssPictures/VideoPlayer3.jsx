@@ -46,20 +46,18 @@ export const VideoPlayer3 = ({url, selectedImages}) => {
                         plugins={[lgZoom]}
                         elementClassNames="h-full w-full"
                     >
-                        <a href={selectedImages[0]} className='flex-1 pb-px'>
-                            <div className='flex-1 h-1/2 pb-px'>
-                                <img className='w-full h-full object-cover'
-                                    src= {selectedImages[0]}
-                                    alt=''
-                                />
-                            </div> 
-                            <div className='flex-1 h-1/2 pt-px'>
-                                <img className='w-full h-full object-cover'
-                                    src= {selectedImages[1]}
-                                    alt=''
-                                />
-                            </div> 
-                        </a> 
+                    <a href={selectedImages[0]} className=''>
+                        <img className='w-full h-[35vh] object-cover pb-0.5'
+                            src= {selectedImages[0]}
+                            alt=''
+                        />
+                    </a>  
+                    <a href={selectedImages[1]} className=''>
+                        <img className='w-full h-[35vh] object-cover'
+                            src= {selectedImages[1]}
+                            alt=''
+                        />
+                    </a> 
                     </LightGallery>                                       
                 </div>
             ) : (

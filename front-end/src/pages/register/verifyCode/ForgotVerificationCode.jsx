@@ -69,7 +69,7 @@ const ForgotVerificationCode = () => {
                         </div>
                         <div className='flex justify-end mt-[40vh]'>
                             <div className='flex space-x-4'>
-                                <Link className='w-[10vh] bg-gray-400 text-white px-4 py-2 rounded-xl font-medium hover:bg-gray-600'
+                                <Link className='w-[10vh] bg-gray-400 text-white px-3 py-2 rounded-xl font-medium hover:bg-gray-600'
                                         to = "/login"
                                 >
                                     Cancel

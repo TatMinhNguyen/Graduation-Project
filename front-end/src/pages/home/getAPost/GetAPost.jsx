@@ -20,6 +20,7 @@ import { ImageComment } from '../../../components/CssPictures/ImageComment';
 import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction';
 import LoadingSpinner from '../../../components/spinner/LoadingSpinner';
 import GetFeft from '../../../components/comment/GetFeft';
+import NavBar from '../../../components/navbar/NavBar';
 
 const GetAPost = () => {
     const { postId } = useParams();
@@ -37,7 +38,7 @@ const GetAPost = () => {
     const [imagePreview, setImagePreview] = useState(null)
     const textareaRef = useRef(null); 
     const imageInputRef = useRef(null);
-    console.log(post) 
+    // console.log(post) 
     const [hoveredPostId, setHoveredPostId] = useState(null);
     const [showFelter, setShowFelter] = useState(false)
 
@@ -191,378 +192,409 @@ const GetAPost = () => {
     // console.log(post)
 
   return (
-    <div className="flex-1 flex justify-center bg-black">
-        <div className='absolute left-0 top-0 p-3 bg-gray-500 m-3 rounded-full cursor-pointer hover:bg-gray-400'
-                onClick={handleGoBack}
-        >
-            <img
-                src={require('../../../assets/icons/cancel.png')}
-                alt=''
-                className='w-5 h-5'
-            />
-        </div>
-        <div className="h-full w-1/2 bg-white shadow z-50 min-h-screen">
-            <div className='py-2 h-[calc(100%)] p-0 '>
-                <div>
-                    <div className='flex-1 flex items-center mx-3 mb-2'>
-                        <div className='w-10 h-10'>
-                            <img className='h-full w-full object-cover rounded-full  hover:opacity-90'
-                                src= {post?.author?.authorAvatar}
-                                alt='Avatar'
-                            />
-                        </div>
-                        <div className='ml-3'>
-                            <h1 className='font-medium text-base'>
-                                {post?.author?.authorName}
-                            </h1>
-                            <p className='text-xs text-gray-500'>
-                                {timeAgo(post?.post?.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                    <div>
-                        {post?.post?.typeText === false ?(
-                            <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
-                                {post?.post?.description ? (
-                                    convertNewlinesToBreaks(post?.post?.description)
-                                ) : (
-                                    ''
-                                )}
-                            </p>
-                        ) : (
-                            <p className='ml-3.5 font-sans' style={{color: "#050505"}}>
-                                {post?.post?.description ? (
-                                    convertNewlinesToBreaks(post?.post?.description)
-                                ) : (
-                                    ''
-                                )}
-                            </p>
-                        )} 
-                        <div className='mt-2 cursor-pointer'>
-                            {(post?.post?.video == null || !post?.post?.video) ? (
-                                <>
-                                    {post?.post?.images.length > 5 ? (
-                                        <SixPictures
-                                            selectedImages={post?.post?.images.map(img => img.url)} 
-                                            extraImagesCount={post?.post?.images.length - 4}
-                                        />
-                                    ) : post?.post?.images.length === 5 ? (
-                                        <FivePictures selectedImages={post?.post?.images.map(img => img.url)}/>
-                                    ) : post?.post?.images.length === 4 ? (
-                                        <FourPictures selectedImages={post?.post?.images.map(img => img.url)}/>
-                                    ) : post?.post?.images.length === 3 ? (
-                                        <ThreePictures selectedImages={post?.post?.images.map(img => img.url)}/>
-                                    ) : post?.post?.images.length === 2 ? (
-                                        <TwoPictures selectedImages={post?.post?.images.map(img => img.url)}/>
-                                    ) : post?.post?.images.length === 1 ? (
-                                        <OnePicture selectedImages={post?.post?.images.map(img => img.url)}/>
-                                    ) : ('')}
-                                </>
-                            ) : (
-                                <>  
-                                    {post?.post?.images.length > 3 ? (
-                                        <VideoPlayer5
-                                            url = {post?.post?.video.url}
-                                            selectedImages = {post?.post?.images.map(img => img.url)}
-                                            extraImagesCount={post?.post?.images.length - 2}
-                                        /> 
-                                    ) : post?.post?.images.length === 3 ? (
-                                        <VideoPlayer4
-                                            url = {post?.post?.video.url}
-                                            selectedImages = {post?.post?.images.map(img => img.url)}
-                                        />                                        
-                                    ) : post?.post?.images.length === 2 ? (
-                                        <VideoPlayer3
-                                            url = {post?.post?.video.url}
-                                            selectedImages = {post?.post?.images.map(img => img.url)}
-                                        />                                        
-                                    ) : post?.post?.images.length === 1 ? (
-                                        <VideoPlayer2 
-                                            url = {post?.post?.video.url}
-                                            selectedImages = {post?.post?.images.map(img => img.url)}
-                                        />                                        
-                                    ) : (
-                                        <VideoPlayer url = {post?.post?.video.url}/>
-                                    )} 
-                                </>
-                            )} 
-                        </div>                                                   
-                    </div>
-                    <div className=''>
-                        <div className='flex mt-2 mb-2'>
-                            <div className='w-1/2 flex-1 flex items-center '>
-                                <div className='cursor-pointer flex' onClick={()=> setShowFelter(true)}>
-                                    <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
-                                        src={require("../../../assets/icons/like-blue1.png")}
-                                        alt=''
-                                    />
-                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                        src={require("../../../assets/icons/love.png")}
-                                        alt=''
-                                    />
-                                    <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
-                                        src={require("../../../assets/icons/haha.png")}
-                                        alt=''
+    <div >
+        {postId === 'undefined' ? (
+            <div>
+                <div className='fixed top-0 w-full z-50'>
+                    <NavBar 
+                        user={user}
+                    />
+                </div> 
+                <div className='h-screen pt-20 bg-gray-100 flex-1 flex flex-col justify-center items-center'>
+                    <img className='w-32 h-32'
+                        src={require('../../../assets/icons/file.png')}
+                        alt=''
+                    />
+                    <p className='text-xl font-bold text-gray-500 my-2'>
+                        The post has been deleted.
+                    </p>
+                    <button className='text-white font-medium bg-customBlue px-5 py-2 rounded-md hover:bg-blue-600'
+                        onClick={() => navigate('/')}
+                    >
+                        Go to News Feed   
+                    </button>  
+                    <button className='text-blue-600 font-medium text-[17px] mt-2 px-1 hover:border-b hover:border-customBlue'
+                        onClick={() => navigate(-1)}
+                    >
+                        Go back    
+                    </button>                      
+                </div> 
+            </div>
+        ) : (
+            <div className="flex-1 flex justify-center bg-black">
+                <div className='fixed left-0 top-0 p-3 bg-gray-500 m-3 rounded-full cursor-pointer hover:bg-gray-400'
+                        onClick={handleGoBack}
+                >
+                    <img
+                        src={require('../../../assets/icons/cancel.png')}
+                        alt=''
+                        className='w-5 h-5'
+                    />
+                </div>
+                <div className="h-full w-1/2 bg-white shadow z-50 min-h-screen">
+                    <div className='py-2 h-[calc(100%)] p-0 '>
+                        <div>
+                            <div className='flex-1 flex items-center mx-3 mb-2'>
+                                <div className='w-10 h-10'>
+                                    <img className='h-full w-full object-cover rounded-full  hover:opacity-90'
+                                        src= {post?.author?.authorAvatar}
+                                        alt='Avatar'
                                     />
                                 </div>
-                                <p className='text-gray-500 font-normal text-base ml-1'>
-                                    {post?.post?.felt}
-                                </p>
-                            </div>
-                            <div className='w-1/2 flex '>
-                                <div className='flex-1'></div>
-                                <p className='text-gray-500 font-normal text-base'>
-                                    {post?.post?.comment}
-                                </p>
-                                <p className='text-gray-500 font-normal text-base ml-1 mr-3.5'>
-                                    comments
-                                </p>
-                            </div> 
-                        </div>
-                        {showFelter && (
-                            <GetFeft
-                                postId={post?.post?._id}
-                                isCloseModal = {() => setShowFelter(false)}
-                            />
-                        )}
-                        <div className='relative'>
-                            {/* Các nút hành động */}
-                            <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>
-                                <div
-                                    className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100`}
-                                    onMouseEnter={() => handleMouseEnter(post.post?._id)}
-                                    onMouseLeave={handleMouseLeave}
-                                >
-                                    {post?.is_feel === '1' ? (
-                                        <div className='w-full flex items-center justify-center py-1'
-                                            onClick={() => handleUnLike(post.post?._id)}
-                                        >
-                                            <img className='h-6 w-6 ml-2'
-                                                src={require("../../../assets/icons/like-blue.png")}
-                                                alt=''
-                                            />
-                                            <p className='text-customBlue font-normal text-base ml-2 mr-12'>
-                                                Like
-                                            </p>
-                                        </div>
-                                    ) : post?.is_feel === '2' ? (
-                                        <div className='w-full flex items-center justify-center py-1'
-                                            onClick={() => handleUnLike(post.post?._id)}
-                                        >
-                                            <img className='h-6 w-6 ml-2'
-                                                src={require("../../../assets/icons/love.png")}
-                                                alt=''
-                                            />
-                                            <p className='text-red-500 font-normal text-base ml-2 mr-12'>
-                                                Love
-                                            </p>
-                                        </div>
-                                    ) : post?.is_feel === '3' ? (
-                                        <div className='w-full flex items-center justify-center py-1'
-                                            onClick={() => handleUnLike(post.post?._id)}
-                                        >
-                                            <img className='h-6 w-6 ml-2'
-                                                src={require("../../../assets/icons/haha.png")}
-                                                alt=''
-                                            />
-                                            <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
-                                                Haha
-                                            </p>
-                                        </div>
-                                    ) : post?.is_feel === '4' ? (
-                                        <div className='w-full flex items-center justify-center py-1'
-                                            onClick={() => handleUnLike(post.post?._id)}
-                                        >
-                                            <img className='h-6 w-6 ml-2'
-                                                src={require("../../../assets/icons/sad.png")}
-                                                alt=''
-                                            />
-                                            <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
-                                                Sad
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className='w-full flex items-center justify-center py-1'
-                                            onClick={() => handleLike(post.post?._id, '1')}
-                                        >
-                                            <img className='h-6 w-6 ml-2'
-                                                src={require("../../../assets/icons/like.png")}
-                                                alt=''
-                                            />
-                                            <p className='text-gray-500 font-normal text-base ml-2 mr-12'>
-                                                Like
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Nút comment */}
-                                <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100'
-                                    // onClick={() => handleGetAPost(post?.postId)}
-                                >
-                                    <img className='h-5 w-5 ml-2'
-                                        src={require("../../../assets/icons/comment.png")}
-                                        alt=''
-                                    />
-                                    <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
-                                        Comment
+                                <div className='ml-3'>
+                                    <h1 className='font-medium text-base'>
+                                        {post?.author?.authorName}
+                                    </h1>
+                                    <p className='text-xs text-gray-500'>
+                                        {timeAgo(post?.post?.createdAt)}
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Modal hiển thị cảm xúc khi hover */}
-                            {hoveredPostId === post.post?._id && (
-                                <div className='absolute bottom-full -mb-2 left-24 p-1 bg-white shadow-lg rounded-md z-10'
-                                    onClick={()=> setHoveredPostId(null)}
-                                    onMouseEnter={() => handleMouseEnter(post.post?._id)}  
-                                    onMouseLeave={handleMouseLeave}
-                                >
-                                    <div className='flex justify-between'>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
-                                            onClick={() => post?.is_feel === -1 
-                                                ? handleLike(post.post?._id, '1') 
-                                                : handleUpdateFelt(post.post?._id, '1')}
-                                        >
-                                            <img className='h-6 w-6' src={require("../../../assets/icons/like-blue.png")} alt='Like' />
-                                            <p className='text-customBlue text-xs'>Like</p>
-                                        </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
-                                            onClick={() => post?.is_feel === -1 
-                                                ? handleLike(post.post?._id, '2') 
-                                                : handleUpdateFelt(post.post?._id, '2')}
-                                        >
-                                            <img className='h-6 w-6' src={require("../../../assets/icons/love.png")} alt='Love' />
-                                            <p className='text-red-500 text-xs'>Love</p>
-                                        </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
-                                            onClick={() => post?.is_feel === -1 
-                                                ? handleLike(post.post?._id, '3') 
-                                                : handleUpdateFelt(post.post?._id, '3')}
-                                        >
-                                            <img className='h-6 w-6' src={require("../../../assets/icons/haha.png")} alt='Haha' />
-                                            <p className='text-orange-400 text-xs'>Haha</p>
-                                        </div>
-                                        <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
-                                            onClick={() => post?.is_feel === -1 
-                                                ? handleLike(post.post?._id, '4') 
-                                                : handleUpdateFelt(post.post?._id, '4')}
-                                        >
-                                            <img className='h-6 w-6' src={require("../../../assets/icons/sad.png")} alt='Sad' />
-                                            <p className='text-orange-400 text-xs'>Sad</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>                    
-                </div>
-                    <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white '>
-                        <div className='h-10 w-10 mr-3'>
-                            <img className='h-full w-full object-cover rounded-full shadow'
-                                src={profile?.profilePicture}
-                                alt='Avatar'
-                            />
-                        </div>
-                        <form onSubmit={handleCreateComment} className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
-                            <textarea
-                                id="description"
-                                name="description"
-                                rows="1"
-                                value={description}
-                                onChange={handleInput}
-                                ref={textareaRef}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleCreateComment(e);  // Gọi hàm submit form
-                                    }
-                                }}
-                                className="flex-grow w-full px-4 py-2 rounded-2xl mt-1 bg-gray-100 overflow-hidden
-                                    focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
-                                placeholder="Write your comment here..."
-                                style={{resize: 'none'}} // Optional: Prevent manual resizing
-                            />
-                            {imagePreview && (
-                                <div className='m-4 flex-1 flex'>
-                                    <ImageComment
-                                        selectedImages = {imagePreview}
-                                    />
-                                    <div className='w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300'
-                                            onClick={handleDeletePreView}
-                                    >
-                                        <img
-                                            src={require('../../../assets/icons/close.png')}
-                                            alt=''
-                                            className='w-4 h-4'
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                            
-                            <div className="flex items-center space-x-2 pb-2 px-3">
-                                <div className='text-gray-500 cursor-pointer'>
-                                    <img className='h-6 w-6 object-cover'
-                                        src={require("../../../assets/icons/smile.png")}
-                                        alt=''
-                                    />                                 
-                                </div>
-                                <div onClick={handleImageClick} className='text-gray-500 cursor-pointer'>
-                                    <img className='h-6 w-6 object-cover'
-                                        src={require("../../../assets/icons/camera.png")}
-                                        alt=''
-                                    />                                 
-                                </div>  
-                                {/* Hidden inputs */}
-                                <input 
-                                    type="file" 
-                                    accept="image/*" 
-                                    ref={imageInputRef} 
-                                    style={{ display: 'none' }} 
-                                    onChange={handleImageChange} 
-                                />                                             
-                                <div className='flex-1'></div>
-                                {loading ? (
-                                    <div>
-                                        <LoadingSpinner/>
-                                    </div>
-                                ):(
-                                    <>
-                                        {description || image ? (
-                                            <button type="submit" className="text-white">
-                                                <img className='h-6 w-6 object-cover'
-                                                    src={require("../../../assets/icons/send-blue.png")}
-                                                    alt=''
-                                                />                            
-                                            </button>                                 
-                                        ) :(
-                                            <div className="text-white">
-                                                <img className='h-6 w-6 object-cover'
-                                                    src={require("../../../assets/icons/send-gray.png")}
-                                                    alt=''
-                                                />                            
-                                            </div>   
-                                        )}                                    
-                                    </>
-                                )}                          
+                            <div>
+                                {post?.post?.typeText === false ?(
+                                    <p className='ml-3.5 font-mono' style={{color: "#333333"}}>
+                                        {post?.post?.description ? (
+                                            convertNewlinesToBreaks(post?.post?.description)
+                                        ) : (
+                                            ''
+                                        )}
+                                    </p>
+                                ) : (
+                                    <p className='ml-3.5 font-sans' style={{color: "#050505"}}>
+                                        {post?.post?.description ? (
+                                            convertNewlinesToBreaks(post?.post?.description)
+                                        ) : (
+                                            ''
+                                        )}
+                                    </p>
+                                )} 
+                                <div className='mt-2 cursor-pointer'>
+                                    {(post?.post?.video == null || !post?.post?.video) ? (
+                                        <>
+                                            {post?.post?.images.length > 5 ? (
+                                                <SixPictures
+                                                    selectedImages={post?.post?.images.map(img => img.url)} 
+                                                    extraImagesCount={post?.post?.images.length - 4}
+                                                />
+                                            ) : post?.post?.images.length === 5 ? (
+                                                <FivePictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                            ) : post?.post?.images.length === 4 ? (
+                                                <FourPictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                            ) : post?.post?.images.length === 3 ? (
+                                                <ThreePictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                            ) : post?.post?.images.length === 2 ? (
+                                                <TwoPictures selectedImages={post?.post?.images.map(img => img.url)}/>
+                                            ) : post?.post?.images.length === 1 ? (
+                                                <OnePicture selectedImages={post?.post?.images.map(img => img.url)}/>
+                                            ) : ('')}
+                                        </>
+                                    ) : (
+                                        <>  
+                                            {post?.post?.images.length > 3 ? (
+                                                <VideoPlayer5
+                                                    url = {post?.post?.video.url}
+                                                    selectedImages = {post?.post?.images.map(img => img.url)}
+                                                    extraImagesCount={post?.post?.images.length - 2}
+                                                /> 
+                                            ) : post?.post?.images.length === 3 ? (
+                                                <VideoPlayer4
+                                                    url = {post?.post?.video.url}
+                                                    selectedImages = {post?.post?.images.map(img => img.url)}
+                                                />                                        
+                                            ) : post?.post?.images.length === 2 ? (
+                                                <VideoPlayer3
+                                                    url = {post?.post?.video.url}
+                                                    selectedImages = {post?.post?.images.map(img => img.url)}
+                                                />                                        
+                                            ) : post?.post?.images.length === 1 ? (
+                                                <VideoPlayer2 
+                                                    url = {post?.post?.video.url}
+                                                    selectedImages = {post?.post?.images.map(img => img.url)}
+                                                />                                        
+                                            ) : (
+                                                <VideoPlayer url = {post?.post?.video.url}/>
+                                            )} 
+                                        </>
+                                    )} 
+                                </div>                                                   
                             </div>
-                        </form>            
+                            <div className=''>
+                                <div className='flex mt-2 mb-2'>
+                                    <div className='w-1/2 flex-1 flex items-center '>
+                                        <div className='cursor-pointer flex' onClick={()=> setShowFelter(true)}>
+                                            <img className='h-6 w-6 ml-3.5 rounded-full border-2 border-white shadow-xl'
+                                                src={require("../../../assets/icons/like-blue1.png")}
+                                                alt=''
+                                            />
+                                            <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                src={require("../../../assets/icons/love.png")}
+                                                alt=''
+                                            />
+                                            <img className='h-6 w-6 -ml-1 rounded-full border-2 border-white shadow-xl'
+                                                src={require("../../../assets/icons/haha.png")}
+                                                alt=''
+                                            />
+                                        </div>
+                                        <p className='text-gray-500 font-normal text-base ml-1'>
+                                            {post?.post?.felt}
+                                        </p>
+                                    </div>
+                                    <div className='w-1/2 flex '>
+                                        <div className='flex-1'></div>
+                                        <p className='text-gray-500 font-normal text-base'>
+                                            {post?.post?.comment}
+                                        </p>
+                                        <p className='text-gray-500 font-normal text-base ml-1 mr-3.5'>
+                                            comments
+                                        </p>
+                                    </div> 
+                                </div>
+                                {showFelter && (
+                                    <GetFeft
+                                        postId={post?.post?._id}
+                                        isCloseModal = {() => setShowFelter(false)}
+                                    />
+                                )}
+                                <div className='relative'>
+                                    {/* Các nút hành động */}
+                                    <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>
+                                        <div
+                                            className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100`}
+                                            onMouseEnter={() => handleMouseEnter(post.post?._id)}
+                                            onMouseLeave={handleMouseLeave}
+                                        >
+                                            {post?.is_feel === '1' ? (
+                                                <div className='w-full flex items-center justify-center py-1'
+                                                    onClick={() => handleUnLike(post.post?._id)}
+                                                >
+                                                    <img className='h-6 w-6 ml-2'
+                                                        src={require("../../../assets/icons/like-blue.png")}
+                                                        alt=''
+                                                    />
+                                                    <p className='text-customBlue font-normal text-base ml-2 mr-12'>
+                                                        Like
+                                                    </p>
+                                                </div>
+                                            ) : post?.is_feel === '2' ? (
+                                                <div className='w-full flex items-center justify-center py-1'
+                                                    onClick={() => handleUnLike(post.post?._id)}
+                                                >
+                                                    <img className='h-6 w-6 ml-2'
+                                                        src={require("../../../assets/icons/love.png")}
+                                                        alt=''
+                                                    />
+                                                    <p className='text-red-500 font-normal text-base ml-2 mr-12'>
+                                                        Love
+                                                    </p>
+                                                </div>
+                                            ) : post?.is_feel === '3' ? (
+                                                <div className='w-full flex items-center justify-center py-1'
+                                                    onClick={() => handleUnLike(post?.post?._id)}
+                                                >
+                                                    <img className='h-6 w-6 ml-2'
+                                                        src={require("../../../assets/icons/haha.png")}
+                                                        alt=''
+                                                    />
+                                                    <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
+                                                        Haha
+                                                    </p>
+                                                </div>
+                                            ) : post?.is_feel === '4' ? (
+                                                <div className='w-full flex items-center justify-center py-1'
+                                                    onClick={() => handleUnLike(post?.post?._id)}
+                                                >
+                                                    <img className='h-6 w-6 ml-2'
+                                                        src={require("../../../assets/icons/sad.png")}
+                                                        alt=''
+                                                    />
+                                                    <p className='text-orange-400 font-normal text-base ml-2 mr-12'>
+                                                        Sad
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <div className='w-full flex items-center justify-center py-1'
+                                                    onClick={() => handleLike(post?.post?._id, '1')}
+                                                >
+                                                    <img className='h-6 w-6 ml-2'
+                                                        src={require("../../../assets/icons/like.png")}
+                                                        alt=''
+                                                    />
+                                                    <p className='text-gray-500 font-normal text-base ml-2 mr-12'>
+                                                        Like
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Nút comment */}
+                                        <div className='w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100'
+                                            // onClick={() => handleGetAPost(post?.postId)}
+                                        >
+                                            <img className='h-5 w-5 ml-2'
+                                                src={require("../../../assets/icons/comment.png")}
+                                                alt=''
+                                            />
+                                            <p className='text-gray-500 font-normal text-base ml-3 mb-1'>
+                                                Comment
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Modal hiển thị cảm xúc khi hover */}
+                                    {hoveredPostId === post?.post?._id && (
+                                        <div className='absolute bottom-full -mb-2 left-24 p-1 bg-white shadow-lg rounded-md z-10'
+                                            onClick={()=> setHoveredPostId(null)}
+                                            onMouseEnter={() => handleMouseEnter(post?.post?._id)}  
+                                            onMouseLeave={handleMouseLeave}
+                                        >
+                                            <div className='flex justify-between'>
+                                                <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                                    onClick={() => post?.is_feel === -1 
+                                                        ? handleLike(post?.post?._id, '1') 
+                                                        : handleUpdateFelt(post?.post?._id, '1')}
+                                                >
+                                                    <img className='h-6 w-6' src={require("../../../assets/icons/like-blue.png")} alt='Like' />
+                                                    <p className='text-customBlue text-xs'>Like</p>
+                                                </div>
+                                                <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                                    onClick={() => post?.is_feel === -1 
+                                                        ? handleLike(post?.post?._id, '2') 
+                                                        : handleUpdateFelt(post?.post?._id, '2')}
+                                                >
+                                                    <img className='h-6 w-6' src={require("../../../assets/icons/love.png")} alt='Love' />
+                                                    <p className='text-red-500 text-xs'>Love</p>
+                                                </div>
+                                                <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                                    onClick={() => post?.is_feel === -1 
+                                                        ? handleLike(post?.post?._id, '3') 
+                                                        : handleUpdateFelt(post?.post?._id, '3')}
+                                                >
+                                                    <img className='h-6 w-6' src={require("../../../assets/icons/haha.png")} alt='Haha' />
+                                                    <p className='text-orange-400 text-xs'>Haha</p>
+                                                </div>
+                                                <div className='flex flex-col items-center cursor-pointer hover:bg-gray-200 p-1.5 rounded-md'
+                                                    onClick={() => post?.is_feel === -1 
+                                                        ? handleLike(post?.post?._id, '4') 
+                                                        : handleUpdateFelt(post?.post?._id, '4')}
+                                                >
+                                                    <img className='h-6 w-6' src={require("../../../assets/icons/sad.png")} alt='Sad' />
+                                                    <p className='text-orange-400 text-xs'>Sad</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>                    
+                        </div>
+                            <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white '>
+                                <div className='h-10 w-10 mr-3'>
+                                    <img className='h-full w-full object-cover rounded-full shadow'
+                                        src={profile?.profilePicture}
+                                        alt='Avatar'
+                                    />
+                                </div>
+                                <form onSubmit={handleCreateComment} className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
+                                    <textarea
+                                        id="description"
+                                        name="description"
+                                        rows="1"
+                                        value={description}
+                                        onChange={handleInput}
+                                        ref={textareaRef}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleCreateComment(e);  // Gọi hàm submit form
+                                            }
+                                        }}
+                                        className="flex-grow w-full px-4 py-2 rounded-2xl mt-1 bg-gray-100 overflow-hidden
+                                            focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
+                                        placeholder="Write your comment here..."
+                                        style={{resize: 'none'}} // Optional: Prevent manual resizing
+                                    />
+                                    {imagePreview && (
+                                        <div className='m-4 flex-1 flex'>
+                                            <ImageComment
+                                                selectedImages = {imagePreview}
+                                            />
+                                            <div className='w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300'
+                                                    onClick={handleDeletePreView}
+                                            >
+                                                <img
+                                                    src={require('../../../assets/icons/close.png')}
+                                                    alt=''
+                                                    className='w-4 h-4'
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="flex items-center space-x-2 pb-2 px-3">
+                                        <div className='text-gray-500 cursor-pointer'>
+                                            <img className='h-6 w-6 object-cover'
+                                                src={require("../../../assets/icons/smile.png")}
+                                                alt=''
+                                            />                                 
+                                        </div>
+                                        <div onClick={handleImageClick} className='text-gray-500 cursor-pointer'>
+                                            <img className='h-6 w-6 object-cover'
+                                                src={require("../../../assets/icons/camera.png")}
+                                                alt=''
+                                            />                                 
+                                        </div>  
+                                        {/* Hidden inputs */}
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            ref={imageInputRef} 
+                                            style={{ display: 'none' }} 
+                                            onChange={handleImageChange} 
+                                        />                                             
+                                        <div className='flex-1'></div>
+                                        {loading ? (
+                                            <div>
+                                                <LoadingSpinner/>
+                                            </div>
+                                        ):(
+                                            <>
+                                                {description || image ? (
+                                                    <button type="submit" className="text-white">
+                                                        <img className='h-6 w-6 object-cover'
+                                                            src={require("../../../assets/icons/send-blue.png")}
+                                                            alt=''
+                                                        />                            
+                                                    </button>                                 
+                                                ) :(
+                                                    <div className="text-white">
+                                                        <img className='h-6 w-6 object-cover'
+                                                            src={require("../../../assets/icons/send-gray.png")}
+                                                            alt=''
+                                                        />                            
+                                                    </div>   
+                                                )}                                    
+                                            </>
+                                        )}                          
+                                    </div>
+                                </form>            
+                            </div>
+                        <div>
+                            <Comment 
+                                comments = {comments}
+                                user = {user}
+                                authorPost = {post?.author?.authorId}
+                                postId = {postId}
+                                profile = {profile?.profilePicture}
+                            />
+                        </div> 
+                        <div className='ml-3 mb-2'>
+                            <p className='text-xs text-gray-500'>
+                            There are no more comments.
+                            </p>
+                        </div>                                 
                     </div>
-                <div>
-                    <Comment 
-                        comments = {comments}
-                        user = {user}
-                        authorPost = {post?.author?.authorId}
-                        postId = {postId}
-                        profile = {profile?.profilePicture}
-                    />
-                </div> 
-                <div className='ml-3 mb-2'>
-                    <p className='text-xs text-gray-500'>
-                    There are no more comments.
-                    </p>
-                </div>                                 
-            </div>
-        </div>
+                </div>            
+            </div>            
+        )}
     </div>
   )
     

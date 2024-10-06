@@ -10,7 +10,7 @@ const SearchUsers = () => {
 
   const handleGetUser = async(userId) => {
     navigation(`/get-profile/${userId}`)
-}
+  }
   return (
     <div>
       {searchUsers?.length > 0 ? (
@@ -42,7 +42,7 @@ const SearchUsers = () => {
                       </div>
                     </div> 
                     <div className='flex-1'></div>
-                    <div className='py-1.5 px-3 bg-blue-100 rounded-md cursor-pointer mr-1'
+                    <div className='py-1.5 px-3 bg-blue-100 hover:bg-blue-200 rounded-md cursor-pointer mr-1'
                       onClick={() => handleGetUser(user?.userId)}
                     >
                       <p className='text-customBlue font-medium'>

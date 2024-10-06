@@ -18,6 +18,9 @@ import SearchUsers from './components/search/SearchUsers';
 import { useSelector } from 'react-redux';
 import socket from './socket';
 import MyFriends from './pages/myFriends/MyFriends';
+import GetFriends from './components/myFriends/GetFriends';
+import GetRequests from './components/myFriends/GetRequests';
+import GetSuggestions from './components/myFriends/GetSuggestions';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -48,7 +51,9 @@ function App() {
           <Route path='users' element={<SearchUsers/>}/>
         </Route>
         <Route path='/friends' element = {<MyFriends/>}>
-          
+          <Route path='' element={<GetFriends />} />
+          <Route path='requests' element={<GetRequests />} />
+          <Route path='suggestions' element={<GetSuggestions />} />
         </Route>
       </Routes>
     </Router>

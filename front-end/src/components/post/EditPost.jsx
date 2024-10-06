@@ -64,7 +64,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
         }
   
         // Giải phóng các URL cũ
-        imagePreviews?.forEach((preview) => URL.revokeObjectURL(preview.url));
+        // imagePreviews?.forEach((preview) => URL.revokeObjectURL(preview.url));
     };    
 
     const handleVideoChange = (e) => {

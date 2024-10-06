@@ -39,33 +39,30 @@ export const VideoPlayer4 = ({url, selectedImages}) => {
                 />
             </div>   
             {!isWidthLarger ? (
-                <div className= {`h-[70vh] w-2/5 pl-0.5 flex flex-col`}>
+                <div className= {`h-[70vh] w-2/5 pl-[2.5px] `}>
                     <LightGallery
                         onInit={onInit}
                         speed={500}
                         plugins={[lgZoom]}
                         elementClassNames="h-full w-full"
                     >
-                    <a href={selectedImages[0]} className='flex-1 pb-px'>
-                        <div className='flex-1 h-1/3 pb-px'>
-                            <img className='w-full h-full object-cover'
-                                src= {selectedImages[0]}
-                                alt=''
-                            />
-                        </div> 
-                        <div className='flex-1 h-1/3 py-px'>
-                            <img className='w-full h-full object-cover'
-                                src= {selectedImages[1]}
-                                alt=''
-                            />
-                        </div> 
-                        <div className='relative h-1/3 flex-1 pt-px'>
-                            <img className='opacity-50 w-full h-full object-cover'
-                                src={selectedImages[2]}
-                                alt=''
-                            />
-                                
-                        </div>
+                    <a href={selectedImages[0]} className=''>
+                        <img className='w-full h-[23.3vh] object-cover mb-0.5'
+                            src= {selectedImages[0]}
+                            alt=''
+                        />
+                    </a>  
+                    <a href={selectedImages[1]} className=''>
+                        <img className='w-full h-[23.3vh] object-cover my-0.5'
+                            src= {selectedImages[1]}
+                            alt=''
+                        />
+                    </a> 
+                    <a href={selectedImages[2]} className=''>
+                        <img className='w-full h-[23vh] object-cover '
+                            src= {selectedImages[2]}
+                            alt=''
+                        />
                     </a> 
                     </LightGallery>                                     
                 </div>

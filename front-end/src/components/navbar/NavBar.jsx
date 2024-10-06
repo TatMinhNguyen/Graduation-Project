@@ -144,7 +144,7 @@ const NavBar = ({user}) => {
 
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
-        <div className='w-1/3 flex-1 flex items-center ml-[2vh]'>
+        <div className='flex-1 flex items-center ml-[2vh]' style={{ flex: '30%' }}>
             <img className='h-5/6'
                 src= {require("../../assets/images/logo.png")}
                 alt="Logo"
@@ -153,7 +153,7 @@ const NavBar = ({user}) => {
                 Lionelsocial
             </h1>
         </div>
-        <div className='w-1/3'>
+        <div className='w-2/5 mr-4'>
             <form className='flex-1 flex items-center p-1 pb-0.5 pl-2 mt-1.5 bg-gray-100 mx-auto rounded-3xl'
                     onSubmit={handleSearch}
             >
@@ -175,7 +175,7 @@ const NavBar = ({user}) => {
                 />
             </form>
         </div>
-        <div className='w-1/3 flex items-center'>
+        <div className='flex items-center' style={{ flex: '30%' }}>
             <div className='flex-1'></div>  {/* Đây là phần tử đệm để đẩy các phần tử khác sang phải */}
             <div className='mr-5 flex items-center'>
                 <div className={`h-10 w-10 ${location.pathname === `/` ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'}  flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
