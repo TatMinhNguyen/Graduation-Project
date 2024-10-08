@@ -45,6 +45,9 @@ const chatController = {
                 chats.map(async (chat) => {
                     // Nếu đoạn chat không có tên
                     if (!chat.name) {
+                        let chatObject = chat.toObject();
+                        delete chatObject.avatar;
+
                         // Tìm userId còn lại trong đoạn chat
                         const otherUserId = chat.members.find((id) => id !== req.user.id);
                         
@@ -53,7 +56,7 @@ const chatController = {
                         
                         // Thêm thông tin user vào chat
                         return {
-                            ...chat.toObject(),
+                            ...chatObject,
                             name: otherUser?.username,
                             avatar: otherUser?.profilePicture,
                             userId: otherUser?._id

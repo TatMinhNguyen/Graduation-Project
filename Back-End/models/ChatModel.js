@@ -9,6 +9,10 @@ const chatSchema = new mongoose.Schema(
         name:{
             type: String
         },
+        avatar:{
+            type: String,
+            default: "https://ik.imagekit.io/minhnt204587/Chat/chat-group.png"
+        },
         createId:{
             type: String,
             // required: true
