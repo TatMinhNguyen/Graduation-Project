@@ -9,7 +9,7 @@ const GetChats = () => {
             </h1>
             <div className='flex-1'></div>
             <div className='bg-gray-100 p-2 rounded-full cursor-pointer hover:bg-gray-200 mr-2'>
-                <img className='w-5 h-5'
+                <img className='w-4 h-4'
                     src={require('../../assets/icons/plus.png')}
                     alt=''
                 />                

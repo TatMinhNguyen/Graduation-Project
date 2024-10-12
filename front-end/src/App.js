@@ -21,6 +21,8 @@ import MyFriends from './pages/myFriends/MyFriends';
 import GetFriends from './components/myFriends/GetFriends';
 import GetRequests from './components/myFriends/GetRequests';
 import GetSuggestions from './components/myFriends/GetSuggestions';
+import GetMessages from './components/messenger/GetMessages';
+import GetNoConversation from './components/messenger/GetNoConversation';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -45,7 +47,10 @@ function App() {
           <Route path='' element={<UserPosts />} />
           <Route path='friends' element={<Friends />} />
         </Route>
-        <Route path='/messenger' element = {<Messenger/>}/>
+        <Route path='/messenger' element = {<Messenger/>}>
+          <Route path='' element={<GetNoConversation />} />
+          <Route path=':chatId' element={<GetMessages />} />
+        </Route>
         <Route path="/search" element={<Search />} >
           <Route path='posts' element={<SearchPosts/>}/>
           <Route path='users' element={<SearchUsers/>}/>
