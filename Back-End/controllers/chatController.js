@@ -30,6 +30,35 @@ const chatController = {
             }
         }    
     }, 
+
+    createGroupChat : async (req, res) => {
+        try {
+            const { members, name } = req.body;
+            const createId = req.user.id;
+
+            if (!members.includes(createId)) {
+                members.push(createId);
+            }
+    
+            // Kiểm tra số lượng thành viên
+            if (!members || members.length < 3) {
+                return res.status(400).json({ message: "Nhóm chat phải có ít nhất 3 thành viên." });
+            }
+    
+            // Tạo nhóm chat mới
+            const newChat = new ChatModel({
+                members,
+                name,
+                createId,
+            });
+    
+            await newChat.save();
+    
+            return res.status(201).json({ message: "Tạo nhóm chat thành công", chat: newChat });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
     
     // Get chat from user    
     userChats: async (req, res) => {
@@ -61,6 +90,20 @@ const chatController = {
                             avatar: otherUser?.profilePicture,
                             userId: otherUser?._id
                         };
+                    } else {
+                        if (chat.createId) {
+                            let chatObject = chat.toObject();
+    
+                            // Truy vấn thông tin của người tạo từ UserModel
+                            const creatorUser = await UserModel.findById(chat.createId).select('_id username profilePicture');
+    
+                            // Thêm thông tin người tạo vào chat
+                            return {
+                                ...chatObject,
+                                creatorUsername: creatorUser?.username,
+                                creatorAvatar: creatorUser?.profilePicture,
+                            };
+                        }
                     }
                     return chat.toObject(); // Giữ nguyên nếu đã có tên
                 })

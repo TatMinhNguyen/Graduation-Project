@@ -6,7 +6,7 @@ const messageSchema = new mongoose.Schema(
             type: String,
         },
         senderId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId, ref: 'UserModel'
         },
         text: {
             type: String,
@@ -15,9 +15,6 @@ const messageSchema = new mongoose.Schema(
         image: {
             type: Object
         },
-        video: {
-            type: Object
-        }
     },
     { timestamps: true }
 )

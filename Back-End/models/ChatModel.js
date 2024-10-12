@@ -2,10 +2,8 @@ const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema(
     {
-        members: {
-            type: Array,
-            required: true
-        },
+        members: 
+            [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel', required: true }],
         name:{
             type: String
         },
@@ -14,7 +12,7 @@ const chatSchema = new mongoose.Schema(
             default: "https://ik.imagekit.io/minhnt204587/Chat/chat-group.png"
         },
         createId:{
-            type: String,
+            type: mongoose.Schema.Types.ObjectId, ref: 'UserModel'
             // required: true
         },
         messageCount:{

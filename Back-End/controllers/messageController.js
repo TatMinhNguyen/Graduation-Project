@@ -1,5 +1,6 @@
 const ChatModel = require("../models/ChatModel");
 const MessageModel = require("../models/MessageModel");
+const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
 const messageController = {
@@ -78,7 +79,19 @@ const messageController = {
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
+    getMessages: async (req, res) => {
+        const { chatId } = req.params;
+        try {
+            // Tìm tất cả các tin nhắn theo chatId
+            const messages = await MessageModel.find({ chatId })
+                .populate('senderId', 'username profilePicture'); 
+            
+            res.status(200).json(messages);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    }    
 }
 
 module.exports = messageController

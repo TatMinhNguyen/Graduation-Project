@@ -7,6 +7,8 @@ const router = require("express").Router();
 
 router.post("/create-chat/:member", middleware.verifyToken, chatController.createChat);
 
+router.post('/create-group-chat', middleware.verifyToken, chatController.createGroupChat);
+
 router.get('/get-user-chat', middleware.verifyToken, chatController.userChats)
 
 router.post("/add-message",
@@ -16,5 +18,7 @@ router.post("/add-message",
 )
 
 router.delete('/delete-message/:messageId', middleware.verifyToken, messageController.deleteMessage)
+
+router.get('/get-message/:chatId', middleware.verifyToken, messageController.getMessages)
 
 module.exports = router;

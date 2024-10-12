@@ -158,7 +158,7 @@ const NavBar = ({user}) => {
                     onSubmit={handleSearch}
             >
                 <button>
-                    <img className='w-6 h-6'
+                    <img className='w-6 h-6 ml-1'
                         src = {require('../../assets/icons/search.png')}
                         alt=''
                     />                    
