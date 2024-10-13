@@ -78,7 +78,7 @@ const chatController = {
                         delete chatObject.avatar;
 
                         // Tìm userId còn lại trong đoạn chat
-                        const otherUserId = chat.members.find((id) => id !== req.user.id);
+                        const otherUserId = chat.members.find((id) => id.toString() !== req.user.id);
                         
                         // Truy vấn thông tin của user đó từ UserModel
                         const otherUser = await UserModel.findById(otherUserId).select('_id username profilePicture');
