@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserChat } from '../../api/chat/chat'
+import { useNavigate } from 'react-router-dom'
 
 const GetChats = () => {
     const chats = useSelector((state) => state.chat.chats)
     const user = useSelector((state) => state.auth.login?.currentUser)
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleGetUserChats = async() => {
         try {
@@ -66,6 +68,7 @@ const GetChats = () => {
                     return (
                         <div key={chat._id}
                             className='flex items-center p-2 py-2.5 hover:bg-gray-100 rounded-lg cursor-pointer'
+                            onClick={() => navigate(`/messenger/${chat._id}`)}
                         >
                             <div className='w-11 h-11'>
                                 <img className='h-full w-full object-cover rounded-full'

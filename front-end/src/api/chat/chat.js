@@ -14,3 +14,14 @@ export const getUserChat = async (token, dispatch) => {
         console.log(error);
     }
 };
+
+export const getAChat = async (token, chatId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/chat/get-a-chat/${chatId}`, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}

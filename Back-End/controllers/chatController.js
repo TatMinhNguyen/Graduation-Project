@@ -114,6 +114,55 @@ const chatController = {
             res.status(500).json(error);
         }
     },
+    getAChat: async (req, res) => {
+        try {
+            const chatId = req.params.chatId;
+    
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Chat not found" });
+            }
+    
+            if (!chat.name) {
+                let chatObject = chat.toObject();
+                delete chatObject.avatar;
+    
+                // Tìm userId còn lại trong đoạn chat
+                const otherUserId = chat.members.find((id) => id.toString() !== req.user.id);
+    
+                // Truy vấn thông tin của user đó từ UserModel
+                const otherUser = await UserModel.findById(otherUserId).select('_id username profilePicture');
+    
+                // Thêm thông tin user vào chat
+                return res.json({
+                    ...chatObject,
+                    name: otherUser?.username,
+                    avatar: otherUser?.profilePicture,
+                    userId: otherUser?._id
+                });
+            }
+    
+            if (chat.createId) {
+                let chatObject = chat.toObject();
+    
+                // Truy vấn thông tin của người tạo từ UserModel
+                const creatorUser = await UserModel.findById(chat.createId).select('_id username profilePicture');
+    
+                // Thêm thông tin người tạo vào chat
+                return res.json({
+                    ...chatObject,
+                    creatorUsername: creatorUser?.username,
+                    creatorAvatar: creatorUser?.profilePicture,
+                });
+            }
+    
+            // Trường hợp khác (ví dụ như chat có `name` và không cần thêm gì)
+            return res.json(chat);
+    
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
     
 }  
 

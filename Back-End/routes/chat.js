@@ -11,6 +11,8 @@ router.post('/create-group-chat', middleware.verifyToken, chatController.createG
 
 router.get('/get-user-chat', middleware.verifyToken, chatController.userChats)
 
+router.get('/get-a-chat/:chatId', middleware.verifyToken, chatController.getAChat)
+
 router.post("/add-message",
     upload.fields([{ name: 'image', maxCount: 1}]), 
     middleware.verifyToken,

@@ -195,10 +195,10 @@ const NavBar = ({user}) => {
                     )}
 
                 </div>
-                <div className={`h-10 w-10 ${location.pathname === `/messenger` ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'} flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
+                <div className={`h-10 w-10 ${location.pathname.includes('/messenger') ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'} flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
                     onClick={() => navigation('/messenger')}
                 >
-                    {location.pathname === `/messenger` ? (
+                    {location.pathname.includes('/messenger') ? (
                         <img className='h-6'
                             src={require("../../assets/icons/messenger-blue.png")}
                             alt="" 
