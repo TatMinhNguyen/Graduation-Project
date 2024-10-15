@@ -25,3 +25,17 @@ export const getAChat = async (token, chatId) => {
         console.log(error)
     }
 }
+
+export const createChat1vs1 = async (token, userId, navigate) => {
+    try {
+        const res = await axios.post(`${apiUrl}/chat/create-chat/${userId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        })
+        navigate(`/messenger/${res.data._id}`)
+    } catch (error) {
+        // console.log(error)
+        if(error.response.data.error === 'Phòng chat đã tồn tại'){
+            navigate(`/messenger/${error.response.data.chatId}`)
+        }
+    }
+}

@@ -14,7 +14,7 @@ const chatController = {
         });
 
         if (existingChat) {
-            return res.status(403).json({ error: 'Phòng chat đã tồn tại' }); 
+            return res.status(403).json({ error: 'Phòng chat đã tồn tại', chatId: existingChat._id }); 
         }
 
         else{

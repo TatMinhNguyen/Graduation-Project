@@ -17,6 +17,7 @@ import ChangeAvatar from '../../components/changeProfile/ChangeAvatar';
 import ChangeBackground from '../../components/changeProfile/ChangeBackground';
 import ChangeProfile from '../../components/changeProfile/ChangeProfile';
 import { acceptRequest, cancelFriend, cancelRequest, refuseRequest, requestFriends } from '../../api/friends/friends';
+import { createChat1vs1 } from '../../api/chat/chat';
 
 const Profile = () => {
     const { userId } = useParams();
@@ -159,6 +160,14 @@ const Profile = () => {
             setConfirmationModal(false)
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    const handleCreateChat = async () => {
+        try {
+            await createChat1vs1(user?.token, userId, navigation)
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -356,7 +365,9 @@ const Profile = () => {
                                             </p>                                           
                                         </div>                                       
                                     )}
-                                    <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'>
+                                    <div className='flex items-center bg-gray-200 cursor-pointer pl-2 pr-3 py-2 rounded-md mr-3'
+                                        onClick={handleCreateChat}
+                                    >
                                         <img className='h-5 w-5 mr-1 mt-px'
                                             src={require("../../assets/icons/messenger-black.png")}
                                             alt=''
