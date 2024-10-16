@@ -13,15 +13,17 @@ export const timeAgo = (createdAt) => {
     const minutes = duration.minutes();
   
     if (years > 0) {
-      return `${years} year ago`;
+      return `${years} years ago`;
     } else if (months > 0) {
-      return `${months} month ago`;
+      return `${months} months ago`;
     } else if (days > 0) {
-      return `${days} day ago`;
+      return `${days} days ago`;
     } else if (hours > 0) {
-      return `${hours} hour ago`;
+      return `${hours} hours ago`;
+    } else if (minutes > 1) {
+      return `${minutes} minutes ago`;
     } else {
-      return `${minutes} minute ago`;
+      return `Just now`
     }
 };
 
@@ -50,8 +52,10 @@ export const timeAgoShort = (createdAt) => {
     return `${days}d`;
   } else if (hours > 0) {
     return `${hours}h`;
-  } else {
+  } else if(minutes > 1) {
     return `${minutes}m`;
+  } else {
+    return `now`
   }
 };
 

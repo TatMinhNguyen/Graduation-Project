@@ -82,16 +82,25 @@ const messageController = {
     },
     getMessages: async (req, res) => {
         const { chatId } = req.params;
+        const { index, page } = req.query; // Nhận index và page từ query
+        const limit = parseInt(index) || 5; // Số phần tử trong một trang, mặc định là 5
+        const skip = ((parseInt(page) || 1) - 1) * limit; // Tính toán để bỏ qua số phần tử tương ứng
+    
         try {
-            // Tìm tất cả các tin nhắn theo chatId
+            // Tìm các tin nhắn theo chatId với giới hạn và phân trang
             const messages = await MessageModel.find({ chatId })
-                .populate('senderId', 'username profilePicture'); 
+                .populate('senderId', 'username profilePicture')
+                .skip(skip) // Bỏ qua số phần tử
+                .limit(limit) // Lấy số phần tử nhất định
+                .sort({ 
+                    createdAt: -1 });
             
             res.status(200).json(messages);
         } catch (error) {
             res.status(500).json(error);
         }
-    }    
+    }
+        
 }
 
 module.exports = messageController

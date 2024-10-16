@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setChats } from "../../redux/chatSlice";
+import { setChats, setMessages } from "../../redux/chatSlice";
 
 
 export const getUserChat = async (token, dispatch) => {
@@ -37,5 +37,18 @@ export const createChat1vs1 = async (token, userId, navigate) => {
         if(error.response.data.error === 'Phòng chat đã tồn tại'){
             navigate(`/messenger/${error.response.data.chatId}`)
         }
+    }
+}
+
+export const getMess = async (token, chatId, params, dispatch) => {
+    try {
+        const res = await axios.get(`${apiUrl}/chat/get-message/${chatId}`, {
+            headers: { token: `Bearer ${token}` },
+            params: params
+        })
+        dispatch(setMessages(res.data))
+        // return res.data
+    } catch (error) {
+        console.log(error)
     }
 }
