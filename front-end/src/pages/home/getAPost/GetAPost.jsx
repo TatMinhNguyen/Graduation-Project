@@ -357,7 +357,7 @@ const GetAPost = () => {
                                 )}
                                 <div className='relative'>
                                     {/* Các nút hành động */}
-                                    <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5'>
+                                    <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5 border-b'>
                                         <div
                                             className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100`}
                                             onMouseEnter={() => handleMouseEnter(post.post?._id)}
@@ -486,97 +486,97 @@ const GetAPost = () => {
                                 </div>
                             </div>                    
                         </div>
-                            <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white '>
-                                <div className='h-10 w-10 mr-3'>
-                                    <img className='h-full w-full object-cover rounded-full shadow'
-                                        src={profile?.profilePicture}
-                                        alt='Avatar'
-                                    />
-                                </div>
-                                <form onSubmit={handleCreateComment} className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
-                                    <textarea
-                                        id="description"
-                                        name="description"
-                                        rows="1"
-                                        value={description}
-                                        onChange={handleInput}
-                                        ref={textareaRef}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                handleCreateComment(e);  // Gọi hàm submit form
-                                            }
-                                        }}
-                                        className="flex-grow w-full px-4 py-2 rounded-2xl mt-1 bg-gray-100 overflow-hidden
-                                            focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
-                                        placeholder="Write your comment here..."
-                                        style={{resize: 'none'}} // Optional: Prevent manual resizing
-                                    />
-                                    {imagePreview && (
-                                        <div className='m-4 flex-1 flex'>
-                                            <ImageComment
-                                                selectedImages = {imagePreview}
-                                            />
-                                            <div className='w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300'
-                                                    onClick={handleDeletePreView}
-                                            >
-                                                <img
-                                                    src={require('../../../assets/icons/close.png')}
-                                                    alt=''
-                                                    className='w-4 h-4'
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    <div className="flex items-center space-x-2 pb-2 px-3">
-                                        <div className='text-gray-500 cursor-pointer'>
-                                            <img className='h-6 w-6 object-cover'
-                                                src={require("../../../assets/icons/smile.png")}
-                                                alt=''
-                                            />                                 
-                                        </div>
-                                        <div onClick={handleImageClick} className='text-gray-500 cursor-pointer'>
-                                            <img className='h-6 w-6 object-cover'
-                                                src={require("../../../assets/icons/camera.png")}
-                                                alt=''
-                                            />                                 
-                                        </div>  
-                                        {/* Hidden inputs */}
-                                        <input 
-                                            type="file" 
-                                            accept="image/*" 
-                                            ref={imageInputRef} 
-                                            style={{ display: 'none' }} 
-                                            onChange={handleImageChange} 
-                                        />                                             
-                                        <div className='flex-1'></div>
-                                        {loading ? (
-                                            <div>
-                                                <LoadingSpinner/>
-                                            </div>
-                                        ):(
-                                            <>
-                                                {description || image ? (
-                                                    <button type="submit" className="text-white">
-                                                        <img className='h-6 w-6 object-cover'
-                                                            src={require("../../../assets/icons/send-blue.png")}
-                                                            alt=''
-                                                        />                            
-                                                    </button>                                 
-                                                ) :(
-                                                    <div className="text-white">
-                                                        <img className='h-6 w-6 object-cover'
-                                                            src={require("../../../assets/icons/send-gray.png")}
-                                                            alt=''
-                                                        />                            
-                                                    </div>   
-                                                )}                                    
-                                            </>
-                                        )}                          
-                                    </div>
-                                </form>            
+                        <div className='flex-1 flex items-center justify-center w-full px-3 py-2 bg-white'>
+                            <div className='h-10 w-10 mr-3'>
+                                <img className='h-full w-full object-cover rounded-full shadow'
+                                    src={profile?.profilePicture}
+                                    alt='Avatar'
+                                />
                             </div>
+                            <form onSubmit={handleCreateComment} className="w-11/12 mx-auto rounded-2xl bg-gray-100 items-center">
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    rows="1"
+                                    value={description}
+                                    onChange={handleInput}
+                                    ref={textareaRef}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleCreateComment(e);  // Gọi hàm submit form
+                                        }
+                                    }}
+                                    className="flex-grow w-full px-4 py-2 rounded-2xl mt-1 bg-gray-100 overflow-hidden
+                                        focus:outline-none focus:border-gray-100 focus:ring-1 focus:ring-gray-100"
+                                    placeholder="Write your comment here..."
+                                    style={{resize: 'none'}} // Optional: Prevent manual resizing
+                                />
+                                {imagePreview && (
+                                    <div className='m-4 flex-1 flex'>
+                                        <ImageComment
+                                            selectedImages = {imagePreview}
+                                        />
+                                        <div className='w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300'
+                                                onClick={handleDeletePreView}
+                                        >
+                                            <img
+                                                src={require('../../../assets/icons/close.png')}
+                                                alt=''
+                                                className='w-4 h-4'
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <div className="flex items-center space-x-2 pb-2 px-3">
+                                    <div className='text-gray-500 cursor-pointer'>
+                                        <img className='h-6 w-6 object-cover'
+                                            src={require("../../../assets/icons/smile.png")}
+                                            alt=''
+                                        />                                 
+                                    </div>
+                                    <div onClick={handleImageClick} className='text-gray-500 cursor-pointer'>
+                                        <img className='h-6 w-6 object-cover'
+                                            src={require("../../../assets/icons/camera.png")}
+                                            alt=''
+                                        />                                 
+                                    </div>  
+                                    {/* Hidden inputs */}
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        ref={imageInputRef} 
+                                        style={{ display: 'none' }} 
+                                        onChange={handleImageChange} 
+                                    />                                             
+                                    <div className='flex-1'></div>
+                                    {loading ? (
+                                        <div>
+                                            <LoadingSpinner/>
+                                        </div>
+                                    ):(
+                                        <>
+                                            {description || image ? (
+                                                <button type="submit" className="text-white">
+                                                    <img className='h-6 w-6 object-cover'
+                                                        src={require("../../../assets/icons/send-blue.png")}
+                                                        alt=''
+                                                    />                            
+                                                </button>                                 
+                                            ) :(
+                                                <div className="text-white">
+                                                    <img className='h-6 w-6 object-cover'
+                                                        src={require("../../../assets/icons/send-gray.png")}
+                                                        alt=''
+                                                    />                            
+                                                </div>   
+                                            )}                                    
+                                        </>
+                                    )}                          
+                                </div>
+                            </form>            
+                        </div>
                         <div>
                             <Comment 
                                 comments = {comments}

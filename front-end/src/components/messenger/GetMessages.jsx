@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { getAChat, getMess } from '../../api/chat/chat';
+import { addMess, getAChat, getMess } from '../../api/chat/chat';
 import { useDispatch, useSelector } from 'react-redux';
 import InputEmoji from "react-input-emoji";
 import { timeAgoShort } from '../../utils';
+import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const GetMessages = () => {
   const { chatId } = useParams();
+  const imageInputRef = useRef(null);
+  const loadMoreTopRef = useRef(null);
   const user = useSelector((state) => state.auth.login?.currentUser)
   const messages = useSelector((state) => state.chat.messages)
   const [chat, setChat] = useState({})
-//   const [messages, setMessages] = useState([])
-//   console.log(messages)
+  const [newMessages, setMessages] = useState('')
+  const [image, setImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const [params, setParams] = useState({
     page: 1,
@@ -20,15 +25,98 @@ const GetMessages = () => {
 
   const dispatch = useDispatch();
 
+  const handleImageClick = (e) => {
+    e.preventDefault();
+    imageInputRef.current.click();
+};
+
+  const handleImageChange = (e) => {
+    const selectedImage = e.target.files[0];       
+
+    if(selectedImage){
+        setImage(selectedImage);
+        const ImageUrl = URL.createObjectURL(selectedImage);
+        setImagePreview(ImageUrl);            
+    }
+
+    if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+    }
+  };
+
+  const handleDeletePreView = () => {
+    setImage(null);
+    setImagePreview(null)
+    URL.revokeObjectURL(imagePreview);
+  }
+
+  const handleAddMessage = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    try {
+        const formData = new FormData();
+
+        formData.append('chatId', chatId)
+
+        if(newMessages) {
+            formData.append('text', newMessages)
+        }
+
+        if(image) {
+            formData.append('image', image)
+        }
+
+        await addMess(user?.token, formData)
+
+        setImage(null)
+        setMessages('')
+        setImagePreview(null)
+
+        handleGetMess();
+
+    } catch (error) {
+        console.log(error)
+    } finally {
+        // Giải phóng các URL sau khi không cần sử dụng nữa
+        URL.revokeObjectURL(imagePreview);
+        setLoading(false)
+      }
+  }
+
   const handleGetAChat = async () => {
     const result = await getAChat(user?.token, chatId)
     setChat(result)
   }
 
-  const handleGetMess = async () => {
-    await getMess(user?.token, chatId, params, dispatch)
-    // setMessages([...messages, ...result]);
+  const handleGetMess = async (isLoadMore = false) => {
+    if (isLoadMore) {
+      setParams((prevParams) => ({
+        ...prevParams,
+        index: prevParams.index + 10, // Tăng số lượng tin nhắn mỗi khi cuộn lên trên
+      }));
+    }
+    await getMess(user?.token, chatId, params, dispatch);
   }
+
+  const handleScroll = (entries) => {
+    const entry = entries[0];
+    if (entry.isIntersecting) {
+      handleGetMess(true); // Gọi hàm để tải thêm tin nhắn khi cuộn lên trên
+    }
+  };
+  
+  /* eslint-disable */
+  useEffect(() => {
+    if (!loadMoreTopRef.current) return;
+  
+    const observer = new IntersectionObserver((entries) => {
+      handleScroll(entries); // Truyền entries vào handleScroll
+    });
+  
+    observer.observe(loadMoreTopRef.current);
+  
+    return () => observer.disconnect(); // Ngắt kết nối observer khi component bị unmount
+  }, []);
 
   /* eslint-disable */
   useEffect(() => {
@@ -68,10 +156,12 @@ const GetMessages = () => {
         </div>
 
         {/* Khoảng trống bù để nội dung không bị che bởi header */}
-        <div className="h-[8vh]"></div>
+        <div className="h-[7.5vh]"></div>
+
+        <div ref={loadMoreTopRef} style={{ height: '0px' }} />
 
         {/* Nội dung chat cuộn */}
-        <div className=" overflow-y-auto h-[73vh] flex flex-col-reverse px-3">
+        <div className=" overflow-y-auto h-[73vh] flex flex-col-reverse px-3 pt-2">
             {messages?.map((message) => (
                 <div key={message._id}
                     className={`flex ${message.senderId._id === user?.userId ? 'justify-end' : 'justify-start'} mb-2`}
@@ -79,32 +169,52 @@ const GetMessages = () => {
                     {message.senderId._id === user?.userId ? (
                         <div className=' '>
                             <div>
-                                <div className='pb-1.5 pt-1 px-1.5 rounded-tl-lg rounded-tr-lg rounded-bl-lg max-w-xs bg-purple-600 text-white'>
-                                    <p className=''>
-                                        {message.text}
-                                    </p>
-                                
-                                </div>
+                                {message.image !== null && (
+                                    <div className='mb-1'>
+                                        <img className='max-w-xs max-h-[350px] rounded-lg'
+                                            src={message.image.url}
+                                            alt=''
+                                        />                                        
+                                    </div>
+                                )}
+                                {message.text !== '' && (
+                                    <div className='pb-1.5 pt-1.5 px-1.5 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl max-w-xs bg-purple-500 text-white w-fit ml-auto'>
+                                        <p className='text-[15px]'>
+                                            {message.text}
+                                        </p>
+                                    
+                                    </div>                                    
+                                )}
                                 <p className='text-[10px] text-gray-800 mr-1 flex justify-end'>
                                     {timeAgoShort(message.createdAt)}
                                 </p>                                
                             </div>
                         </div>
                     ):(
-                        <div className='flex-1 flex items-center'>
-                            <div className='h-9 w-9 mr-2'>
+                        <div className='flex'>
+                            <div className='h-9 w-9 '>
                                 <img className='h-full w-full object-cover rounded-full hover:opacity-90'
                                     src={message.senderId.profilePicture}
                                     alt=''
                                 />
                             </div>
-                            <div>
-                                <div className='pb-1.5 pt-1 px-1.5 rounded-tl-lg rounded-tr-lg rounded-br-lg rounded- max-w-xs bg-gray-200 text-black'>
-                                    <p className=''>
-                                        {message.text}
-                                    </p>
-                                
-                                </div>
+                            <div className='ml-2'>
+                                {message.image !== null && (
+                                    <div className='mb-1'>
+                                        <img className='max-w-xs max-h-[350px] rounded-lg'
+                                            src={message.image.url}
+                                            alt=''
+                                        />                                        
+                                    </div>
+                                )}
+                                {message.text !== '' && (
+                                    <div className='pb-1.5 pt-1.5 pr-3 pl-2 rounded-tl-2xl rounded-tr-2xl rounded-br-2xl max-w-xs bg-gray-200 text-black inline-block'>
+                                        <p className='text-[15px]'>
+                                            {message.text}
+                                        </p>
+                                    
+                                    </div>                                    
+                                )}
                                 <p className='text-[10px] text-gray-800 ml-1'>
                                     {timeAgoShort(message.createdAt)}
                                 </p>                                
@@ -117,16 +227,58 @@ const GetMessages = () => {
         </div>
 
         {/* Footer cố định */}
-        <div className="fixed bottom-4 w-[calc(65vw-12px)] bg-white flex items-center z-10 px-2">
-            <div>+</div>
+        <form className="fixed bottom-4 w-[calc(65vw-12px)] bg-white flex items-center z-10 px-2"
+            onSubmit={handleAddMessage}
+        >
+            <button className='w-10 h-9 flex items-center justify-center'
+                onClick={handleImageClick}
+            >
+                <img className='w-7 h-7'
+                    src={require("../../assets/icons/image.png")}
+                    alt=''
+                />
+            </button>
+            {/* Hidden inputs */}
+            <input 
+                type="file" 
+                accept="image/*" 
+                ref={imageInputRef} 
+                style={{ display: 'none' }} 
+                onChange={handleImageChange} 
+            /> 
             <InputEmoji
-                // value={newMessage}
-                // onChange={handleChange}
+                value={newMessages}
+                onChange={setMessages}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault(); // Ngăn việc thêm dòng mới
+                        handleAddMessage(e);
+                    }
+                }}
             />
-            <div className="send-button button">
-                Send
-            </div>
-        </div>
+            {loading ? (
+                <div>
+                    <LoadingSpinner/>
+                </div>
+            ) : (
+                <>
+                    {newMessages !== '' || image ? (
+                        <button type='submit'>
+                            <img className='w-6 h-6'
+                                src={require('../../assets/icons/send-blue.png')}
+                                alt=''
+                            />
+                        </button>
+                    ) : (
+                        <img className='w-6 h-6'
+                            src={require('../../assets/icons/send-gray.png')}
+                            alt=''
+                        />
+                    )}                
+                </>
+            )}
+
+        </form>
     </div>
   )
 }
