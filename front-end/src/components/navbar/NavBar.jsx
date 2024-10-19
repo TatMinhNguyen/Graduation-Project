@@ -39,6 +39,8 @@ const NavBar = ({user}) => {
           // Cập nhật state thông báo
           setNotifications((prev) => [newNotification, ...prev]);
         }); 
+
+
       
         return () => {
           socket.off("connect");

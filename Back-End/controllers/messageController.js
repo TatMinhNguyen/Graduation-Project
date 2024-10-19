@@ -1,6 +1,7 @@
 const ChatModel = require("../models/ChatModel");
 const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
+const { sendMessage } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 const messageController = {
@@ -46,6 +47,8 @@ const messageController = {
 
             chat.messageCount = chat.messageCount + 1
             await chat.save()
+
+            sendMessage(chat.members, message)
 
             const result = await message.save();
             res.status(200).json(result);

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserChat } from '../../api/chat/chat'
 import { useNavigate, useParams } from 'react-router-dom'
+import socket from '../../socket'
 
 const GetChats = () => {
     const chats = useSelector((state) => state.chat.chats)
@@ -18,6 +19,19 @@ const GetChats = () => {
             console.log(error)
         }
     }
+
+      /* eslint-disable */
+    useEffect(() => {
+        socket.on('send-message', (message) => {
+        //   console.log('newMess: ', message);
+        handleGetUserChats(); // Gọi lại hàm để lấy tin nhắn mới
+        });
+    
+        // Hủy sự kiện khi component unmount
+        return () => {
+        socket.off('send-message');
+        };
+    }, []); 
 
     /* eslint-disable */
     useEffect(() => {

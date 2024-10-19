@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { addMess, getAChat, getMess } from '../../api/chat/chat';
+import { addMess, getAChat, getMess, getUserChat } from '../../api/chat/chat';
 import { useDispatch, useSelector } from 'react-redux';
 import InputEmoji from "react-input-emoji";
 import { timeAgoShort } from '../../utils';
 import LoadingSpinner from '../spinner/LoadingSpinner';
+import socket from '../../socket';
 
 const GetMessages = () => {
   const { chatId } = useParams();
@@ -24,6 +25,19 @@ const GetMessages = () => {
   })
 
   const dispatch = useDispatch();
+
+  /* eslint-disable */
+  useEffect(() => {
+    socket.on('send-message', (message) => {
+    //   console.log('newMess: ', message);
+      handleGetMess(); // Gọi lại hàm để lấy tin nhắn mới
+    });
+  
+    // Hủy sự kiện khi component unmount
+    return () => {
+      socket.off('send-message');
+    };
+  }, []);  
 
   const handleImageClick = (e) => {
     e.preventDefault();
@@ -73,6 +87,7 @@ const GetMessages = () => {
         setImagePreview(null)
 
         handleGetMess();
+        await getUserChat(user?.token, dispatch)
 
     } catch (error) {
         console.log(error)
@@ -195,7 +210,7 @@ const GetMessages = () => {
                         </div>
                     ):(
                         <div>
-                            {chat?.members.length > 2 && (
+                            {chat?.members?.length > 2 && (
                                 <div className='ml-11 mb-px'>
                                     <p className='text-[12px]'>
                                         {message.senderId.username}
