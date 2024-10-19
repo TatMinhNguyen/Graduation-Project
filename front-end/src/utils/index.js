@@ -52,7 +52,7 @@ export const timeAgoShort = (createdAt) => {
     return `${days}d`;
   } else if (hours > 0) {
     return `${hours}h`;
-  } else if(minutes > 1) {
+  } else if(minutes >= 1) {
     return `${minutes}m`;
   } else {
     return `now`

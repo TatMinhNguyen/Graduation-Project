@@ -20,7 +20,7 @@ const GetMessages = () => {
 
   const [params, setParams] = useState({
     page: 1,
-    index: 10,
+    index: 20,
   })
 
   const dispatch = useDispatch();
@@ -88,22 +88,26 @@ const GetMessages = () => {
     setChat(result)
   }
 
-  const handleGetMess = async (isLoadMore = false) => {
-    if (isLoadMore) {
-      setParams((prevParams) => ({
-        ...prevParams,
-        index: prevParams.index + 10, // Tăng số lượng tin nhắn mỗi khi cuộn lên trên
-      }));
-    }
-    await getMess(user?.token, chatId, params, dispatch);
-  }
+  const handleGetMess = async () => {
+    try {
+        await getMess(user?.token, chatId, params, dispatch);
+    } catch (error) {
+        console.error('Errors:', error);
+      }
+    
+};
+
 
   const handleScroll = (entries) => {
     const entry = entries[0];
     if (entry.isIntersecting) {
-      handleGetMess(true); // Gọi hàm để tải thêm tin nhắn khi cuộn lên trên
+      setParams((prevParams) => ({
+        ...prevParams,
+        index: prevParams.index + 20,
+      }));
     }
-  };
+};
+
   
   /* eslint-disable */
   useEffect(() => {
@@ -116,7 +120,8 @@ const GetMessages = () => {
     observer.observe(loadMoreTopRef.current);
   
     return () => observer.disconnect(); // Ngắt kết nối observer khi component bị unmount
-  }, []);
+  }, []); 
+
 
   /* eslint-disable */
   useEffect(() => {
@@ -124,7 +129,7 @@ const GetMessages = () => {
         handleGetAChat();
         handleGetMess();
     }
-  }, [chatId]);
+  }, [chatId, params]);
   return (
     <div className="relative flex flex-col ">
         {/* Header cố định */}
@@ -158,8 +163,6 @@ const GetMessages = () => {
         {/* Khoảng trống bù để nội dung không bị che bởi header */}
         <div className="h-[7.5vh]"></div>
 
-        <div ref={loadMoreTopRef} style={{ height: '0px' }} />
-
         {/* Nội dung chat cuộn */}
         <div className=" overflow-y-auto h-[73vh] flex flex-col-reverse px-3 pt-2">
             {messages?.map((message) => (
@@ -191,39 +194,50 @@ const GetMessages = () => {
                             </div>
                         </div>
                     ):(
-                        <div className='flex'>
-                            <div className='h-9 w-9 '>
-                                <img className='h-full w-full object-cover rounded-full hover:opacity-90'
-                                    src={message.senderId.profilePicture}
-                                    alt=''
-                                />
-                            </div>
-                            <div className='ml-2'>
-                                {message.image !== null && (
-                                    <div className='mb-1'>
-                                        <img className='max-w-xs max-h-[350px] rounded-lg'
-                                            src={message.image.url}
-                                            alt=''
-                                        />                                        
-                                    </div>
-                                )}
-                                {message.text !== '' && (
-                                    <div className='pb-1.5 pt-1.5 pr-3 pl-2 rounded-tl-2xl rounded-tr-2xl rounded-br-2xl max-w-xs bg-gray-200 text-black inline-block'>
-                                        <p className='text-[15px]'>
-                                            {message.text}
-                                        </p>
-                                    
-                                    </div>                                    
-                                )}
-                                <p className='text-[10px] text-gray-800 ml-1'>
-                                    {timeAgoShort(message.createdAt)}
-                                </p>                                
-                            </div>
-                             
+                        <div>
+                            {chat?.members.length > 2 && (
+                                <div className='ml-11 mb-px'>
+                                    <p className='text-[12px]'>
+                                        {message.senderId.username}
+                                    </p>
+                                </div>
+                            )}
+                            <div className='flex'>
+                                <div className='h-9 w-9'>
+                                    <img className='h-full w-full object-cover rounded-full hover:opacity-90'
+                                        src={message.senderId.profilePicture}
+                                        alt=''
+                                    />
+                                </div>
+                                <div className='ml-2'>
+                                    {message.image !== null && (
+                                        <div className='mb-1'>
+                                            <img className='max-w-xs max-h-[350px] rounded-lg'
+                                                src={message.image.url}
+                                                alt=''
+                                            />                                        
+                                        </div>
+                                    )}
+                                    {message.text !== '' && (
+                                        <div className='pb-1.5 pt-1.5 pr-3 pl-2 rounded-tl-2xl rounded-tr-2xl rounded-br-2xl max-w-xs bg-gray-200 text-black inline-block'>
+                                            <p className='text-[15px]'>
+                                                {message.text}
+                                            </p>
+                                        
+                                        </div>                                    
+                                    )}
+                                    <p className='text-[10px] text-gray-800 ml-1'>
+                                        {timeAgoShort(message.createdAt)}
+                                    </p>                                
+                                </div>
+                                
+                            </div>                        
                         </div>
+
                     )}
                 </div>
             ))}
+            <div ref={loadMoreTopRef} style={{ height: '0px' }} />
         </div>
 
         {/* Footer cố định */}
