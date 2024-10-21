@@ -26,19 +26,6 @@ const GetMessages = () => {
 
   const dispatch = useDispatch();
 
-  /* eslint-disable */
-  useEffect(() => {
-    socket.on('send-message', (message) => {
-    //   console.log('newMess: ', message);
-      handleGetMess(); // Gọi lại hàm để lấy tin nhắn mới
-    });
-  
-    // Hủy sự kiện khi component unmount
-    return () => {
-      socket.off('send-message');
-    };
-  }, []);  
-
   const handleImageClick = (e) => {
     e.preventDefault();
     imageInputRef.current.click();
@@ -108,9 +95,8 @@ const GetMessages = () => {
         await getMess(user?.token, chatId, params, dispatch);
     } catch (error) {
         console.error('Errors:', error);
-      }
-    
-};
+    }
+  };
 
 
   const handleScroll = (entries) => {
@@ -122,6 +108,19 @@ const GetMessages = () => {
       }));
     }
 };
+
+  /* eslint-disable */
+  useEffect(() => {
+    socket.on('send-message', (message) => {
+      console.log('newMess: ', message);
+      handleGetMess(); // Gọi lại hàm để lấy tin nhắn mới
+    });
+  
+    // Hủy sự kiện khi component unmount
+    return () => {
+      socket.off('send-message');
+    };
+  }, []);  
 
   
   /* eslint-disable */

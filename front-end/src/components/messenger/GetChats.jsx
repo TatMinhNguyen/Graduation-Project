@@ -23,7 +23,7 @@ const GetChats = () => {
       /* eslint-disable */
     useEffect(() => {
         socket.on('send-message', (message) => {
-        //   console.log('newMess: ', message);
+          console.log('newMess: ', message);
         handleGetUserChats(); // Gọi lại hàm để lấy tin nhắn mới
         });
     
@@ -81,45 +81,65 @@ const GetChats = () => {
             <div className='mt-4'>
                 {chats?.map((chat) => {
                     return (
-                        <>
-                            {chat._id === chatId ? (
-                                <div key={chat._id}
-                                    className='flex items-center p-2 py-2.5 bg-neutral-200 rounded-lg cursor-pointer'
-                                    onClick={() => navigate(`/messenger/${chat._id}`)}
-                                >
-                                    <div className='w-11 h-11'>
-                                        <img className='h-full w-full object-cover rounded-full'
-                                            src={chat.avatar}
-                                            alt=''
-                                        />                                
+                        <div key={chat._id}
+                            className={`flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
+                            onClick={() => navigate(`/messenger/${chat._id}`)}
+                        >
+                            <div className='w-10 h-10'>
+                                <img className='h-full w-full object-cover rounded-full'
+                                    src={chat.avatar}
+                                    alt=''
+                                />                                
+                            </div>
+                            <div className='ml-3'>
+                                <h1 className={`text-[15px] font-medium`}>
+                                    {chat.name}
+                                </h1>
+                                {chat.firstMessage === null ? (
+                                    <div className={`text-[13.5px] font-medium`}>
+                                        Please send a message to {chat.name}.
                                     </div>
-                                    <div className='ml-3'>
-                                        <h1 className='font-medium text-[16px]'>
-                                            {chat.name}
-                                        </h1>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div key={chat._id}
-                                    className='flex items-center p-2 py-2.5 hover:bg-gray-200 rounded-lg cursor-pointer'
-                                    onClick={() => navigate(`/messenger/${chat._id}`)}
-                                >
-                                    <div className='w-11 h-11'>
-                                        <img className='h-full w-full object-cover rounded-full'
-                                            src={chat.avatar}
-                                            alt=''
-                                        />                                
-                                    </div>
-                                    <div className='ml-3'>
-                                        <h1 className='font-medium text-[16px]'>
-                                            {chat.name}
-                                        </h1>
-                                    </div>
-                                </div>
-                            )}
-                        
-                        </>
+                                ) : (
+                                    <div>
+                                        {chat.firstMessage?.image !== null ? (
+                                            <div className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}>
+                                                {chat.firstMessage?.senderId._id === user?.userId ? (
+                                                    <p>
+                                                        You have sent 1 photo to {chat.name}.
+                                                    </p>
+                                                ) : (
+                                                    <p>
+                                                        {chat.firstMessage?.senderId.username} have sent 1 photo to you.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}
+                                                style={{ 
+                                                    maxWidth: '20vw', 
+                                                    overflow: 'hidden', 
+                                                    whiteSpace: 'nowrap', 
+                                                    textOverflow: 'ellipsis',
+                                                    display: 'block' // Đảm bảo rằng nó là block hoặc inline-block để xử lý ellipsis
+                                                }}
+                                            >
+                                                {chat.firstMessage?.senderId._id === user?.userId ? (
+                                                    <p style={{ display: 'inline', margin: 0 }}>
+                                                        You: {chat.firstMessage?.text}
+                                                    </p>
+                                                ) : (
+                                                    <p style={{ display: 'inline', margin: 0 }}>
+                                                        {chat.firstMessage?.senderId.username}: {chat.firstMessage?.text}
+                                                    </p>
+                                                )}
+                                            </div>
 
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>                      
                     )
                 })}
             </div>

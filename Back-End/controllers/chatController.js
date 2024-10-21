@@ -1,4 +1,5 @@
 const ChatModel = require("../models/ChatModel");
+const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
 
 const chatController = {
@@ -72,6 +73,12 @@ const chatController = {
             // Duyệt qua từng đoạn chat
             const updatedChats = await Promise.all(
                 chats.map(async (chat) => {
+                    const chatId = chat._id;
+                    const firstMessage = await MessageModel.findOne({ chatId })
+                        .select('senderId text image')
+                        .populate('senderId', 'username profilePicture')
+                        .sort({ createdAt: -1 });
+
                     // Nếu đoạn chat không có tên
                     if (!chat.name) {
                         let chatObject = chat.toObject();
@@ -86,6 +93,7 @@ const chatController = {
                         // Thêm thông tin user vào chat
                         return {
                             ...chatObject,
+                            firstMessage,
                             name: otherUser?.username,
                             avatar: otherUser?.profilePicture,
                             userId: otherUser?._id
@@ -100,8 +108,9 @@ const chatController = {
                             // Thêm thông tin người tạo vào chat
                             return {
                                 ...chatObject,
-                                creatorUsername: creatorUser?.username,
-                                creatorAvatar: creatorUser?.profilePicture,
+                                firstMessage,
+                                // creatorUsername: creatorUser?.username,
+                                // creatorAvatar: creatorUser?.profilePicture,
                             };
                         }
                     }
