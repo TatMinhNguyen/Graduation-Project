@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import {  useDispatch, useSelector } from 'react-redux'
 import { getUserChat } from '../../api/chat/chat'
 import { useNavigate, useParams } from 'react-router-dom'
 import socket from '../../socket'
@@ -9,30 +9,29 @@ const GetChats = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
     const { chatId } = useParams();
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const dispatch = useDispatch();
+  
     const handleGetUserChats = async() => {
-        try {
-            await getUserChat(user?.token, dispatch)
-        } catch (error) {
-            console.log(error)
-        }
+      try {
+          await getUserChat(user?.token, dispatch)
+      } catch (error) {
+          console.log(error)
+      }
     }
-
-      /* eslint-disable */
+  
+    /* eslint-disable */
     useEffect(() => {
-        socket.on('send-message', (message) => {
-          console.log('newMess: ', message);
-        handleGetUserChats(); // Gọi lại hàm để lấy tin nhắn mới
-        });
-    
-        // Hủy sự kiện khi component unmount
-        return () => {
-        socket.off('send-message');
-        };
+      socket.on('send-chat', () => {
+        handleGetUserChats(); 
+      });
+  
+      // //Hủy sự kiện khi component unmount
+      return () => {
+        socket.off('send-chat');
+      };
     }, []); 
-
+  
     /* eslint-disable */
     useEffect(() => {
         if (!user) {
@@ -42,6 +41,7 @@ const GetChats = () => {
             handleGetUserChats();
         }
     }, []);
+
     return (
         <div className='p-2'>
             <div className='flex mt-1'>

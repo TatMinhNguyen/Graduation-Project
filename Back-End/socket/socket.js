@@ -61,4 +61,16 @@ const sendMessage = (receiverIds, message) => {
   })
 }
 
-module.exports = { socketConfig, sendNotification, sendMessage };
+const sendChats = (receiverIds) => {
+  receiverIds.forEach(userId => {
+    const socketId = userSocketMap[userId];
+    if(socketId) {
+      io.to(socketId).emit('send-chat');
+      console.log(`Message sent to userId ${userId} with socket ID ${socketId}`);
+    } else {
+      console.log(`User ${userId} is not connected`);
+    }
+  })
+}
+
+module.exports = { socketConfig, sendNotification, sendMessage, sendChats };

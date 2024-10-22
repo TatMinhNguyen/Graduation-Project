@@ -24,7 +24,17 @@ const GetMessages = () => {
     index: 20,
   })
 
+//   console.log(messages)
+
   const dispatch = useDispatch();
+
+  const handleGetMess = async () => {
+    try {
+        await getMess(user?.token, chatId, params, dispatch);
+    } catch (error) {
+        console.error('Errors:', error);
+    }
+  };
 
   const handleImageClick = (e) => {
     e.preventDefault();
@@ -90,14 +100,16 @@ const GetMessages = () => {
     setChat(result)
   }
 
-  const handleGetMess = async () => {
-    try {
-        await getMess(user?.token, chatId, params, dispatch);
-    } catch (error) {
-        console.error('Errors:', error);
-    }
-  };
+  /* eslint-disable */
+  useEffect(() => {
+    socket.on('send-message', () => {
+      handleGetMess();
+    });
 
+    return () => {
+        socket.off('send-message');
+    };
+  }, [messages]); 
 
   const handleScroll = (entries) => {
     const entry = entries[0];
@@ -107,21 +119,7 @@ const GetMessages = () => {
         index: prevParams.index + 20,
       }));
     }
-};
-
-  /* eslint-disable */
-  useEffect(() => {
-    socket.on('send-message', (message) => {
-      console.log('newMess: ', message);
-      handleGetMess(); // Gọi lại hàm để lấy tin nhắn mới
-    });
-  
-    // Hủy sự kiện khi component unmount
-    return () => {
-      socket.off('send-message');
-    };
-  }, []);  
-
+  };
   
   /* eslint-disable */
   useEffect(() => {
@@ -178,7 +176,7 @@ const GetMessages = () => {
         <div className="h-[7.5vh]"></div>
 
         {/* Nội dung chat cuộn */}
-        <div className=" overflow-y-auto h-[73vh] flex flex-col-reverse px-3 pt-2">
+        <div className={`overflow-y-auto ${imagePreview ? 'h-[calc(72vh-90px)]' : 'h-[73vh]'}  flex flex-col-reverse px-3 pt-2`}>
             {messages?.map((message) => (
                 <div key={message._id}
                     className={`flex ${message.senderId._id === user?.userId ? 'justify-end' : 'justify-start'} mb-2`}
@@ -255,58 +253,77 @@ const GetMessages = () => {
         </div>
 
         {/* Footer cố định */}
-        <form className="fixed bottom-4 w-[calc(65vw-12px)] bg-white flex items-center z-10 px-2"
-            onSubmit={handleAddMessage}
-        >
-            <button className='w-10 h-9 flex items-center justify-center'
-                onClick={handleImageClick}
-            >
-                <img className='w-7 h-7'
-                    src={require("../../assets/icons/image.png")}
-                    alt=''
-                />
-            </button>
-            {/* Hidden inputs */}
-            <input 
-                type="file" 
-                accept="image/*" 
-                ref={imageInputRef} 
-                style={{ display: 'none' }} 
-                onChange={handleImageChange} 
-            /> 
-            <InputEmoji
-                value={newMessages}
-                onChange={setMessages}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault(); // Ngăn việc thêm dòng mới
-                        handleAddMessage(e);
-                    }
-                }}
-            />
-            {loading ? (
-                <div>
-                    <LoadingSpinner/>
+        <div className='fixed bottom-4 w-[calc(65vw-12px)] bg-white rounded-md'>
+            {imagePreview && (
+                <div className='flex'>
+                    <img className='max-w-[100px] max-h-[100px] rounded ml-[5vw] mr-3'
+                        src={imagePreview}
+                        alt=''
+                    /> 
+                    <div className='w-6 h-6 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 cursor-pointer'
+                        onClick={handleDeletePreView}
+                    >
+                        <img className='w-3 h-3'
+                            src={require('../../assets/icons/close.png')}
+                            alt=''
+                        />    
+                    </div>                   
                 </div>
-            ) : (
-                <>
-                    {newMessages !== '' || image ? (
-                        <button type='submit'>
+            )}
+            <form className=" flex items-center z-10 px-2 "
+                onSubmit={handleAddMessage}
+            >
+                <button className='w-10 h-9 flex items-center justify-center'
+                    onClick={handleImageClick}
+                >
+                    <img className='w-7 h-7'
+                        src={require("../../assets/icons/image.png")}
+                        alt=''
+                    />
+                </button>
+                {/* Hidden inputs */}
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    ref={imageInputRef} 
+                    style={{ display: 'none' }} 
+                    onChange={handleImageChange} 
+                /> 
+                <InputEmoji
+                    value={newMessages}
+                    onChange={setMessages}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault(); // Ngăn việc thêm dòng mới
+                            handleAddMessage(e);
+                        }
+                    }}
+                />
+                {loading ? (
+                    <div>
+                        <LoadingSpinner/>
+                    </div>
+                ) : (
+                    <>
+                        {newMessages !== '' || image ? (
+                            <button type='submit'>
+                                <img className='w-6 h-6'
+                                    src={require('../../assets/icons/send-blue.png')}
+                                    alt=''
+                                />
+                            </button>
+                        ) : (
                             <img className='w-6 h-6'
-                                src={require('../../assets/icons/send-blue.png')}
+                                src={require('../../assets/icons/send-gray.png')}
                                 alt=''
                             />
-                        </button>
-                    ) : (
-                        <img className='w-6 h-6'
-                            src={require('../../assets/icons/send-gray.png')}
-                            alt=''
-                        />
-                    )}                
-                </>
-            )}
+                        )}                
+                    </>
+                )}
 
-        </form>
+            </form>            
+        </div>
+
     </div>
   )
 }

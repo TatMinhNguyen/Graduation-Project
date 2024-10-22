@@ -2,10 +2,10 @@ import React from 'react'
 import NavBar from '../../components/navbar/NavBar'
 import { useSelector } from 'react-redux'
 import GetChats from '../../components/messenger/GetChats'
-import { Outlet } from 'react-router-dom'
-
+import { Outlet} from 'react-router-dom'
 const Messenger = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
+  
   return (
     <div className='bg-gray-100 min-h-screen overflow-y-scroll '>
       <div className='fixed top-0 w-[calc(100vw-15px)] z-50'>

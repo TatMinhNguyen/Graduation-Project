@@ -2,24 +2,36 @@ const FeelModel = require("../models/FeelModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
 
+function removeVietnameseTones(str) {
+    return str
+        .normalize('NFD') // Tách các ký tự có dấu
+        .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+}
+    
 const searchController =  {
     searchPostsAndUsers: async (req, res) => {
         try {
             const userId = req.user.id;
             const searchInput = req.query.q || ""; // Lấy từ khóa tìm kiếm từ query params
             
-            // Escape các ký tự đặc biệt để tránh lỗi regex
-            const escapedSearchInput = searchInput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            
-            // Tạo regex để tìm kiếm description và username tương đồng
-            const searchRegex = new RegExp(escapedSearchInput, 'i'); // 'i' để không phân biệt chữ hoa/thường
+            // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
+            const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
     
             // Tìm tất cả các bài viết có description khớp với từ khóa tìm kiếm
-            const posts = await PostModel.find({ description: { $regex: searchRegex } }).sort({ createdAt: -1 });
+            const posts = await PostModel.find()
+                .sort({ createdAt: -1 })
+                .then(posts => {
+                    return posts.filter(post => {
+                        const postDescription = removeVietnameseTones(post.description).toLowerCase();
+                        return postDescription.includes(searchKeyword);
+                    });
+                });
     
             // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
             const users = await UserModel.find(
-                { username: { $regex: searchRegex }, isVerify: true, _id: { $nin: userId }, },
+                { isVerify: true, _id: { $nin: userId }, isAdmin: { $ne: true }},
                 { 
                     _id: 1, 
                     username: 1, 
@@ -28,17 +40,23 @@ const searchController =  {
                     friendsCount: 1, 
                     isVerify: 1
                 }
-            ).sort({ createdAt: -1 });
-
+            ).sort({ createdAt: -1 })
+            .then(users => {
+                return users.filter(user => {
+                    const username = removeVietnameseTones(user.username).toLowerCase();
+                    return username.includes(searchKeyword);
+                });
+            });
+    
             // Lấy danh sách bạn bè của người dùng đang đăng nhập
             const currentUser = await UserModel.findById(userId);
             const friends = currentUser.friends;
     
-            // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
+            // Lấy thông tin người dùng tương ứng với mỗi bài viết
             const userIds = posts.map(post => post.userId);
             const postUsers = await UserModel.find({ _id: { $in: userIds } });
     
-            // Tạo một mảng các lời hứa để lấy thông tin cảm xúc của userId đối với từng post
+            // Lấy thông tin cảm xúc của userId đối với từng post
             const feelPromises = posts.map(post => FeelModel.findOne({ userId: userId, postId: post._id }));
             const feels = await Promise.all(feelPromises);
     
@@ -72,7 +90,6 @@ const searchController =  {
                     username: user.username,
                     profilePicture: user.profilePicture,
                     friendsCount: user.friendsCount,
-                    // isVerify: user.isVerify,
                     mutualFriends: mutualFriends.length
                 };
             });
@@ -83,6 +100,7 @@ const searchController =  {
             return res.status(500).json({ error: error.message });
         }
     }
+    
 }
 
 module.exports = searchController;
