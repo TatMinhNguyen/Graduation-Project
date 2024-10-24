@@ -1,6 +1,7 @@
 const ChatModel = require("../models/ChatModel");
 const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
+const imagekit = require("../utils/imagekitConfig");
 
 const chatController = {
     // create chat 2 people
@@ -170,6 +171,227 @@ const chatController = {
     
         } catch (error) {
             res.status(500).json({ error: error.message });
+        }
+    },
+
+    getMembers: async (req, res) => {
+        try {
+          const chatId = req.params.chatId;
+          const chat = await ChatModel.findById(chatId).select('members'); 
+          
+          if (!chat) {
+            return res.status(404).json({ error: 'Chat not found' });
+          }
+      
+          const memberIds = chat.members; 
+          const members = await UserModel.find({ _id: { $in: memberIds } }).select('id username profilePicture'); 
+      
+          res.status(200).json( members );
+        } catch (error) {
+          res.status(500).json(error);
+        }
+    },
+
+    addMembersToGroupChat: async (req, res) => {
+        try {
+            const { chatId } = req.params; // Lấy ID của nhóm chat từ params
+            const { newMembers } = req.body; // Nhận danh sách các thành viên mới từ body
+            const userId = req.user.id; // ID của người thực hiện yêu cầu
+    
+            // Kiểm tra nếu không có thành viên mới nào được gửi lên
+            if (!newMembers || newMembers.length === 0) {
+                return res.status(400).json({ message: "Không có thành viên nào để thêm vào nhóm chat." });
+            }
+    
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+    
+            // Kiểm tra xem người dùng có phải là thành viên của nhóm không
+            if (!chat.members.includes(userId)) {
+                return res.status(403).json({ message: "Bạn không phải là thành viên của nhóm chat này." });
+            }
+    
+            // Thêm thành viên mới nếu chưa có trong danh sách thành viên của nhóm
+            newMembers.forEach(member => {
+                if (!chat.members.includes(member)) {
+                    chat.members.push(member);
+                }
+            });
+    
+            // Lưu lại nhóm chat
+            await chat.save();
+    
+            return res.status(200).json({ message: "Thêm thành viên vào nhóm chat thành công" });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+    
+    removeMemberFromGroupChat: async (req, res) => {
+        try {
+            const { chatId } = req.params; // Lấy ID của nhóm chat từ params
+            const { memberId } = req.body; // Nhận ID của thành viên cần xóa từ body
+            const userId = req.user.id; // ID của người thực hiện yêu cầu
+    
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+    
+            // Kiểm tra quyền: chỉ người tạo nhóm chat mới có quyền xóa thành viên
+            if (chat.createId.toString() !== userId) {
+                return res.status(403).json({ message: "Bạn không có quyền xóa thành viên khỏi nhóm chat này." });
+            }
+               
+            // Kiểm tra nếu thành viên cần xóa có trong nhóm
+            if (!chat.members.includes(memberId)) {
+                return res.status(400).json({ message: "Thành viên không có trong nhóm chat." });
+            }
+    
+            // Xóa thành viên khỏi danh sách
+            chat.members = chat.members.filter(member => member.toString() !== memberId);
+    
+            // Lưu lại nhóm chat
+            await chat.save();
+    
+            return res.status(200).json({ message: "Xóa thành viên khỏi nhóm chat thành công" });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+    
+    leaveGroupChat: async (req, res) => {
+        try {
+            const { chatId } = req.params; // Lấy ID của nhóm chat từ params
+            const userId = req.user.id; // ID của người thực hiện yêu cầu
+    
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+    
+            // Kiểm tra nếu người dùng không phải là thành viên của nhóm
+            if (!chat.members.map(member => member.toString()).includes(userId)) {
+                return res.status(400).json({ message: "Bạn không phải là thành viên của nhóm chat này." });
+            }
+    
+            // Nếu nhóm chỉ còn 3 người không cho phép rời nhóm
+            if (chat.members.length === 3) {
+                return res.status(400).json({ message: "Nhóm chat cần ít nhất 3 thành viên. Không thể rời nhóm." });
+            }
+    
+            // Xóa thành viên khỏi danh sách
+            chat.members = chat.members.filter(member => member.toString() !== userId);
+    
+            // Nếu người dùng rời là nhóm trưởng
+            if (chat.createId.toString() === userId) {
+                // Chuyển quyền nhóm trưởng cho một thành viên ngẫu nhiên còn lại
+                if (chat.members.length > 0) {
+                    chat.createId = chat.members[Math.floor(Math.random() * chat.members.length)];
+                }
+            }
+    
+            // Lưu lại nhóm chat
+            await chat.save();
+    
+            return res.status(200).json({ message: "Rời nhóm chat thành công" });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+
+    deleteGroupChat: async (req, res) => {
+        try {
+            const { chatId } = req.params; // Lấy ID của nhóm chat từ params
+            const userId = req.user.id; // ID của người thực hiện yêu cầu
+    
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+    
+            // Kiểm tra quyền: chỉ người tạo nhóm mới có quyền xóa nhóm
+            if (chat.createId.toString() !== userId) {
+                return res.status(403).json({ message: "Bạn không có quyền xóa nhóm chat này." });
+            }
+    
+            // Xóa nhóm chat
+            await ChatModel.findByIdAndDelete(chatId);
+    
+            return res.status(200).json({ message: "Xóa nhóm chat thành công." });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+
+    changeChatPhoto: async (req, res) => {
+        try {
+            const chatId = req.params.chatId;
+            const userId = req.user.id;
+
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+
+            if (chat.createId.toString() !== userId) {
+                return res.status(403).json({ message: "Bạn không có quyền thay đổi ảnh đại diện nhóm chat này." });
+            }
+
+            // Upload ảnh lên ImageKit
+            const imageUploadPromises = req.files.image ? imagekit.upload({
+                file: req.files.image[0].buffer, // buffer video từ multer
+                fileName: req.files.image[0].originalname,
+                folder: '/Chat' // Thư mục lưu video
+            }) : Promise.resolve(null);
+
+            const [imageUploadResults] = await Promise.all([
+                imageUploadPromises,
+            ]);
+    
+            const imageUrl = imageUploadResults ? 
+                `${imageUploadResults.url}`
+            : null; 
+
+            chat.avatar = imageUrl
+
+            await chat.save();
+
+            return res.status(200).json({ message: 'Upload successfully.'});
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+    changeChatName : async (req, res) => {
+        try {
+            const chatId = req.params.chatId;
+            const userId = req.user.id;
+            const newName = req.body.newName;
+
+            // Tìm nhóm chat bằng chatId
+            const chat = await ChatModel.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            }
+
+            if (chat.createId.toString() !== userId) {
+                return res.status(403).json({ message: "Bạn không có quyền thay đổi tên nhóm chat này." });
+            }  
+            
+            chat.name = newName;
+
+            await chat.save();
+
+            return res.status(200).json({ message: 'Upload successfully.'});            
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
         }
     }
     

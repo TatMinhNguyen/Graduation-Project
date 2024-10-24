@@ -23,4 +23,22 @@ router.delete('/delete-message/:messageId', middleware.verifyToken, messageContr
 
 router.get('/get-message/:chatId', middleware.verifyToken, messageController.getMessages)
 
+router.get('/get-members/:chatId', middleware.verifyToken, chatController.getMembers)
+
+router.post('/add-members/:chatId', middleware.verifyToken, chatController.addMembersToGroupChat)
+
+router.post('/delete-members/:chatId', middleware.verifyToken, chatController.removeMemberFromGroupChat)
+
+router.post('/leave-group/:chatId', middleware.verifyToken, chatController.leaveGroupChat)
+
+router.delete('/delete-group/:chatId', middleware.verifyToken, chatController.deleteGroupChat)
+
+router.post('/change-avatar/:chatId', 
+    upload.fields([{name: 'image', maxCount:1}]),
+    middleware.verifyToken,
+    chatController.changeChatPhoto
+)
+
+router.post('/change-name/:chatId', middleware.verifyToken, chatController.changeChatName)
+
 module.exports = router;
