@@ -6,6 +6,7 @@ import InputEmoji from "react-input-emoji";
 import { timeAgoShort } from '../../utils';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 import socket from '../../socket';
+import GetDetailConversation from './GetDetailConversation';
 
 const GetMessages = () => {
   const { chatId } = useParams();
@@ -18,6 +19,7 @@ const GetMessages = () => {
   const [image, setImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [showConversation, setShowConversation] = useState(false)
 
   const [params, setParams] = useState({
     page: 1,
@@ -148,29 +150,38 @@ const GetMessages = () => {
         <div className='fixed w-[calc(65vw-12px)] flex items-center h-[7vh] min-h-14 bg-white rounded-t-lg border border-white shadow z-10'>
             <div className='w-10 h-10 ml-3'>
                 <img className='h-full w-full object-cover rounded-full'
-                    src={chat.avatar}
+                    src={chat?.avatar}
                     alt=''
                 />                                
             </div>
             <div className='ml-3'>
                 <h1 className='font-medium text-[16px]'>
-                    {chat.name}
+                    {chat?.name}
                 </h1>
             </div>
             <div className='flex-1'></div>
-            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2'>
+            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'>
                 <img className='h-5 w-5 object-cover rounded-full'
                     src={require('../../assets/icons/call.png')}
                     alt=''
                 />  
             </div>   
-            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-3'>
+            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-3 cursor-pointer'
+                onClick={() => setShowConversation(true)}
+            >
                 <img className='h-5 w-5 object-cover rounded-full'
                     src={require('../../assets/icons/option.png')}
                     alt=''
                 />  
             </div>        
         </div>
+
+        {showConversation && (
+            <GetDetailConversation
+                chat = {chat}
+                isCloseModal = {() => setShowConversation(false)}
+            />
+        )}
 
         {/* Khoảng trống bù để nội dung không bị che bởi header */}
         <div className="h-[7.5vh]"></div>

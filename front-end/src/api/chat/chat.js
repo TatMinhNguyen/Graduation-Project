@@ -63,3 +63,14 @@ export const addMess = async (token, message) => {
         console.log(error)
     }
 }
+
+export const getMembers = async (token, chatId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/chat/get-members/${chatId}`, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
