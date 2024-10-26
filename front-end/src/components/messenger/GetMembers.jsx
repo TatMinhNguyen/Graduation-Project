@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getMembers } from '../../api/chat/chat'
+import AddMembers from './AddMembers'
 
-const GetMembers = ({chatId, createId}) => {
+const GetMembers = ({chatId, createId, isCloseModal}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
 
     const [members, setMembers] = useState([])
+    const [showAddMembers, setShowAddMembers] = useState(false)
 
-    const handleGetMembers = async () => {
+    const handleShowAddMembers = ()  => {
+        setShowAddMembers(true);
+    }
+    
+     const handleGetMembers = async () => {
         try {
             const res = await getMembers(user?.token, chatId)
             setMembers(res)
@@ -53,7 +59,9 @@ const GetMembers = ({chatId, createId}) => {
                     </div>
                 </div>
             ))}
-            <div className='m-3 py-1 px-3 flex items-center hover:bg-gray-100 rounded-md cursor-pointer'>
+            <div className='m-3 py-1 px-3 flex items-center hover:bg-gray-100 rounded-md cursor-pointer'
+                onClick={handleShowAddMembers}
+            >
                 <div className='w-9 h-9 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer'>
                     <img className='w-5 h-5'
                         src={require("../../assets/icons/invite.png")}
@@ -64,6 +72,13 @@ const GetMembers = ({chatId, createId}) => {
                     Add people
                 </p>
             </div>
+            {showAddMembers && (
+                <AddMembers
+                    chatId={chatId}
+                    onCloseModal={() => setShowAddMembers(false)}
+                    isCloseModal={() => isCloseModal()}
+                />
+            )}
         </div>
     )
 }

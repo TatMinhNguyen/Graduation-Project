@@ -3,6 +3,14 @@ const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
+function removeVietnameseTones(str) {
+    return str
+        .normalize('NFD') // Tách các ký tự có dấu
+        .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+}
+
 const chatController = {
     // create chat 2 people
     createChat : async (req, res) =>{
@@ -189,6 +197,53 @@ const chatController = {
           res.status(200).json( members );
         } catch (error) {
           res.status(500).json(error);
+        }
+    },
+
+    searchUsers: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const searchInput = req.body.searchInput; // Lấy từ khóa tìm kiếm từ query params
+
+            const chatId = req.params.chatId;
+            const chat = await ChatModel.findById(chatId).select('members'); 
+            
+            if (!chat) {
+              return res.status(404).json({ error: 'Chat not found' });
+            }
+            const memberIds = chat.members; 
+            
+            // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
+            const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
+            
+            // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
+            const users = await UserModel.find(
+                { isVerify: true,  _id: { $nin: [...memberIds, userId] }, isAdmin: { $ne: true }},
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    isVerify: 1
+                }
+            ).sort({ createdAt: -1 })
+            .then(users => {
+                return users.filter(user => {
+                    const username = removeVietnameseTones(user.username).toLowerCase();
+                    return username.includes(searchKeyword);
+                });
+            });
+
+            // Kết quả tìm kiếm người dùng
+            const userResults = users.map(user => {              
+                return {
+                    userId: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                };
+            });
+            return res.status(200).json(userResults);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
     },
 

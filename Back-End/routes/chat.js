@@ -41,4 +41,6 @@ router.post('/change-avatar/:chatId',
 
 router.post('/change-name/:chatId', middleware.verifyToken, chatController.changeChatName)
 
+router.post('/search-user/:chatId', middleware.verifyToken, chatController.searchUsers)
+
 module.exports = router;

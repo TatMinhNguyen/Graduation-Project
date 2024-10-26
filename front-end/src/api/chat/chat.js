@@ -74,3 +74,25 @@ export const getMembers = async (token, chatId) => {
         console.log(error)
     }
 }
+
+export const searchUser = async(token, input, chatId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/chat/search-user/${chatId}`, input, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const addMemberes = async(token, members, chatId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/chat/add-members/${chatId}`, members, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}

@@ -75,7 +75,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                     <div>
                         <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer'>
                             <div className='w-7 h-7 flex justify-center items-center rounded-full bg-gray-200'>
-                                <img className='h-4 w-4'
+                                <img className='h-5 w-5'
                                     src={require("../../assets/icons/edit.png")}
                                     alt=''
                                 />
@@ -122,6 +122,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                     <GetMembers
                         chatId = {chat?._id}
                         createId = {chat?.createId}
+                        isCloseModal = {() => isCloseModal()}
                     />
                 )}
             </div>
