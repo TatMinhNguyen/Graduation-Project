@@ -165,7 +165,15 @@ const GetMessages = () => {
                     src={require('../../assets/icons/call.png')}
                     alt=''
                 />  
-            </div>   
+            </div> 
+            {chat?.members?.length > 2 && (
+                <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'>
+                    <img className='h-5 w-5 object-cover rounded-full'
+                        src={require('../../assets/icons/bell-ring.png')}
+                        alt=''
+                    />  
+                </div>                 
+            )}  
             <div className='p-1.5 hover:bg-gray-100 rounded-full mr-3 cursor-pointer'
                 onClick={() => setShowConversation(true)}
             >

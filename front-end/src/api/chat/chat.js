@@ -96,3 +96,14 @@ export const addMemberes = async(token, members, chatId) => {
         console.log(error)
     }
 }
+
+export const deleteMember = async(token, members, chatId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/chat/delete-members/${chatId}`, members, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }    
+}

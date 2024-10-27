@@ -9,6 +9,9 @@ module.exports = {
         customBlue: '#0866FF',  // Định nghĩa màu xanh tùy chỉnh
         customGreen: '#10B981', // Định nghĩa màu xanh lá tùy chỉnh
       },
+      boxShadow: {
+        'custom-above': '0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1)',
+      },
     },
   },
   plugins: [
