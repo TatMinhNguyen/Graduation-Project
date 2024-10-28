@@ -43,4 +43,6 @@ router.post('/change-name/:chatId', middleware.verifyToken, chatController.chang
 
 router.post('/search-user/:chatId', middleware.verifyToken, chatController.searchUsers)
 
+router.post('/search-members', middleware.verifyToken, chatController.searchMembers)
+
 module.exports = router;

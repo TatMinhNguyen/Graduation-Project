@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearUser, setEmail, setLogin, setLogOut, setPassword, setVerificationCode } from "../../redux/authSlice";
+import { setEmail, setLogin, setLogOut, setPassword, setVerificationCode } from "../../redux/authSlice";
 import { apiUrl } from "../API_URL"
 
 export const loginUser = async (user, dispatch, navigate) => {

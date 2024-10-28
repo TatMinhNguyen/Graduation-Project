@@ -15,7 +15,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                 className='bg-white rounded-lg shadow-lg w-full max-w-sm h-[80vh] overflow-y-auto no-scrollbar'
                 onClick={(e) => e.stopPropagation()} // Ngăn sự kiện onClick lan truyền lên
             >
-                <div className="flex-1 flex flex-col justify-center items-center p-4">
+                <div className="flex-1 flex flex-col justify-center items-center p-4 pb-2">
                     <div className='w-16 h-16'>
                         <img className='h-full w-full object-cover rounded-full'
                             src={chat?.avatar}
@@ -51,7 +51,35 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                     </div>           
                 </div>
                 {chat?.members.length > 2 && (
-                    <div className='flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 cursor-pointer'
+                    <div className='flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 cursor-pointer mt-1'
+                        onClick={() => setShowMembers(!showMembers)}
+                    >
+                        <p className='font-medium text-[16px]'>
+                            Chat members
+                        </p>
+                        <div className='flex-1'></div>
+                        {showMembers ? (
+                            <img className='h-3.5 w-3.5'
+                                src={require("../../assets/icons/bot-arrow.png")}
+                                alt=''
+                            />
+                        ) : (
+                            <img className='h-3.5 w-3.5'
+                                src={require("../../assets/icons/right-arrow.png")}
+                                alt=''
+                            />
+                        )}
+                    </div>                    
+                )}
+                {showMembers && (
+                    <GetMembers
+                        chatId = {chat?._id}
+                        createId = {chat?.createId}
+                        isCloseModal = {() => isCloseModal()}
+                    />
+                )}
+                {chat?.members.length > 2 && (
+                    <div className='flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 mb-2 cursor-pointer'
                         onClick={() => setShowChange(!showChange)}
                     >
                         <p className='font-medium text-[16px]'>
@@ -84,7 +112,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                                 Change chat name
                             </p>
                         </div>  
-                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer'>
+                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer mb-2'>
                             <div className='w-7 h-7 flex justify-center items-center rounded-full bg-gray-200'>
                                 <img className='h-4 w-4'
                                     src={require("../../assets/icons/image1.png")}
@@ -96,34 +124,6 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                             </p>
                         </div>                      
                     </div>
-                )}
-                {chat?.members.length > 2 && (
-                    <div className='flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 cursor-pointer mt-1'
-                        onClick={() => setShowMembers(!showMembers)}
-                    >
-                        <p className='font-medium text-[16px]'>
-                            Chat members
-                        </p>
-                        <div className='flex-1'></div>
-                        {showMembers ? (
-                            <img className='h-3.5 w-3.5'
-                                src={require("../../assets/icons/bot-arrow.png")}
-                                alt=''
-                            />
-                        ) : (
-                            <img className='h-3.5 w-3.5'
-                                src={require("../../assets/icons/right-arrow.png")}
-                                alt=''
-                            />
-                        )}
-                    </div>                    
-                )}
-                {showMembers && (
-                    <GetMembers
-                        chatId = {chat?._id}
-                        createId = {chat?.createId}
-                        isCloseModal = {() => isCloseModal()}
-                    />
                 )}
             </div>
         </div>

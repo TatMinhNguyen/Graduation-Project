@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { getMembers } from '../../api/chat/chat'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteMember, getMembers, getUserChat, leaveGroup } from '../../api/chat/chat'
 import AddMembers from './AddMembers'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { useNavigate } from 'react-router-dom'
 
 const GetMembers = ({chatId, createId, isCloseModal}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
@@ -15,6 +16,9 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
     const [showDelete, setShowDelete] = useState(false)
     const [showLeave, setShowLeave] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleShowAddMembers = ()  => {
         setShowAddMembers(true);
@@ -44,6 +48,30 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
         setShowDelete(false)
         setShowLeave(false)
         setSelectedUser(null)    
+    }
+
+    const handleDeleteMembers = async (memberId) => {
+        try {
+            const member = {
+                memberId: memberId
+            }
+            await deleteMember(user?.token, member, chatId)
+            setLoading(true)
+            handleGetMembers();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleLeaveGroup = async () => {
+        try {
+            await leaveGroup(user?.token, chatId)
+            setLoading(true)
+            await getUserChat(user?.token, dispatch)
+            navigate(`/messenger`)
+        } catch (error) {
+            console.log(error)
+        }
     }
     
     const handleGetMembers = async () => {
@@ -239,7 +267,7 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                         </button>
                                         <button 
                                             className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
-                                            // onClick={() => handleDeletepost(selectedUser?.postId)}
+                                            onClick={() => handleDeleteMembers(selectedUser?._id)}
                                         >
                                             Remove
                                         </button>
@@ -271,7 +299,7 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                         </button>
                                         <button 
                                             className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
-                                            // onClick={() => handleDeletepost(selectedUser?.postId)}
+                                            onClick={() => handleLeaveGroup()}
                                         >
                                             Leave group
                                         </button>

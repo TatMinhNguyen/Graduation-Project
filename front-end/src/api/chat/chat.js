@@ -86,6 +86,17 @@ export const searchUser = async(token, input, chatId) => {
     }
 }
 
+export const searchMembers = async(token, input) => {
+    try {
+        const res = await axios.post(`${apiUrl}/chat/search-members`, input, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const addMemberes = async(token, members, chatId) => {
     try {
         const res = await axios.post(`${apiUrl}/chat/add-members/${chatId}`, members, {
@@ -106,4 +117,24 @@ export const deleteMember = async(token, members, chatId) => {
     } catch (error) {
         console.log(error)
     }    
+}
+
+export const leaveGroup = async(token, chatId) => {
+    try {
+        await axios.post(`${apiUrl}/chat/leave-group/${chatId}`, {}, {
+            headers: { token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const createChatRoom = async(token, chat) => {
+    try {
+        await axios.post(`${apiUrl}/chat/create-group-chat`, chat, {
+            headers: { token: `Bearer ${token}`}
+        })        
+    } catch (error) {
+        console.log(error)
+    }
 }

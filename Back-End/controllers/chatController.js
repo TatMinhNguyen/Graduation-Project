@@ -1,6 +1,7 @@
 const ChatModel = require("../models/ChatModel");
 const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
+const { sendChats } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 function removeVietnameseTones(str) {
@@ -61,6 +62,8 @@ const chatController = {
                 name,
                 createId,
             });
+
+            sendChats(newChat.members)
     
             await newChat.save();
     
@@ -245,6 +248,45 @@ const chatController = {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+    },
+
+    searchMembers: async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const searchInput = req.body.searchInput; // Lấy từ khóa tìm kiếm từ query params
+            
+            // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
+            const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
+            
+            // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
+            const users = await UserModel.find(
+                { isVerify: true,  _id: { $nin: userId }, isAdmin: { $ne: true }},
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    isVerify: 1
+                }
+            ).sort({ createdAt: -1 })
+            .then(users => {
+                return users.filter(user => {
+                    const username = removeVietnameseTones(user.username).toLowerCase();
+                    return username.includes(searchKeyword);
+                });
+            });
+
+            // Kết quả tìm kiếm người dùng
+            const userResults = users.map(user => {              
+                return {
+                    userId: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                };
+            });
+            return res.status(200).json(userResults);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }        
     },
 
     addMembersToGroupChat: async (req, res) => {

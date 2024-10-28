@@ -1,13 +1,10 @@
 import React, { useState } from 'react'
 
 import { Link, useNavigate, } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginUser } from '../../api/auth/auth';
 
 function Login() {
-    // const currentEmail = useSelector((state) => state.auth.user?.email)
-    // const currentPassword = useSelector((state) => state.auth.user?.password)
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 

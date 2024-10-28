@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {  useDispatch, useSelector } from 'react-redux'
 import { getUserChat } from '../../api/chat/chat'
 import { useNavigate, useParams } from 'react-router-dom'
 import socket from '../../socket'
+import CreateGroupChat from './CreateGroupChat'
 
 const GetChats = () => {
     const chats = useSelector((state) => state.chat.chats)
     const user = useSelector((state) => state.auth.login?.currentUser)
     const { chatId } = useParams();
+
+    const [showCreateGroupChat, setShowCreateGroupChat] = useState(false)
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -49,13 +52,20 @@ const GetChats = () => {
                     Chats
                 </h1>
                 <div className='flex-1'></div>
-                <div className='bg-gray-100 p-2 rounded-full cursor-pointer hover:bg-gray-200 mr-2'>
+                <div className='bg-gray-100 p-2 rounded-full cursor-pointer hover:bg-gray-200 mr-2'
+                    onClick={() => setShowCreateGroupChat(true)}
+                >
                     <img className='w-4 h-4'
                         src={require('../../assets/icons/plus.png')}
                         alt=''
                     />                
                 </div>
             </div>
+            {showCreateGroupChat && (
+                <CreateGroupChat
+                    isClose = {() => setShowCreateGroupChat(false)}
+                />
+            )}
             <div className='w-full px-2'>
                 <form className='flex-1 flex items-center mt-2 bg-gray-100 mx-auto rounded-3xl'
                         // onSubmit={handleSearch}
