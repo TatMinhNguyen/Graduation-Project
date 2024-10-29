@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setChats, setMessages } from "../../redux/chatSlice";
+import { setChat, setChats, setMessages } from "../../redux/chatSlice";
 
 
 export const getUserChat = async (token, dispatch) => {
@@ -15,11 +15,12 @@ export const getUserChat = async (token, dispatch) => {
     }
 };
 
-export const getAChat = async (token, chatId) => {
+export const getAChat = async (token, chatId, dispatch) => {
     try {
         const res = await axios.get(`${apiUrl}/chat/get-a-chat/${chatId}`, {
             headers: { token: `Bearer ${token}` },
         })
+        dispatch(setChat(res.data))
         return res.data
     } catch (error) {
         console.log(error)
@@ -129,12 +130,35 @@ export const leaveGroup = async(token, chatId) => {
     }
 }
 
-export const createChatRoom = async(token, chat) => {
+export const createChatRoom = async(token, chat, navigate) => {
     try {
-        await axios.post(`${apiUrl}/chat/create-group-chat`, chat, {
+        const res = await axios.post(`${apiUrl}/chat/create-group-chat`, chat, {
             headers: { token: `Bearer ${token}`}
-        })        
+        }) 
+        navigate(`/messenger/${res.data.chat._id}`)       
     } catch (error) {
         console.log(error)
     }
+}
+
+export const changePhoto = async(token, photo, chatId, navigate) => {
+    try {
+        await axios.post(`${apiUrl}/chat/change-avatar/${chatId}`, photo, {
+            headers: { token: `Bearer ${token}`}
+        }) 
+        navigate(`/messenger/${chatId}`) 
+    } catch (error) {
+        console.log(error)
+    }    
+}
+
+export const changeName = async(token, name, chatId, navigate) => {
+    try {
+        await axios.post(`${apiUrl}/chat/change-name/${chatId}`, name, {
+            headers: { token: `Bearer ${token}`}
+        }) 
+        navigate(`/messenger/${chatId}`) 
+    } catch (error) {
+        console.log(error)
+    }    
 }

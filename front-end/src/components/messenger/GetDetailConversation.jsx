@@ -1,10 +1,18 @@
 import React, { useState } from 'react'
 import GetMembers from './GetMembers'
+import { useSelector } from 'react-redux'
+import ChangePhoto from './ChangePhoto'
+import ChangeName from './ChangeName'
 
 const GetDetailConversation = ({chat, isCloseModal}) => {
 
+    const user = useSelector((state) => state.auth.login?.currentUser)
+
     const [showChange, setShowChange] = useState(false)
     const [showMembers, setShowMembers] = useState(false)
+    const [showEditAvatar, setShowEditAvatar] = useState(false)
+    const [showEditName, setShowEditName] = useState(false)
+    console.log(showEditName)
 
     return (
         <div 
@@ -101,7 +109,9 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                 )}
                 {showChange && (
                     <div>
-                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer'>
+                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer'
+                            onClick={() => setShowEditName(true)}
+                        >
                             <div className='w-7 h-7 flex justify-center items-center rounded-full bg-gray-200'>
                                 <img className='h-5 w-5'
                                     src={require("../../assets/icons/edit.png")}
@@ -112,7 +122,9 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                                 Change chat name
                             </p>
                         </div>  
-                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer mb-2'>
+                        <div className='mx-2 px-4 flex items-center hover:bg-gray-100 rounded-md py-1 cursor-pointer mb-2'
+                            onClick={() => setShowEditAvatar(true)}
+                        >
                             <div className='w-7 h-7 flex justify-center items-center rounded-full bg-gray-200'>
                                 <img className='h-4 w-4'
                                     src={require("../../assets/icons/image1.png")}
@@ -125,6 +137,23 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                         </div>                      
                     </div>
                 )}
+                {showEditAvatar && (
+                    <ChangePhoto
+                        avatar = {chat?.avatar}
+                        user = {user}
+                        isCloseModal = {() => setShowEditAvatar(false)}
+                        chatId = {chat?._id}
+                        isClose={()=> isCloseModal()}
+                    />
+                )}   
+                {showEditName && (
+                    <ChangeName
+                        chat={chat}
+                        user={user}
+                        isClose={()=> isCloseModal()}
+                        isCloseModal = {() => setShowEditName(false)}
+                    />
+                )}             
             </div>
         </div>
     )

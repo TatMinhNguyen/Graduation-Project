@@ -9,12 +9,12 @@ import socket from '../../socket';
 import GetDetailConversation from './GetDetailConversation';
 
 const GetMessages = () => {
+  const chat = useSelector((state) => state.chat.chat)
   const { chatId } = useParams();
   const imageInputRef = useRef(null);
   const loadMoreTopRef = useRef(null);
   const user = useSelector((state) => state.auth.login?.currentUser)
   const messages = useSelector((state) => state.chat.messages)
-  const [chat, setChat] = useState({})
   const [newMessages, setMessages] = useState('')
   const [image, setImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
@@ -98,8 +98,7 @@ const GetMessages = () => {
   }
 
   const handleGetAChat = async () => {
-    const result = await getAChat(user?.token, chatId)
-    setChat(result)
+    await getAChat(user?.token, chatId, dispatch)
   }
 
   /* eslint-disable */

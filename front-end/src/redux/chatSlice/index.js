@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const INIT = {
     chats:[],
-    messages:[]
+    messages:[],
+    chat: {}
 }
 
 const chat = createSlice({
@@ -16,6 +17,10 @@ const chat = createSlice({
       setMessages: (state, action) => {
         state.messages = action.payload;
         return state;
+      },
+      setChat: (state, action) => {
+        state.chat = action.payload;
+        return state
       }
     },
 })
@@ -23,6 +28,7 @@ const chat = createSlice({
 export const { 
     setChats,
     setMessages,
+    setChat
   } = chat.actions
 
 export default chat.reducer

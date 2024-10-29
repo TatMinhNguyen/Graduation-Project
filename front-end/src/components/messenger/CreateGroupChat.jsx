@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createChatRoom, getUserChat, searchMembers } from '../../api/chat/chat'
+import { useNavigate } from 'react-router-dom'
 
 const CreateGroupChat = ({isClose}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
@@ -11,6 +12,7 @@ const CreateGroupChat = ({isClose}) => {
     const [name, setname] = useState('');
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const getNewMembersId = (selectedUsers) => {
         return selectedUsers.map(user => user.userId);
@@ -47,7 +49,7 @@ const CreateGroupChat = ({isClose}) => {
             name: name
         }
         try {
-            await createChatRoom(user?.token, newGroup)
+            await createChatRoom(user?.token, newGroup, navigate)
             isClose();
             await getUserChat(user?.token, dispatch)
         } catch (error) {
@@ -184,7 +186,7 @@ const CreateGroupChat = ({isClose}) => {
                 ))}
             </div>
             <div className='flex-1 flex justify-center mt-2.5'>
-                {newMembersId?.length > 0 ? (
+                {newMembersId?.length > 0 && name ? (
                     <button className={`bg-customBlue text-white w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}
                         onClick={handleCreateGroup}
                     >
