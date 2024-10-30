@@ -18,6 +18,7 @@ const commentRoute = require("./routes/comment");
 const searchRoute = require('./routes/search');
 const chatRoute = require('./routes/chat')
 const notificationRoute = require('./routes/notification')
+const groupRoute = require('./routes/group')
 
 const path = require("path");
 const imagekit = require("./utils/imagekitConfig");
@@ -53,6 +54,7 @@ app.use("/api/comment", commentRoute)
 app.use('/api/search', searchRoute)
 app.use('/api/chat', chatRoute)
 app.use('/api/notification', notificationRoute)
+app.use('/api/group', groupRoute)
 
 // Cấu hình Socket.IO
 socketConfig(server);  // Gọi hàm cấu hình Socket.IO từ file socket.js

@@ -19,7 +19,7 @@ const Home = () => {
   // eslint-disable-next-line
   const [params, setParams] = useState({
     page: 1,
-    limit: 20,
+    limit: 10,
   })
 
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const Home = () => {
     if (entry.isIntersecting) {
       setParams((prevParams) => ({
         ...prevParams,
-        limit: prevParams.limit + 20, // Tăng số lượng bài viết mỗi khi cuộn tới cuối trang
+        limit: prevParams.limit + 10, // Tăng số lượng bài viết mỗi khi cuộn tới cuối trang
       }));
     }
   };

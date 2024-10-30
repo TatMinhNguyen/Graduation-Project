@@ -12,7 +12,6 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
     const [showMembers, setShowMembers] = useState(false)
     const [showEditAvatar, setShowEditAvatar] = useState(false)
     const [showEditName, setShowEditName] = useState(false)
-    console.log(showEditName)
 
     return (
         <div 
@@ -87,7 +86,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                     />
                 )}
                 {chat?.members.length > 2 && (
-                    <div className='flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 mb-2 cursor-pointer'
+                    <div className={`flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 ${showChange ? '' : 'mb-2'}  cursor-pointer`}
                         onClick={() => setShowChange(!showChange)}
                     >
                         <p className='font-medium text-[16px]'>
