@@ -251,6 +251,31 @@ const groupController = {
         }
     },
 
+    cancelJoinGroup: async (req, res) => {
+        try {
+            const { groupId } = req.params; // Lấy ID của nhóm từ params
+            const userId = req.user.id; 
+
+            const group = await GroupModel.findById(groupId);
+            if (!group) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm." });
+            }
+
+            // Kiểm tra nếu người dùng không phải là thành viên của nhóm
+            if (!group.pendingMembers.map(member => member.toString()).includes(userId)) {
+                return res.status(400).json({ message: "Bạn không phải là thành viên của nhóm group này." });
+            }
+
+            group.pendingMembers = group.pendingMembers.filter(member => member.toString() !== userId);
+
+            await group.save();
+    
+            return res.status(200).json({ message: "Rời nhóm group thành công" });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+
     deleteGroup: async (req, res) => {
         try {
             const { groupId } = req.params; // Lấy ID của nhóm chat từ params

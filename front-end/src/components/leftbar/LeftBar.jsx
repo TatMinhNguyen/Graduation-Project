@@ -41,7 +41,9 @@ const LeftBar = ({profile}) => {
         </p>       
       </div>
 
-      <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md'>
+      <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md'
+        onClick={() => navigate('/groups')}
+      >
         <div className='h-9 w-9'
           style={{ backgroundPosition: '0px -37px', backgroundImage: `url(${require('../../assets/icons/media.png')})` }}
         >

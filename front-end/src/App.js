@@ -23,6 +23,10 @@ import GetRequests from './components/myFriends/GetRequests';
 import GetSuggestions from './components/myFriends/GetSuggestions';
 import GetMessages from './components/messenger/GetMessages';
 import GetNoConversation from './components/messenger/GetNoConversation';
+import Group from './pages/group/Group';
+import GetMyGroups from './components/group/GetMyGroups';
+import GetSuggestGroups from './components/group/GetSuggestGroups';
+import GetPostsGroup from './components/group/GetPostsGroup';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -60,6 +64,11 @@ function App() {
           <Route path='requests' element={<GetRequests />} />
           <Route path='suggestions' element={<GetSuggestions />} />
         </Route>
+        <Route path='/groups' element={<Group/>}>
+          <Route path='' element={<GetMyGroups/>}/>
+          <Route path='discover' element={<GetSuggestGroups/>}/>
+          <Route path=':groupId' element={<GetPostsGroup/>}/>
+        </Route>        
       </Routes>
     </Router>
   );

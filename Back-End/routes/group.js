@@ -23,6 +23,8 @@ router.post('/leave-group/:groupId', middleware.verifyToken, groupController.lea
 
 router.post('/join-group/:groupId', middleware.verifyToken, groupController.joinGroup)
 
+router.post('/cancel-join/:groupId', middleware.verifyToken, groupController.cancelJoinGroup)
+
 router.delete('/delete-group/:groupId', middleware.verifyToken, groupController.deleteGroup)
 
 router.post('/accept-members/:groupId/:requestId', middleware.verifyToken, groupController.approveRequest)

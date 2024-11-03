@@ -213,7 +213,7 @@ const NavBar = ({user}) => {
                     )}
                 </div>
                 <div className=''>
-                    {scountNotifications.length > 0 && (
+                    {scountNotifications?.length > 0 && (
                         <div className='absolute bg-red-600 w-5 h-5 rounded-full right-16 top-1'>
                             {scountNotifications?.length <= 99 ? (
                                 <p className={`text-white text-[12px] ${scountNotifications?.length < 10 ? 'ml-[6.5px]' : 'ml-[3px]'}  mt-[1.5px] text-medium`}>
