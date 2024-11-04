@@ -9,15 +9,12 @@ const GetMyGroups = () => {
     const navigate = useNavigate();
     const [groups, setGroups] = useState([])
     const [suggestions, setSuggestions] = useState([])
-    const [isClick, setIsClick] = useState({})
 
-      const handleRequest = async(groupId) => {
+    const handleRequest = async(groupId) => {
         try {
             await joinGroup(user?.token, groupId)
-            setIsClick(prev => ({
-                ...prev,
-                [groupId]: true
-            }));
+            handleGetSuggest();
+            handleGetGroups();
         } catch (error) {
             console.log(error)
         }
@@ -26,10 +23,8 @@ const GetMyGroups = () => {
     const handleCancelRequest = async(groupId) => {
         try {
             await cancelJoinGroup(user?.token, groupId)
-            setIsClick(prev => ({
-                ...prev,
-                [groupId]: false
-            }));
+            handleGetSuggest();
+            handleGetGroups();
         } catch (error) {
             console.log(error)
         }
@@ -71,26 +66,23 @@ const GetMyGroups = () => {
                 All groups you've joined
             </h1> 
             {groups?.length > 0 ? (
-                <div className="grid grid-cols-4 gap-4">
-                {groups?.map((group) => (
-                    <div key={group._id} className="border bg-white rounded-lg pb-2">
-                    <img src={group.avatar} alt='' 
-                        className="w-full h-[30vh] cursor-pointer object-cover rounded-t-md hover:opacity-90" 
-                        // onClick={() => handleGetProfile(group._id)}
-                    />
-                    <div className='mt-2 px-3'>
-                        <h2 className="text-[17px] font-medium cursor-pointer hover:text-gray-700" 
-                        // onClick={() => handleGetProfile(group._id)}
-                        >{group.username}</h2>
-                        <p className="text-sm text-gray-500">{group.mutualgroups} mutual groups</p>              
-                    </div>
-                    <div className="mt-4 px-3 flex flex-col space-y-1.5">
-                        <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg"
-                        // onClick={() => handleGetProfile(group._id)}
-                        >View profile</button>
-                    </div>
-                    </div>
-                ))}
+                <div className="grid grid-cols-3 gap-4">
+                    {groups?.map((group) => (
+                        <div key={group._id} className="border bg-white rounded-lg pb-2 flex flex-col justify-between h-full">
+                            <img src={group.avatar} alt='' 
+                                className="w-full h-[30vh] cursor-pointer object-cover rounded-t-md hover:opacity-90" 
+                            />
+                            <div className='mt-2 px-3'>
+                                <h2 className="text-[17px] font-medium cursor-pointer hover:text-gray-700" 
+                                >{group.name}</h2>
+                                <p className="text-sm text-gray-500">{group.members?.length} members</p>              
+                            </div>
+                            <div className="mt-4 px-3 flex flex-col space-y-1.5">
+                                <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg"
+                                >View group</button>
+                            </div>
+                        </div>
+                    ))}
                 </div>        
             ) : (
                 <div>
@@ -103,27 +95,31 @@ const GetMyGroups = () => {
                             <div key={group._id} className="border bg-white rounded-lg pb-2 flex flex-col justify-between h-full">
                                 <img src={group.avatar} alt='' 
                                     className="w-full h-[30vh] cursor-pointer object-cover rounded-t-md hover:opacity-90" 
-                                // onClick={() => handleGetProfile(group._id)}
                                 />
                                 <div className='mt-2 px-3'>
                                     <h2 className="text-[17px] font-medium cursor-pointer hover:text-gray-700"
-                                        // onClick={() => handleGetProfile(group._id)}
                                     >{group.name}</h2>
-                                    <p className="text-sm text-gray-500">{group.members.length} members</p>              
+                                    <p className="text-sm text-gray-500">{group.members?.length} members</p>              
                                 </div>
                                 <div className="mt-4 px-3 flex flex-col space-y-1.5">
-                                    {!isClick[group?._id] ? (
-                                        <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg"
-                                        // onClick={() => handleRequest(group._id)}
-                                        >
-                                            Join group
-                                        </button>
-                                    ) : (
+                                    {group.members?.includes(user?.userId) ? (
                                         <button className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg"
-                                        // onClick={() => handleCancelRequest(group._id)}
+                                        >
+                                            View group
+                                        </button>                                         
+
+                                    ) : group.pendingMembers?.includes(user?.userId) ? (
+                                        <button className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg"
+                                            onClick={() => handleCancelRequest(group._id)}
                                         >
                                             Cancel request
                                         </button>
+                                    ) : (
+                                        <button className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg"
+                                            onClick={() => handleRequest(group._id)}
+                                        >
+                                            Join group
+                                        </button>                                       
                                     )}
                                 </div>
                             </div>

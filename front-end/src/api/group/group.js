@@ -25,7 +25,7 @@ export const getSuggestGroup = async(token) => {
 
 export const joinGroup = async (token, groupId) => {
     try {
-        const res = await axios.post(`${apiUrl}/group/join-group/${groupId}`, {
+        const res = await axios.post(`${apiUrl}/group/join-group/${groupId}`, {}, {
             headers: { token: `Bearer ${token}` },
         })
         return res.data          
@@ -36,7 +36,7 @@ export const joinGroup = async (token, groupId) => {
 
 export const cancelJoinGroup = async (token, groupId) => {
     try {
-        const res = await axios.post(`${apiUrl}/group/cancel-join/${groupId}`, {
+        const res = await axios.post(`${apiUrl}/group/cancel-join/${groupId}`, {}, {
             headers: { token: `Bearer ${token}` },
         })
         return res.data          
@@ -47,7 +47,7 @@ export const cancelJoinGroup = async (token, groupId) => {
 
 export const leaveGroup = async (token, groupId) => {
     try {
-        const res = await axios.post(`${apiUrl}/group/leave-group/${groupId}`, {
+        const res = await axios.post(`${apiUrl}/group/leave-group/${groupId}`, {}, {
             headers: { token: `Bearer ${token}` },
         })
         return res.data          
