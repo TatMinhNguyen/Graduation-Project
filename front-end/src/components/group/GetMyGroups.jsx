@@ -79,6 +79,7 @@ const GetMyGroups = () => {
                             </div>
                             <div className="mt-4 px-3 flex flex-col space-y-1.5">
                                 <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg"
+                                    onClick={() => navigate(`/groups/${group._id}`)}
                                 >View group</button>
                             </div>
                         </div>
@@ -104,6 +105,7 @@ const GetMyGroups = () => {
                                 <div className="mt-4 px-3 flex flex-col space-y-1.5">
                                     {group.members?.includes(user?.userId) ? (
                                         <button className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg"
+                                            onClick={() => navigate(`/groups/${group._id}`)}
                                         >
                                             View group
                                         </button>                                         

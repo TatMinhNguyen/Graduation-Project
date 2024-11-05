@@ -93,7 +93,9 @@ const GetSuggestGroups = () => {
             </div>
             <div className="mt-4 px-3 flex flex-col space-y-1.5">
               {groupStatus[group._id] === 'view' ? (
-                <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg">
+                <button className="bg-blue-100 hover:bg-blue-200 text-customBlue font-medium py-2 px-4 rounded-lg"
+                  onClick={() => navigate(`/groups/${group._id}`)}
+                >
                   View group
                 </button>
               ) : groupStatus[group._id] === 'cancel' ? (

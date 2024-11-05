@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBar from '../../components/navbar/NavBar'
 import { useSelector } from 'react-redux'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { getUserGroups } from '../../api/group/group'
 
 const Group = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -11,6 +12,30 @@ const Group = () => {
 
   const [showGroupsManage, setShowGroupsManage] = useState(false)
   const [showGroupsJoined, setShowGroupsJoined] = useState(false)
+
+  const [groups, setGroups] = useState([])
+
+  const groupManages = groups?.filter((group) => group.createId === user?.userId)
+  const groupJoined = groups?.filter((group) => group.createId !== user?.userId)
+
+  const handleGetGroups = async() => {
+    try {
+        const res = await getUserGroups(user?.token)
+        setGroups(res)
+    } catch (error) {
+        console.log(error)
+    }
+ }
+
+    /* eslint-disable */
+    useEffect(() => {
+    if (!user) {
+        navigate("/login");
+    }
+    if(user?.token) {
+        handleGetGroups()
+    }
+    },[])
 
   return (
     <div className='bg-gray-100 min-h-screen'>
@@ -101,7 +126,7 @@ const Group = () => {
                 <div className='flex-1 flex items-center px-2 hover:bg-gray-100 rounded-md py-1 pb-1 cursor-pointer mt-1'
                     onClick={() => setShowGroupsManage(!showGroupsManage)}
                 >
-                    <p className='font-medium text-[16px] mb-0.5'>
+                    <p className='font-medium text-[17px] mb-0.5'>
                         Groups you manage
                     </p>
                     <div className='flex-1'></div>
@@ -117,10 +142,32 @@ const Group = () => {
                         />
                     )}
                 </div> 
+                {showGroupsManage && (
+                    <div className='mt-1'>
+                        {groupManages?.map((group) => (
+                            <div key={group._id}
+                                onClick={() => navigate(`/groups/${group._id}`)}
+                                className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg'
+                            >
+                                <div className='w-12 h-12 min-w-[3rem] min-h-[3rem]'>
+                                    <img className='w-full h-full object-cover rounded-md'
+                                        src={group.avatar}
+                                        alt=''
+                                    />                                    
+                                </div>
+                                <div className='ml-3'>
+                                    <h3 className='font-medium text-[15px]'>
+                                        {group.name}
+                                    </h3>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div className='flex-1 flex items-center px-2 hover:bg-gray-100 rounded-md py-1 pb-1 cursor-pointer mt-1'
                     onClick={() => setShowGroupsJoined(!showGroupsJoined)}
                 >
-                    <p className='font-medium text-[16px] mb-0.5'>
+                    <p className='font-medium text-[17px] mb-0.5'>
                         Groups you've joined
                     </p>
                     <div className='flex-1'></div>
@@ -135,7 +182,29 @@ const Group = () => {
                             alt=''
                         />
                     )}
-                </div>                 
+                </div> 
+                {showGroupsJoined && (
+                    <div className='mt-1'>
+                        {groupJoined?.map((group) => (
+                            <div key={group._id}
+                                onClick={() => navigate(`/groups/${group._id}`)}
+                                className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg'
+                            >
+                                <div className='w-12 h-12 min-w-[3rem] min-h-[3rem]'>
+                                    <img className='w-full h-full object-cover rounded-md'
+                                        src={group.avatar}
+                                        alt=''
+                                    />                                    
+                                </div>
+                                <div className='ml-3'>
+                                    <h3 className='font-medium text-[15px]'>
+                                        {group.name}
+                                    </h3>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}                
             </div>
         </div>
         <div className='flex-1'></div>

@@ -55,3 +55,14 @@ export const leaveGroup = async (token, groupId) => {
         console.log(error)
     }
 }
+
+export const getAGroup = async (token, groupId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-a-group/${groupId}`,{
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data         
+    } catch (error) {
+        console.log(error)
+    }
+}

@@ -27,6 +27,9 @@ import Group from './pages/group/Group';
 import GetMyGroups from './components/group/GetMyGroups';
 import GetSuggestGroups from './components/group/GetSuggestGroups';
 import GetPostsGroup from './components/group/GetPostsGroup';
+import GetViewGroup from './components/group/GetViewGroup';
+import GetMembers from './components/group/GetMembers';
+import ViewGroup from './components/group/ViewGroup';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -67,8 +70,13 @@ function App() {
         <Route path='/groups' element={<Group/>}>
           <Route path='' element={<GetMyGroups/>}/>
           <Route path='discover' element={<GetSuggestGroups/>}/>
-          <Route path=':groupId' element={<GetPostsGroup/>}/>
-        </Route>        
+        </Route>    
+        <Route path='/groups/:groupId' element={<GetViewGroup/>}>
+          <Route path='' element={<ViewGroup/>}>
+            <Route path='' element={<GetPostsGroup/>}/>
+            <Route path='members' element={<GetMembers/>}/>
+          </Route>
+        </Route>   
       </Routes>
     </Router>
   );
