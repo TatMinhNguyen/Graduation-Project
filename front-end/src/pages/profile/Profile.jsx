@@ -448,7 +448,7 @@ const Profile = () => {
                     )}
                 </div>
                 <div className='mt-4 flex '>
-                    <div className='w-1/3 bg-white mr-2 border border-white shadow rounded-md self-start'>
+                    <div className='w-1/3 bg-white mr-2 border border-white shadow rounded-md self-start mb-2'>
                         <p className='text-xl font-bold font-sans m-2 ml-4 mb-5'>
                             Introduction  
                         </p>

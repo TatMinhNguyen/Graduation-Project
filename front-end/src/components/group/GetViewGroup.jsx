@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import ViewAdminGroup from './ViewAdminGroup'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { getAGroup } from '../../api/group/group'
-import ViewGroup from './ViewGroup'
 
 const GetViewGroup = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -50,7 +49,7 @@ const GetViewGroup = () => {
         </div>         
       ) : (
         <div className='pt-16 w-3/4'>
-          <ViewGroup/>
+          <Outlet/>
         </div>
       )}
      

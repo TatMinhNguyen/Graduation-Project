@@ -66,3 +66,14 @@ export const getAGroup = async (token, groupId) => {
         console.log(error)
     }
 }
+
+export const getMembers = async (token, groupId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-members/${groupId}`,{
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data         
+    } catch (error) {
+        console.log(error)
+    }    
+}
