@@ -34,7 +34,7 @@ export const createChat1vs1 = async (token, userId, navigate) => {
         })
         navigate(`/messenger/${res.data._id}`)
     } catch (error) {
-        // console.log(error)
+        console.log(error)
         if(error.response.data.error === 'Phòng chat đã tồn tại'){
             navigate(`/messenger/${error.response.data.chatId}`)
         }

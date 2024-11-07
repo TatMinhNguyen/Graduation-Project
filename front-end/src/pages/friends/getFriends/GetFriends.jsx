@@ -5,6 +5,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '../../../api/profile/profile';
 import { useDispatch } from 'react-redux';
+import { createChat1vs1 } from '../../../api/chat/chat';
 
 const GetFriends = ({ userId, user }) => {
     const [data, setData] = useState([]);
@@ -23,6 +24,14 @@ const GetFriends = ({ userId, user }) => {
 
     const dispatch = useDispatch();
     const navigation = useNavigate();
+
+    const handleCreateChat = async (userId) => {
+        try {
+            await createChat1vs1(user?.token, userId, navigation)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleGetCurrentUser = async () => {
         try {
@@ -266,7 +275,9 @@ const GetFriends = ({ userId, user }) => {
                                             } left-0`}>
                                         </div>
                                         <div className='py-2 px-1.5'>
-                                            <div className='flex hover:bg-gray-100 px-2 rounded'>
+                                            <div className='flex hover:bg-gray-100 px-2 rounded'
+                                                onClick={() => handleCreateChat(friend?._id)}
+                                            >
                                                 <img className='w-6 h-6 mr-3 mt-1'
                                                     src={require('../../../assets/icons/chat.png')}
                                                     alt=''

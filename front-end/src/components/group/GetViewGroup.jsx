@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import NavBar from '../navbar/NavBar'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ViewAdminGroup from './ViewAdminGroup'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { getAGroup } from '../../api/group/group'
@@ -8,13 +8,15 @@ import { getAGroup } from '../../api/group/group'
 const GetViewGroup = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
   const { groupId } = useParams();
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [group, setGroup] = useState({})
 
   const handleGetAGroup = async () => {
       try {
-          const result = await getAGroup(user?.token, groupId)
+          const result = await getAGroup(user?.token, groupId , dispatch)
           setGroup(result)
       } catch (error) {
           console.log(error)
@@ -43,7 +45,7 @@ const GetViewGroup = () => {
             <ViewAdminGroup/>
           </div>
           <div className='flex-1'></div>
-          <div className='w-3/4'>
+          <div className='w-3/4 -mt-2.5'>
             <Outlet/>
           </div>
         </div>         

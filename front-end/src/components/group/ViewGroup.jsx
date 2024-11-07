@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getAGroup } from '../../api/group/group';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { formatToMonthYear } from '../../utils';
 
 const ViewGroup = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
     const { groupId } = useParams();
+
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const location = useLocation();
 
     const [group, setGroup] = useState({})
 
     const handleGetAGroup = async () => {
         try {
-            const result = await getAGroup(user?.token, groupId)
+            const result = await getAGroup(user?.token, groupId, dispatch)
             setGroup(result)
         } catch (error) {
             console.log(error)

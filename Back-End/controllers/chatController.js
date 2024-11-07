@@ -35,9 +35,9 @@ const chatController = {
         
             try{
                 const resul = await newChat.save();
-                res.status(200).json(resul);
+                return res.status(200).json(resul);
             }catch (error){
-                res.status(500).json(error);
+                return res.status(500).json({ message: "Lỗi server", error });
             }
         }    
     }, 
@@ -132,7 +132,7 @@ const chatController = {
     
             res.status(200).json(updatedChats);
         } catch (error) {
-            res.status(500).json(error);
+            return res.status(500).json({ message: "Lỗi server", error });
         }
     },
     getAChat: async (req, res) => {
@@ -181,7 +181,7 @@ const chatController = {
             return res.json(chat);
     
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ message: "Lỗi server", error });
         }
     },
 
@@ -197,9 +197,9 @@ const chatController = {
           const memberIds = chat.members; 
           const members = await UserModel.find({ _id: { $in: memberIds } }).select('id username profilePicture'); 
       
-          res.status(200).json( members );
+          return res.status(200).json( members );
         } catch (error) {
-          res.status(500).json(error);
+            return res.status(500).json({ message: "Lỗi server", error });
         }
     },
 
@@ -246,7 +246,7 @@ const chatController = {
             });
             return res.status(200).json(userResults);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ message: "Lỗi server", error });
         }
     },
 
@@ -285,7 +285,7 @@ const chatController = {
             });
             return res.status(200).json(userResults);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ message: "Lỗi server", error });
         }        
     },
 

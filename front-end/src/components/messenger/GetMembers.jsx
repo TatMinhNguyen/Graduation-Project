@@ -51,26 +51,32 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
     }
 
     const handleDeleteMembers = async (memberId) => {
+        setLoading(true)
         try {
             const member = {
                 memberId: memberId
             }
             await deleteMember(user?.token, member, chatId)
-            setLoading(true)
+            
             handleGetMembers();
         } catch (error) {
             console.log(error)
+        } finally{
+            setLoading(false)
         }
     }
 
     const handleLeaveGroup = async () => {
+        setLoading(true)
         try {
             await leaveGroup(user?.token, chatId)
-            setLoading(true)
+            
             await getUserChat(user?.token, dispatch)
             navigate(`/messenger`)
         } catch (error) {
             console.log(error)
+        } finally{
+            setLoading(false)
         }
     }
     
