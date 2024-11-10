@@ -1,5 +1,6 @@
 const groupController = require("../controllers/groupController");
 const middleware = require("../middleware");
+const upload = require("../middleware/multerConfig");
 
 const router = require("express").Router();
 
@@ -31,5 +32,12 @@ router.post('/accept-members/:groupId/:requestId', middleware.verifyToken, group
 
 router.post('/refuse-members/:groupId/:requestId', middleware.verifyToken, groupController.refuseRequest)
 
+router.post('/change-avatar/:groupId', 
+    upload.fields([{name: 'image', maxCount:1}]),
+    middleware.verifyToken,
+    groupController.uploadGroupPicture
+)
+
+router.post('/change-name/:groupId', middleware.verifyToken, groupController.editGroup)
 
 module.exports = router;

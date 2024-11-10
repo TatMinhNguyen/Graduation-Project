@@ -3,9 +3,12 @@ import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getAGroup } from '../../api/group/group';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatToMonthYear } from '../../utils';
+import ChangePhoto from './ChangePhoto';
+import ChangeName from './ChangeName';
 
 const ViewGroup = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
+    const group = useSelector((state) => state.group.group)
     const { groupId } = useParams();
 
     const navigate = useNavigate();
@@ -13,12 +16,13 @@ const ViewGroup = () => {
 
     const location = useLocation();
 
-    const [group, setGroup] = useState({})
+    const [showEditPicture, setShowEditPicture] = useState(false)
+    const [showEditName, setShowEditName] = useState(false)
 
     const handleGetAGroup = async () => {
         try {
-            const result = await getAGroup(user?.token, groupId, dispatch)
-            setGroup(result)
+            await getAGroup(user?.token, groupId, dispatch)
+
         } catch (error) {
             console.log(error)
         }
@@ -44,7 +48,7 @@ const ViewGroup = () => {
                 /> 
                 {group?.createId === user?.userId && (
                     <div 
-                        // onClick={() => setShowEditCover(true)}
+                        onClick={() => setShowEditPicture(true)}
                         className='absolute flex bottom-3 right-5 px-3 py-1.5 bg-white rounded-md shadow cursor-pointer hover:bg-gray-100'>
                         <img
                             src={require('../../assets/icons/camera-black.png')}
@@ -52,7 +56,7 @@ const ViewGroup = () => {
                             className='w-5 h-5 mt-0.5 opacity-90 hover:opacity-100'
                         />   
                         <p className='font-medium ml-2'>
-                            Edit cover photo    
+                            Edit photo    
                         </p> 
                     </div>                    
                 )}
@@ -78,15 +82,22 @@ const ViewGroup = () => {
                         </div>
                         <div className='flex-1'></div>
                         <div className='mb-3 flex'>
-                            <div className='bg-customBlue hover:bg-blue-600 px-3 pr-4 py-1 pt-[5.5px] text-white font-medium rounded-md cursor-pointer'>
+                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center text-white font-medium rounded-md cursor-pointer'>
                                 + Invite
                             </div>
-                            <div className='py-2 px-2 bg-gray-200 hover:bg-gray-300 rounded-md ml-2 cursor-pointer'>
-                                <img className='w-5 h-5'
-                                    src={require('../../assets/icons/menu.png')}
-                                    alt=''
-                                />
-                            </div>
+                            {group?.createId === user?.userId && (
+                                <div className='flex items-center h-10 px-4 bg-gray-200 hover:bg-gray-300 rounded-md ml-2 cursor-pointer'
+                                    onClick={() => setShowEditName(true)}
+                                >
+                                    <img className='w-5 h-5 mt-0.5'
+                                        src={require('../../assets/icons/edit.png')}
+                                        alt=''
+                                    />
+                                    <p className='font-medium ml-1'>
+                                        Edit group
+                                    </p>
+                                </div>                                
+                            )}
                         </div>
                     </div>                    
                 ) : (
@@ -103,21 +114,44 @@ const ViewGroup = () => {
                         </p>
                         <div className='flex-1'></div>
                         <div className='mb-3 flex'>
-                            <div className='bg-customBlue px-3 pr-4 py-1 pt-[5.5px] rounded-md cursor-pointer'>
+                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center rounded-md cursor-pointer'>
                                 <p className='text-white font-medium'>
                                     + Invite
                                 </p>
                             </div>
-                            <div className='py-2 px-2 bg-gray-300 rounded-md ml-2 cursor-pointer'>
-                                <img className='w-5 h-5'
-                                    src={require('../../assets/icons/menu.png')}
-                                    alt=''
-                                />
-                            </div>
+                            {group?.createId === user?.userId && (
+                                <div className='flex items-center h-10 px-4 bg-gray-200 hover:bg-gray-300 rounded-md ml-2 cursor-pointer'
+                                    onClick={() => setShowEditName(true)}
+                                >
+                                    <img className='w-5 h-5 mt-0.5'
+                                        src={require('../../assets/icons/edit.png')}
+                                        alt=''
+                                    />
+                                    <p className='font-medium ml-1'>
+                                        Edit group
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
-
+                {showEditPicture && (
+                    <ChangePhoto
+                        isCloseModal = {() => setShowEditPicture(false)}
+                        avatar = {group?.avatar}
+                        user = {user}
+                        groupId = {groupId}
+                    />
+                )}
+                {showEditName && (
+                    <ChangeName
+                        isCloseModal = {() => setShowEditName(false)}
+                        name = {group?.name}
+                        type = {group?.type}
+                        user = {user}
+                        groupId = {groupId}
+                    />
+                )}
             </div>
         </div>
         <div className='mt-4 flex '>

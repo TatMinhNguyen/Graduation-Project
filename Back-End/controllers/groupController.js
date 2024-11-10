@@ -1,5 +1,6 @@
 const GroupModel = require("../models/GroupModel");
 const UserModel = require("../models/UserModel");
+const imagekit = require("../utils/imagekitConfig");
 
 const groupController = {
     createGroup : async (req, res) => {
@@ -380,6 +381,73 @@ const groupController = {
             res.status(500).json(error);
         }
     },
+
+    uploadGroupPicture: async (req, res) => {
+        try {
+            const userId = req.user.id;
+
+            const group = await GroupModel.findById(req.params.groupId);
+
+            if (!group) {
+                return res.status(404).json({ message: 'Group not found' });
+            }
+
+            if (group.createId.toString() !== userId) {
+                return res.status(404).json({message: 'You are not admin'})
+            }
+
+            // Upload ảnh lên ImageKit
+            const imageUploadPromises = req.files.image ? imagekit.upload({
+                file: req.files.image[0].buffer,
+                fileName: req.files.image[0].originalname,
+                folder: '/Group' 
+            }) : Promise.resolve(null);
+
+            const [imageUploadResults] = await Promise.all([
+                imageUploadPromises,
+            ]);
+    
+            const imageUrl = imageUploadResults ? 
+                `${imageUploadResults.url}`
+             : null; 
+
+            // Lưu URL ảnh vào profile của group
+            group.avatar = imageUrl;
+
+            await group.save();
+            return res.status(200).json({ message: 'Upload picture successfully.'});
+
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
+        }
+    },
+
+    editGroup: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const {name, type} = req.body;
+
+            const group = await GroupModel.findById(req.params.groupId);
+
+            if (!group) {
+                return res.status(404).json({ message: 'Group not found' });
+            }
+
+            if (group.createId.toString() !== userId) {
+                return res.status(404).json({message: 'You are not admin'})
+            }
+
+            group.name = name;
+            group.type = type;
+            
+            await group.save();
+
+            return res.status(201).json({ message: 'update successfully.'})
+            
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
+        }
+    }
 }
 
 module.exports = groupController

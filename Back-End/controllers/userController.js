@@ -64,15 +64,7 @@ const userController = {
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
-            }
-            
-            // if(address){
-            //     user.address = address;
-            // }
-            
-            // if(work){
-            //     user.work = work;
-            // }
+            }           
 
             user.address = address;
             user.work = work;
@@ -100,9 +92,9 @@ const userController = {
 
             // Upload ảnh lên ImageKit
             const imageUploadPromises = req.files.image ? imagekit.upload({
-                file: req.files.image[0].buffer, // buffer video từ multer
+                file: req.files.image[0].buffer, 
                 fileName: req.files.image[0].originalname,
-                folder: '/Avatar' // Thư mục lưu video
+                folder: '/Avatar'
             }) : Promise.resolve(null);
 
             const [imageUploadResults] = await Promise.all([

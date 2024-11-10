@@ -123,3 +123,25 @@ export const decline = async (token, groupId, userId) => {
         console.log(error)
     }    
 }
+
+export const editGroup = async (token, groupId, group) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/change-name/${groupId}`, group, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data          
+    } catch (error) {
+        console.log(error)
+    }   
+}
+
+export const editPhoto = async (token, groupId, group) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/change-avatar/${groupId}`, group, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data          
+    } catch (error) {
+        console.log(error)
+    }   
+}
