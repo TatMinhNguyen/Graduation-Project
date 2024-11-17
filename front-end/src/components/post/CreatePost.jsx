@@ -163,27 +163,27 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
                 </div>
                 <div className="p-4">
                     <div className="flex items-center mb-4">
-                    <div className='w-10 h-10'>
-                        <img 
-                        src={profile?.profilePicture} 
-                        alt="Profile" 
-                        className="h-full w-full object-cover rounded-full" />
-                    </div>
-                    <div className="ml-2">
-                        <h4 className="font-semibold text-base">
-                        {profile?.username}
-                        </h4>
-                        <div className="text-sm text-gray-500">
-                        <button className="flex items-center text-black font-medium">
-                            <img
-                            src={require('../../assets/icons/earth.png')}
-                            alt='Earth'
-                            className='w-3.5 h-3.5 mr-1 mt-px'
-                            />
-                            Public
-                        </button>
+                        <div className='w-10 h-10'>
+                            <img 
+                            src={profile?.profilePicture} 
+                            alt="Profile" 
+                            className="h-full w-full object-cover rounded-full" />
                         </div>
-                    </div>
+                        <div className="ml-2">
+                            <h4 className="font-semibold text-base">
+                            {profile?.username}
+                            </h4>
+                            <div className="text-sm text-gray-500">
+                            <button className="flex items-center text-black font-medium">
+                                <img
+                                src={require('../../assets/icons/earth.png')}
+                                alt='Earth'
+                                className='w-3.5 h-3.5 mr-1 mt-px'
+                                />
+                                Public
+                            </button>
+                            </div>
+                        </div>
                     </div>
                     <div className='relative max-h-[50vh] overflow-y-auto overflow-hidden'>
                     <div>

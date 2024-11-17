@@ -3,6 +3,7 @@ import NavBar from '../../components/navbar/NavBar'
 import { useSelector } from 'react-redux'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getUserGroups } from '../../api/group/group'
+import CreateGroup from '../../components/group/CreateGroup'
 
 const Group = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -10,8 +11,9 @@ const Group = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [showGroupsManage, setShowGroupsManage] = useState(false)
-  const [showGroupsJoined, setShowGroupsJoined] = useState(false)
+  const [showGroupsManage, setShowGroupsManage] = useState(true)
+  const [showGroupsJoined, setShowGroupsJoined] = useState(true)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
 
   const [groups, setGroups] = useState([])
 
@@ -39,7 +41,7 @@ const Group = () => {
 
   return (
     <div className='bg-gray-100 min-h-screen'>
-      <div className='fixed top-0 w-full z-50'>
+      <div className='fixed top-0 w-full z-20'>
         <NavBar
           user={user}
         />
@@ -118,10 +120,12 @@ const Group = () => {
                 </div>
             </div>
             <div className='flex justify-center py-2 pb-3 border-b border-gray-300'>
-                <button className='bg-blue-50 text-customBlue w-full hover:bg-blue-100 py-1 rounded-md'>
+                <button className='bg-blue-50 text-customBlue w-full hover:bg-blue-100 py-1 rounded-md'
+                    onClick={() => setShowCreateGroup(true)}
+                >
                     + Create new group
                 </button>                
-            </div>
+            </div>           
             <div className='mt-2'>
                 <div className='flex-1 flex items-center px-2 hover:bg-gray-100 rounded-md py-1 pb-1 cursor-pointer mt-1'
                     onClick={() => setShowGroupsManage(!showGroupsManage)}
@@ -212,6 +216,11 @@ const Group = () => {
             <Outlet/>
         </div>
       </div>
+        {showCreateGroup && (
+            <CreateGroup
+                isClose = {() => setShowCreateGroup(false)}
+            />
+        )} 
     </div>
   )
 }

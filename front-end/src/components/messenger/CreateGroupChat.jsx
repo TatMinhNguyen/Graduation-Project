@@ -42,6 +42,12 @@ const CreateGroupChat = ({isClose}) => {
         });
     };
 
+    const handleRemove = (selectedUser) => {
+        setSelectedUsers((prevSelected) => 
+            prevSelected.filter(user => user.userId !== selectedUser.userId)
+        );
+    };
+
     const handleCreateGroup = async(e) => {
         e.preventDefault();
         const newGroup = {
@@ -126,7 +132,7 @@ const CreateGroupChat = ({isClose}) => {
                                     alt=''
                                 />
                                 <button
-                                    // onClick={() => handleRemove(user.userId)}
+                                    onClick={() => handleRemove(user)}
                                     className="absolute -top-1 -right-1 w-5 h-5 shadow bg-gray-100 rounded-full hover:bg-gray-200 flex items-center justify-center"
                                 >
                                     <span className="text-sm font-semibold text-gray-600 mb-1">x</span>

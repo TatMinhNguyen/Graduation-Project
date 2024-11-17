@@ -145,3 +145,13 @@ export const editPhoto = async (token, groupId, group) => {
         console.log(error)
     }   
 }
+
+export const createGroup = async (token, group) => {
+    try {
+        await axios.post(`${apiUrl}/group/create-group`, group, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
