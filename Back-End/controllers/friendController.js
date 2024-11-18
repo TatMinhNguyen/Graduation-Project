@@ -40,7 +40,8 @@ const friendController = {
                     friendsCount: 1, 
                     isVerify: 1
                 }
-            );
+            ).sort({ 
+                createdAt: -1 });;
     
             // Tính toán bạn chung cho mỗi người dùng được gợi ý
             const suggestedUsersWithMutualFriends = suggestedUsers.map(user => {

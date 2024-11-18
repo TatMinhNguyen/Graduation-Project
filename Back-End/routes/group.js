@@ -40,4 +40,8 @@ router.post('/change-avatar/:groupId',
 
 router.post('/change-name/:groupId', middleware.verifyToken, groupController.editGroup)
 
+router.get('/get-suggest-user', middleware.verifyToken, groupController.getSuggestionUser)
+
+router.post('/search-suggest-user', middleware.verifyToken, groupController.searchSuggestionUser)
+
 module.exports = router;

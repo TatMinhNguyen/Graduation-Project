@@ -92,8 +92,8 @@ const CreateGroupChat = ({isClose}) => {
                 <label
                     htmlFor="name"
                     className={`absolute left-0 transition-all ${
-                    isnameFocused || name !== "" ? "-top-0.5 text-xs" : "top-2 text-base"
-                    } text-gray-400`}
+                    isnameFocused || name !== "" ? "-top-0.5 text-xs text-blue-500" : "top-2 text-base text-gray-400"
+                    } `}
                 >
                     Enter the chat group name
                 </label>
@@ -192,7 +192,7 @@ const CreateGroupChat = ({isClose}) => {
                 ))}
             </div>
             <div className='flex-1 flex justify-center mt-2.5'>
-                {newMembersId?.length > 0 && name ? (
+                {newMembersId?.length >= 2 && name ? (
                     <button className={`bg-customBlue text-white w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}
                         onClick={handleCreateGroup}
                     >

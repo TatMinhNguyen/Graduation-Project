@@ -2,6 +2,14 @@ const GroupModel = require("../models/GroupModel");
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
+function removeVietnameseTones(str) {
+    return str
+        .normalize('NFD') // Tách các ký tự có dấu
+        .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+}
+
 const groupController = {
     createGroup : async (req, res) => {
         try {
@@ -447,7 +455,87 @@ const groupController = {
         } catch (error) {
             return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
         }
-    }
+    },
+
+    getSuggestionUser: async (req, res) => {
+        try {
+            const userId = req.user.id;
+    
+    
+            // Tìm người dùng phù hợp với điều kiện
+            const suggestedUsers = await UserModel.find(
+                { 
+                    _id: { $ne: userId },
+                    isVerify: true, // Chỉ lấy những người dùng đã xác thực
+                    isAdmin: { $ne: true }
+                },
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    friends: 1, // Lấy danh sách bạn bè để tính toán bạn chung
+                    friendsCount: 1, 
+                    isVerify: 1
+                }
+            ).sort({ 
+                createdAt: -1 });;
+    
+            // Tính toán bạn chung cho mỗi người dùng được gợi ý
+            const suggestedUsersWithMutualFriends = suggestedUsers.map(user => {
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                };
+            });
+    
+            // Giới hạn kết quả trả về tối đa 20 người dùng
+            const topSuggestedUsers = suggestedUsersWithMutualFriends.slice(0, 20);
+    
+            return res.status(200).json(topSuggestedUsers);
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lỗi xảy ra.', error: error.message });
+        }
+    },
+
+    searchSuggestionUser: async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const searchInput = req.body.searchInput; // Lấy từ khóa tìm kiếm từ query params
+            
+            // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
+            const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
+            
+            // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
+            const users = await UserModel.find(
+                { isVerify: true,  _id: { $nin: userId }, isAdmin: { $ne: true }},
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    isVerify: 1
+                }
+            ).sort({ createdAt: -1 })
+            .then(users => {
+                return users.filter(user => {
+                    const username = removeVietnameseTones(user.username).toLowerCase();
+                    return username.includes(searchKeyword);
+                });
+            });
+
+            // Kết quả tìm kiếm người dùng
+            const userResults = users.map(user => {              
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                };
+            });
+            return res.status(200).json(userResults);
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }        
+    },
 }
 
 module.exports = groupController

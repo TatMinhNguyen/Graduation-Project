@@ -146,11 +146,36 @@ export const editPhoto = async (token, groupId, group) => {
     }   
 }
 
-export const createGroup = async (token, group) => {
+export const createGroup = async (token, group, navigate) => {
     try {
-        await axios.post(`${apiUrl}/group/create-group`, group, {
+        const res = await axios.post(`${apiUrl}/group/create-group`, group, {
             headers: {token: `Bearer ${token}`}
         })
+
+        navigate(`/groups/${res.data.group._id}`)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getSuggestionUser = async(token) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-suggest-user`,{
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const SearchSuggestionUser = async(token, input) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/search-suggest-user`, input, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
     } catch (error) {
         console.log(error)
     }
