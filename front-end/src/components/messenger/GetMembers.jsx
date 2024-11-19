@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteMember, getMembers, getUserChat, leaveGroup } from '../../api/chat/chat'
+import { createChat1vs1, deleteMember, getMembers, getUserChat, leaveGroup } from '../../api/chat/chat'
 import AddMembers from './AddMembers'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import { useNavigate } from 'react-router-dom'
@@ -79,6 +79,15 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
             setLoading(false)
         }
     }
+
+    const handleCreateChat = async (userId) => {
+        try {
+            await createChat1vs1(user?.token, userId, navigate)
+            isCloseModal();
+        } catch (error) {
+            console.log(error)
+        }
+    }
     
     const handleGetMembers = async () => {
         try {
@@ -87,6 +96,10 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const handleGetUser = async(userId) => {
+        navigate(`/get-profile/${userId}`)
     }
 
       /* eslint-disable */
@@ -139,16 +152,20 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                 <div>
                                     {user?.userId !== member._id ? (
                                         <div>
-                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' >
+                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' 
+                                                onClick={()=> handleCreateChat(member._id)}
+                                            >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
                                                         src={require("../../assets/icons/message.png")}
                                                         alt=''
                                                     />
                                                 </div>
-                                                Message
+                                                Message 
                                             </div>
-                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' >
+                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' 
+                                                onClick={()=> handleGetUser(member._id)}
+                                            >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
                                                         src={require("../../assets/icons/profile-user.png")}
@@ -172,7 +189,7 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                     ) : (
                                         <div>
                                             <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' 
-                                            
+                                                onClick={()=> handleGetUser(member._id)}
                                             >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
@@ -201,7 +218,9 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                 <div>
                                     {user?.userId === member._id ? (
                                         <div>
-                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' >
+                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' 
+                                                onClick={()=> handleGetUser(member._id)}
+                                            >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
                                                         src={require("../../assets/icons/profile-user.png")}
@@ -224,7 +243,9 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                         </div>                                        
                                     ):(
                                         <div>
-                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' >
+                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer'
+                                                onClick={()=> handleCreateChat(member._id)}
+                                            >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
                                                         src={require("../../assets/icons/message.png")}
@@ -233,7 +254,9 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
                                                 </div>
                                                 Message
                                             </div>
-                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' >
+                                            <div className='p-1 px-2.5 flex items-center rounded-md hover:bg-gray-100 text-[14px] font-medium cursor-pointer' 
+                                                onClick={()=> handleGetUser(member._id)}
+                                            >
                                                 <div className='mr-2'>
                                                     <img className='w-4 h-4'
                                                         src={require("../../assets/icons/profile-user.png")}

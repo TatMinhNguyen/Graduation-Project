@@ -126,6 +126,10 @@ const groupController = {
                         if (!group.members.includes(member)) {
                             group.members.push(member);
                         }
+                        const index = group.pendingMembers.indexOf(member);
+                        if (index !== -1) {
+                            group.pendingMembers.splice(index, 1); // Xóa 1 phần tử tại vị trí index
+                        }
                     });                
                 }else{
                     newMembers.forEach(member => {
@@ -287,24 +291,24 @@ const groupController = {
 
     deleteGroup: async (req, res) => {
         try {
-            const { groupId } = req.params; // Lấy ID của nhóm chat từ params
+            const { groupId } = req.params; // Lấy ID của nhóm group từ params
             const userId = req.user.id; // ID của người thực hiện yêu cầu
     
-            // Tìm nhóm chat bằng groupId
-            const chat = await GroupModel.findById(groupId);
-            if (!chat) {
-                return res.status(404).json({ message: "Không tìm thấy nhóm chat." });
+            // Tìm nhóm group bằng groupId
+            const group = await GroupModel.findById(groupId);
+            if (!group) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm group." });
             }
     
             // Kiểm tra quyền: chỉ người tạo nhóm mới có quyền xóa nhóm
-            if (chat.createId.toString() !== userId) {
-                return res.status(403).json({ message: "Bạn không có quyền xóa nhóm chat này." });
+            if (group.createId.toString() !== userId) {
+                return res.status(403).json({ message: "Bạn không có quyền xóa nhóm group này." });
             }
     
-            // Xóa nhóm chat
-            await ChatModel.findByIdAndDelete(groupId);
+            // Xóa nhóm group
+            await GroupModel.findByIdAndDelete(groupId);
     
-            return res.status(200).json({ message: "Xóa nhóm chat thành công." });
+            return res.status(200).json({ message: "Xóa nhóm group thành công." });
         } catch (error) {
             return res.status(500).json({ message: "Lỗi server", error });
         }
@@ -480,7 +484,6 @@ const groupController = {
             ).sort({ 
                 createdAt: -1 });;
     
-            // Tính toán bạn chung cho mỗi người dùng được gợi ý
             const suggestedUsersWithMutualFriends = suggestedUsers.map(user => {
                 return {
                     _id: user._id,
@@ -535,6 +538,53 @@ const groupController = {
         } catch (error) {
             return res.status(500).json({ message: "Lỗi server", error });
         }        
+    },
+
+    searchInviteUser: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const searchInput = req.body.searchInput; // Lấy từ khóa tìm kiếm từ query params
+
+            const groupId = req.params.groupId;
+            const group = await GroupModel.findById(groupId).select('members'); 
+            
+            if (!group) {
+              return res.status(404).json({ error: 'group not found' });
+            }
+            const memberIds = group.members; 
+            
+            // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
+            const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
+            
+            // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
+            const users = await UserModel.find(
+                { isVerify: true,  _id: { $nin: [...memberIds, userId] }, isAdmin: { $ne: true }},
+                { 
+                    _id: 1, 
+                    username: 1, 
+                    profilePicture: 1, 
+                    isVerify: 1
+                }
+            ).sort({ createdAt: -1 })
+            .then(users => {
+                return users.filter(user => {
+                    const username = removeVietnameseTones(user.username).toLowerCase();
+                    return username.includes(searchKeyword);
+                });
+            });
+
+            // Kết quả tìm kiếm người dùng
+            const userResults = users.map(user => {              
+                return {
+                    userId: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                };
+            });
+            return res.status(200).json(userResults);
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
     },
 }
 

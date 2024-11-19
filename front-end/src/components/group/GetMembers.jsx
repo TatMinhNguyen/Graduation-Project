@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { deleteMember, getMembers, leaveGroup } from '../../api/group/group';
+import { deleteMember, getAGroup, getMembers, leaveGroup } from '../../api/group/group';
 import { createChat1vs1 } from '../../api/chat/chat';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const GetMembers = () => {
   const user = useSelector((state) => state.auth.login?.currentUser) 
+  const members = useSelector((state) => state.group.members)
   const { groupId } = useParams();
 
   const group = useOutletContext()
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(null);
@@ -21,7 +23,7 @@ const GetMembers = () => {
 
   // console.log(showModal)
 
-  const [members, setMemberes] = useState([])
+//   const [members, setMemberes] = useState([])
   const [showDelete, setShowDelete] = useState(false)
   const [showLeave, setShowLeave] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
@@ -53,6 +55,7 @@ const GetMembers = () => {
         await deleteMember(user?.token, member, groupId)
         
         handleGetMemberes();
+        await getAGroup(user?.token, groupId, dispatch)
     } catch (error) {
         console.log(error)
     } finally{
@@ -130,8 +133,8 @@ const GetMembers = () => {
 
   const handleGetMemberes = async() => {
     try {
-      const result = await getMembers(user?.token, groupId)
-      setMemberes(result)
+      await getMembers(user?.token, groupId, dispatch)
+    //   setMemberes(result)
     } catch (error) {
       console.log(error)
     }

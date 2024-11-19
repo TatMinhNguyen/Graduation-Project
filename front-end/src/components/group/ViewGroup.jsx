@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { formatToMonthYear } from '../../utils';
 import ChangePhoto from './ChangePhoto';
 import ChangeName from './ChangeName';
+import InviteMembers from './InviteMembers';
 
 const ViewGroup = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
@@ -18,6 +19,8 @@ const ViewGroup = () => {
 
     const [showEditPicture, setShowEditPicture] = useState(false)
     const [showEditName, setShowEditName] = useState(false)
+
+    const [showAddMembers, setShowAddMembers] = useState(false)
 
     const handleGetAGroup = async () => {
         try {
@@ -82,8 +85,10 @@ const ViewGroup = () => {
                         </div>
                         <div className='flex-1'></div>
                         <div className='mb-3 flex'>
-                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center text-white font-medium rounded-md cursor-pointer'>
-                                + Invite
+                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center text-white font-medium rounded-md cursor-pointer'
+                                onClick={() => setShowAddMembers(true)}
+                            >
+                                + Invite 
                             </div>
                             {group?.createId === user?.userId && (
                                 <div className='flex items-center h-10 px-4 bg-gray-200 hover:bg-gray-300 rounded-md ml-2 cursor-pointer'
@@ -114,7 +119,9 @@ const ViewGroup = () => {
                         </p>
                         <div className='flex-1'></div>
                         <div className='mb-3 flex'>
-                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center rounded-md cursor-pointer'>
+                            <div className='flex bg-customBlue hover:bg-blue-600 px-5 pr-6 h-10 items-center rounded-md cursor-pointer'
+                                onClick={() => setShowAddMembers(true)}
+                            >
                                 <p className='text-white font-medium'>
                                     + Invite
                                 </p>
@@ -134,6 +141,12 @@ const ViewGroup = () => {
                             )}
                         </div>
                     </div>
+                )}
+                {showAddMembers && (
+                    <InviteMembers
+                        groupId = {groupId}
+                        isCloseModal = {() => setShowAddMembers(false)}
+                    />
                 )}
                 {showEditPicture && (
                     <ChangePhoto

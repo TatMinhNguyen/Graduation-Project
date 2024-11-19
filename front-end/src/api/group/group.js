@@ -1,6 +1,6 @@
 import axios from "axios"
 import { apiUrl } from "../API_URL"
-import { setGroup } from "../../redux/groupSlice"
+import { setGroup, setMembers } from "../../redux/groupSlice"
 
 export const getUserGroups = async(token) => {
     try {
@@ -69,11 +69,12 @@ export const getAGroup = async (token, groupId, dispatch) => {
     }
 }
 
-export const getMembers = async (token, groupId) => {
+export const getMembers = async (token, groupId, dispatch) => {
     try {
         const res = await axios.get(`${apiUrl}/group/get-members/${groupId}`,{
             headers: { token: `Bearer ${token}` },
         })
+        dispatch(setMembers(res.data))
         return res.data         
     } catch (error) {
         console.log(error)
@@ -173,6 +174,28 @@ export const getSuggestionUser = async(token) => {
 export const SearchSuggestionUser = async(token, input) => {
     try {
         const res = await axios.post(`${apiUrl}/group/search-suggest-user`, input, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const SearchInviteUser = async(token, input, groupId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/search-invite-user/${groupId}`, input, {
+            headers: { token: `Bearer ${token}` },
+        })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const InviteUser = async(token, member, groupId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/add-members/${groupId}`, member, {
             headers: { token: `Bearer ${token}` },
         })
         return res.data;

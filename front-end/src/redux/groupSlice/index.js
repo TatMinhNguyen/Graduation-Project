@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const INIT = {
     groups:[],
-    group: {}
+    group: {},
+    members:[],
 }
 
 const group = createSlice({
@@ -16,13 +17,18 @@ const group = createSlice({
       setGroup: (state, action) => {
         state.group = action.payload;
         return state
+      },
+      setMembers: (state, action) => {
+        state.members = action.payload;
+        return state;
       }
     },
 })
 
 export const { 
     setGroups,
-    setGroup
+    setGroup,
+    setMembers,
   } = group.actions
 
 export default group.reducer

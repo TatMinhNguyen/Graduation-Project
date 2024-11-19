@@ -3,6 +3,7 @@ import GetMembers from './GetMembers'
 import { useSelector } from 'react-redux'
 import ChangePhoto from './ChangePhoto'
 import ChangeName from './ChangeName'
+import { useNavigate } from 'react-router-dom'
 
 const GetDetailConversation = ({chat, isCloseModal}) => {
 
@@ -13,6 +14,11 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
     const [showEditAvatar, setShowEditAvatar] = useState(false)
     const [showEditName, setShowEditName] = useState(false)
 
+    const navigate = useNavigate()
+
+    const handleGetUser = async(userId) => {
+        navigate(`/get-profile/${userId}`)
+    }
     return (
         <div 
             className='fixed inset-0 bg-gray-800 bg-opacity-80 flex items-center justify-center z-50'
@@ -36,7 +42,9 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                     </div>
                     <div className='flex my-5'>
                         {chat?.members.length <= 2 && (
-                            <div className='flex flex-col justify-center mr-5'>
+                            <div className='flex flex-col justify-center mr-5'
+                                onClick={() => handleGetUser(chat?.userId)}
+                            >
                                 <div className='w-9 h-9 flex justify-center items-center rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer'>
                                     <img className='h-5 w-5'
                                         src={require("../../assets/icons/profile-user.png")}
@@ -85,7 +93,7 @@ const GetDetailConversation = ({chat, isCloseModal}) => {
                         isCloseModal = {() => isCloseModal()}
                     />
                 )}
-                {chat?.members.length > 2 && (
+                {chat?.members.length > 2 && user?.userId === chat?.createId && (
                     <div className={`flex-1 flex items-center px-4 hover:bg-gray-100 rounded-md py-2 pb-3 mx-2 ${showChange ? '' : 'mb-2'}  cursor-pointer`}
                         onClick={() => setShowChange(!showChange)}
                     >

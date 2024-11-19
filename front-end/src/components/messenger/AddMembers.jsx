@@ -56,14 +56,14 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-5 flex items-center justify-center z-50">
             <div className='bg-white rounded-lg shadow-lg w-full max-w-lg h-[80vh]'>
                 <div className="flex justify-between items-center p-4">
-                    <h3 className="text-md font-medium flex-1 flex items-center justify-center">Add people</h3>
+                    <h3 className="text-lg font-bold flex-1 flex items-center justify-center">Add people</h3>
                     <button onClick={() => onCloseModal()} 
-                        className="w-7 h-7 bg-gray-200 rounded-full hover:bg-gray-300 flex items-center justify-center"
+                        className="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 flex items-center justify-center"
                     >
                         <img  
                             src={require('../../assets/icons/close.png')}
                             alt='Earth'
-                            className='w-3.5 h-3.5 '
+                            className='w-4 h-4 '
                         />
                     </button>
                 </div>
@@ -119,7 +119,7 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
                     </div>
                 )}
                 {data?.length > 0 ? (
-                    <p className='mx-5 text-[13px] mb-2'>
+                    <p className='mx-5 text-[13px] mb-2 font-medium'>
                         Result
                     </p>                    
                 ):(
@@ -160,7 +160,7 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
                         </div>
                     ))}
                 </div>
-                <div className='flex-1 flex justify-center mt-2.5'>
+                <div className='flex-1 flex justify-center mt-1'>
                     {newMembersId?.length > 0 ? (
                         <button className={`bg-customBlue text-white w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}
                             onClick={handleAddMembers}
@@ -174,7 +174,6 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
                     )}
 
                 </div>
-
             </div>
         </div>
     )

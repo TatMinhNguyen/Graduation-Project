@@ -43,5 +43,6 @@ router.post('/change-name/:groupId', middleware.verifyToken, groupController.edi
 router.get('/get-suggest-user', middleware.verifyToken, groupController.getSuggestionUser)
 
 router.post('/search-suggest-user', middleware.verifyToken, groupController.searchSuggestionUser)
+router.post('/search-invite-user/:groupId', middleware.verifyToken, groupController.searchInviteUser)
 
 module.exports = router;
