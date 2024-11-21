@@ -147,9 +147,10 @@ const NavBar = ({user}) => {
   return (
     <div className='flex h-[7vh] min-h-14 bg-white border border-white shadow'>
         <div className='flex-1 flex items-center ml-[2vh]' style={{ flex: '30%' }}>
-            <img className='h-5/6'
+            <img className='h-5/6 cursor-pointer'
                 src= {require("../../assets/images/logo.png")}
                 alt="Logo"
+                onClick={()=> navigation(`/`)}
             />
             <h1 className='text-2xl font-medium ml-2 text-blue-600'>
                 Lionelsocial

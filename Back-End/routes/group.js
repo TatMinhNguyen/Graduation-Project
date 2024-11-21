@@ -1,6 +1,8 @@
 const groupController = require("../controllers/groupController");
+const postGroupController = require("../controllers/postGroupController");
 const middleware = require("../middleware");
 const upload = require("../middleware/multerConfig");
+const PostGroupModel = require("../models/PostGroupModel");
 
 const router = require("express").Router();
 
@@ -44,5 +46,30 @@ router.get('/get-suggest-user', middleware.verifyToken, groupController.getSugge
 
 router.post('/search-suggest-user', middleware.verifyToken, groupController.searchSuggestionUser)
 router.post('/search-invite-user/:groupId', middleware.verifyToken, groupController.searchInviteUser)
+
+router.post('/create-post/:groupId',
+    upload.fields([{name: 'images'}]),
+    middleware.verifyToken,
+    postGroupController.createPost
+)
+
+router.post(
+    '/update-a-post/:postId',
+    upload.fields([{ name: 'images'}]),
+    middleware.verifyToken, 
+    postGroupController.updatePost
+)
+
+router.delete('/delete-post/:groupId/:postId', middleware.verifyToken, postGroupController.deletePost)
+
+router.get(
+    '/get-all-posts/:groupId', 
+    middleware.verifyToken, 
+    middleware.paginatedResult(PostGroupModel),
+    postGroupController.getPosts
+)
+
+router.get('/get-a-post/:postId', middleware.verifyToken, postGroupController.getAPost)
+router.get('/get-pending-post/:groupId', middleware.verifyToken, postGroupController.getPendingPost)
 
 module.exports = router;

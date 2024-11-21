@@ -7,6 +7,7 @@ import { timeAgoShort } from '../../utils';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 import socket from '../../socket';
 import GetDetailConversation from './GetDetailConversation';
+import VideoCall from './VideoCall';
 
 const GetMessages = () => {
   const chat = useSelector((state) => state.chat.chat)
@@ -20,6 +21,7 @@ const GetMessages = () => {
   const [imagePreview, setImagePreview] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showConversation, setShowConversation] = useState(false)
+  const [showVideoCall, setShowVideoCall] = useState(false)
 
   const [params, setParams] = useState({
     page: 1,
@@ -159,12 +161,14 @@ const GetMessages = () => {
                 </h1>
             </div>
             <div className='flex-1'></div>
-            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'>
+            <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'
+                onClick={() => setShowVideoCall(true)}
+            >
                 <img className='h-5 w-5 object-cover rounded-full'
                     src={require('../../assets/icons/call.png')}
                     alt=''
                 />  
-            </div> 
+            </div>          
             {chat?.members?.length > 2 && (
                 <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'>
                     <img className='h-5 w-5 object-cover rounded-full'
@@ -183,6 +187,15 @@ const GetMessages = () => {
             </div>        
         </div>
 
+        {/*  */}
+        {showVideoCall && (
+            <VideoCall 
+                myId={user?.userId} 
+                remoteId={chat?.userId}
+                roomId={chatId}
+                isCloseModal={() => setShowVideoCall(false)}
+            />
+        )}
         {showConversation && (
             <GetDetailConversation
                 chat = {chat}

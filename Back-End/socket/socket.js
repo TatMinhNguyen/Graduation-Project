@@ -23,6 +23,40 @@ const socketConfig = (server) => {
       console.log(`User ${userId} is mapped to socket ID ${socket.id}`);
     });
 
+    // Nhận tín hiệu offer và chuyển tiếp
+    socket.on("send-offer", ({ offer, to, from }) => {
+      const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
+      if (receiverSocketId) {
+          io.to(receiverSocketId).emit("receive-offer", { offer, from });
+          console.log(`Forwarded offer from ${from} to ${to}`);
+      } else {
+          console.error(`User ${to} is not connected`);
+      }
+  });
+  
+
+    // Nhận tín hiệu answer và chuyển tiếp
+    socket.on("send-answer", ({ answer, to }) => {
+      const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
+      if (receiverSocketId) {
+          io.to(receiverSocketId).emit("receive-answer", { answer, from: socket.id });
+          console.log(`Forwarded answer from ${socket.id} to ${to}`);
+      } else {
+          console.error(`User ${to} is not connected`);
+      }
+    });
+
+    // Nhận ICE candidate và chuyển tiếp
+    socket.on("send-candidate", ({ candidate, to }) => {
+        const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("receive-candidate", { candidate, from: socket.id });
+            console.log(`Forwarded candidate from ${socket.id} to ${to}`);
+        } else {
+            console.error(`User ${to} is not connected`);
+        }
+    });
+
     // Ngắt kết nối
     socket.on('disconnect', () => {
       console.log(`User disconnected: ${socket.id}`);

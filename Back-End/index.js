@@ -3,9 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-
+// const Pusher = require("pusher");
 const http = require('http');  
 const { socketConfig } = require('./socket/socket');
+// const router = express.Router();
 
 const app = express();
 dotenv.config();
@@ -25,6 +26,15 @@ const imagekit = require("./utils/imagekitConfig");
 
 // Tạo HTTP server từ Express
 const server = http.createServer(app);
+
+
+// const pusher = new Pusher({
+//   appId: process.env.PUSHER_APP_ID,
+//   key: process.env.PUSHER_KEY,
+//   secret: process.env.PUSHER_SECRET,
+//   cluster: process.env.PUSHER_CLUSTER,
+//   useTLS: true,
+// });
 
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => {
