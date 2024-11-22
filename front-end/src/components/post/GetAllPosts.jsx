@@ -13,13 +13,16 @@ import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useNavigate } from 'react-router-dom'
 import { deletePost, getAllPosts } from '../../api/post/post'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import EditPost from './EditPost'
 import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import GetFeft from '../comment/GetFeft'
+import { deletePostGroup, getGroupPosts } from '../../api/group/group'
 
-const GetAllPosts = ({user, posts, params, profile}) => {
+const GetAllPosts = ({user, posts, params, profile, groupId}) => {
+    const group = useSelector((state) => state.group.group)
+
     const [showModal, setShowModal] = useState(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [isAbove, setIsAbove] = useState(false);
@@ -53,7 +56,12 @@ const GetAllPosts = ({user, posts, params, profile}) => {
             }
             await setFelt(user?.token, data)
             setHoveredPostId(null);
-            await getAllPosts(user?.token, dispatch, params)
+
+            if(!groupId){
+                await getAllPosts(user?.token, dispatch, params)
+            }else{
+                await getGroupPosts(user?.token, groupId, dispatch, params)
+            }
         } catch (error) {
             console.log(error)
         }
@@ -63,7 +71,12 @@ const GetAllPosts = ({user, posts, params, profile}) => {
         try {
             await unFelt(user?.token, postId)
             setHoveredPostId(null);
-            await getAllPosts(user?.token, dispatch, params)
+
+            if(!groupId){
+                await getAllPosts(user?.token, dispatch, params)
+            }else{
+                await getGroupPosts(user?.token, groupId, dispatch, params)
+            }
         } catch (error) {
             console.log(error)
         }
@@ -76,7 +89,12 @@ const GetAllPosts = ({user, posts, params, profile}) => {
             } 
             await updateFelt(user?.token, data, postId) 
             setHoveredPostId(null);
-            await getAllPosts(user?.token, dispatch, params)         
+
+            if(!groupId){
+                await getAllPosts(user?.token, dispatch, params)
+            }else{
+                await getGroupPosts(user?.token, groupId, dispatch, params)
+            }       
         } catch (error) {
             console.log(error)
         }
@@ -124,12 +142,20 @@ const GetAllPosts = ({user, posts, params, profile}) => {
     const handleDeletepost = async(postId) => {
         setLoading(true)
         try {
-            await deletePost(user?.token, postId)
-
+            if(!groupId){
+                await deletePost(user?.token, postId)
+            }else{
+                await deletePostGroup(user?.token, postId, groupId)
+            }
+            
             setShowDelete(false)
             setSelectedPost(null)
 
-            await getAllPosts(user?.token, dispatch, params)
+            if(!groupId){
+                await getAllPosts(user?.token, dispatch, params)
+            }else{
+                await getGroupPosts(user?.token, groupId, dispatch, params)
+            }
         } catch (error) {
             console.log(error)
         } finally{
@@ -179,6 +205,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
             document.body.classList.remove('overflow-hidden');
         };
     }, [editModal, showFelter]);
+
   return (
     <div>
         {posts?.map((post) => {
@@ -228,8 +255,8 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                             isAbove ? 'bottom-[-6px] border-b border-r' : 'top-[-6px] border-l border-t'
                                         } left-[132px]`}>
                                     </div>
-                                    {user?.userId === post?.author?.authorId ? (
-                                        <div className='py-2 px-1.5'>
+                                    <div className='py-2 px-1.5'>
+                                        {user?.userId === post?.author?.authorId && (
                                             <div className='flex hover:bg-gray-100 px-2 rounded'
                                                 onClick={() => handleEditModal(post)}
                                             >
@@ -238,19 +265,9 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                                     alt=''
                                                 />
                                                 <p className='py-1 font-medium cursor-pointer text-black'>Edit post </p>
-                                            </div>
-                                            <div className='flex hover:bg-red-50 px-2 rounded'
-                                                    onClick={() => handleShowComfirmDelete(post)}
-                                            >
-                                                <img className='w-5 h-5 mr-3 mt-1'
-                                                    src={require('../../assets/icons/delete.png')}
-                                                    alt=''
-                                                />
-                                                <p className='py-1 font-medium cursor-pointer text-red-600'>Delete post </p>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className='py-2 px-1.5'>
+                                            </div>                                            
+                                        )}
+                                        {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && (
                                             <div className='flex hover:bg-gray-100 px-2 rounded'
                                                 // onClick={() => handleEditModal(post)}
                                             >
@@ -259,10 +276,20 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                                     alt=''
                                                 />
                                                 <p className='py-1 font-medium cursor-pointer text-black'>Report post </p>
-                                            </div>
-                                        </div>
-                                    )}
-
+                                            </div>                                             
+                                        )}
+                                       {(user?.userId === post?.author?.authorId || user?.userId === group?.createId) && (
+                                            <div className='flex hover:bg-red-50 px-2 rounded'
+                                                    onClick={() => handleShowComfirmDelete(post)}
+                                            >
+                                                <img className='w-5 h-5 mr-3 mt-1'
+                                                    src={require('../../assets/icons/delete.png')}
+                                                    alt=''
+                                                />
+                                                <p className='py-1 font-medium cursor-pointer text-red-600'>Delete post </p>
+                                            </div>                                        
+                                       )}
+                                    </div>                         
                                 </div>
                             </div>
                         )}
@@ -307,6 +334,7 @@ const GetAllPosts = ({user, posts, params, profile}) => {
                                 oldImages = {selectedPost?.images}
                                 oldVideo = {selectedPost?.video}
                                 oldTypeText = {selectedPost?.typeText}
+                                groupId = {groupId}
                                 isCloseModal = {() => setEditModal(false)}
                             />
                         )}

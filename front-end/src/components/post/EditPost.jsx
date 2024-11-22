@@ -15,8 +15,9 @@ import { useDispatch } from 'react-redux'
 import { getAllPosts, getUserPost, updatePost } from '../../api/post/post'
 import { search } from '../../api/search/search'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { getGroupPosts, updatePostGroup } from '../../api/group/group'
 
-const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId, searchQuery}) => {
+const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId, searchQuery, groupId}) => {
     const textareaRef = useRef(null);
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -120,6 +121,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             formData.append('typeText', typeText);
 
             await updatePost(user?.token, formData, postId)
+            await updatePostGroup(user?.token, formData, postId)
 
             isCloseModal();
             setImagesId([]);
@@ -128,6 +130,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             await getAllPosts(user?.token, dispatch, params)
             fetchSearchResults();
             await getUserPost(user?.token, user?.userId, dispatch)
+            await getGroupPosts(user?.token, groupId, dispatch, params)
 
         } catch (error) {
             console.log(error)

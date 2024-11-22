@@ -19,6 +19,9 @@ const postGroupSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
+        video:{
+            type: Object
+        },
         comment:{
             type: Number,
             default: 0

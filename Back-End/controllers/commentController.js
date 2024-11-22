@@ -1,5 +1,6 @@
 const CommentModel = require("../models/CommentModel");
 const NotificationModel = require("../models/NotificationModel");
+const PostGroupModel = require("../models/PostGroupModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
 const { sendNotification } = require("../socket/socket");
@@ -19,8 +20,9 @@ const commentController = {
             }
 
             const post = await PostModel.findById(postId);
+            const postGroup = await PostGroupModel.findById(postId)
 
-            if(!post){
+            if(!post && !postGroup){
                 return res.status(404).json({ error: "Post not found" });
             }
 
@@ -47,32 +49,42 @@ const commentController = {
                 image: imageUrl
             })
 
-            post.comment = post.comment + 1;
+            if (post) {
+                post.comment += 1;
+                await post.save();
+
+                if(userId !== post.userId) {
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: post.userId,
+                        type: 'set_comment',
+                        postId: post._id,
+                        commentId: newComment._id,
+                        message: `commented on your post.`
+                    })
+
+                    await notification.save(); 
+                    
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    // Gửi thông báo realtime qua socket
+                    sendNotification([post.userId], populatedNotification); 
+                }
+
+            }
+            
+            if (postGroup) {
+                postGroup.comment += 1;
+                await postGroup.save();
+            }
+            
 
             await newComment.save();
-            await post.save();
 
-            if(userId !== post.userId) {
-                const notification = new NotificationModel({
-                    sender: userId,
-                    receiver: post.userId,
-                    type: 'set_comment',
-                    postId: post._id,
-                    commentId: newComment._id,
-                    message: `commented on your post.`
-                })
-
-                await notification.save(); 
-                
-                const populatedNotification = await NotificationModel.findById(notification._id)
-                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                .populate('postId', 'description')               // Populate thông tin bài viết
-                .populate('commentId', 'content')                // Populate thông tin comment
-                .exec();
-    
-                // Gửi thông báo realtime qua socket
-                sendNotification([post.userId], populatedNotification); 
-            }
 
             const result = {
                 author: {
@@ -99,6 +111,11 @@ const commentController = {
             const comment = await CommentModel.findById(commentId);
 
             const post = await PostModel.findById(comment.postId);
+            const postGroup = await PostGroupModel.findById(comment.postId)
+
+            if(!post && !postGroup){
+                return res.status(404).json({ error: "Post not found" });
+            }
 
             if(!comment) {
                 return res.status(404).json({ error: "Comment not found" })
@@ -160,27 +177,30 @@ const commentController = {
 
             await comment.save();
 
-            if(userId !== post.userId) {
-                const notification = new NotificationModel({
-                    sender: userId,
-                    receiver: post.userId,
-                    type: 'update_comment',
-                    postId: post._id,
-                    commentId: comment._id,
-                    message: `has updated the comment on your post.`
-                })
+            if(post){
+                if(userId !== post.userId) {
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: post.userId,
+                        type: 'update_comment',
+                        postId: post._id,
+                        commentId: comment._id,
+                        message: `has updated the comment on your post.`
+                    })
 
-                await notification.save(); 
-                
-                const populatedNotification = await NotificationModel.findById(notification._id)
-                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                .populate('postId', 'description')               // Populate thông tin bài viết
-                .populate('commentId', 'content')                // Populate thông tin comment
-                .exec();
-    
-                // Gửi thông báo realtime qua socket
-                sendNotification([post.userId], populatedNotification); 
+                    await notification.save(); 
+                    
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    // Gửi thông báo realtime qua socket
+                    sendNotification([post.userId], populatedNotification); 
+                }                
             }
+
 
             return res.status(200).json({ message: "Update Success"});
         } catch (error) {
@@ -200,10 +220,13 @@ const commentController = {
                 return res.status(404).json({ error: "Comment not found" })
             }
 
-            const post = await PostModel.findById(comment.postId);
+            const postId = comment.postId;
 
-            if(!post) {
-                return res.status(404).json({ error: "Post not found" })
+            const post = await PostModel.findById(postId);
+            const postGroup = await PostGroupModel.findById(postId)
+
+            if(!post && !postGroup){
+                return res.status(404).json({ error: "Post not found" });
             }
 
             if(userId != comment.userId && userId != post.userId) {
@@ -219,9 +242,16 @@ const commentController = {
                 imageDeletionPromise
             ]);
 
-            post.comment = post.comment - 1;
-
-            await post.save()
+            if(post) {
+                post.comment = post.comment - 1;
+                await post.save()
+            }
+            
+            if(postGroup) {
+                postGroup.comment = postGroup.comment - 1;
+                await postGroup.save()
+            }
+            
             await CommentModel.findByIdAndDelete(commentId)
 
             return res.status(200).json({ message: "Comment deleted successfully" })

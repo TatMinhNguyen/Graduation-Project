@@ -1,6 +1,6 @@
 import axios from "axios"
 import { apiUrl } from "../API_URL"
-import { setGroup, setMembers } from "../../redux/groupSlice"
+import { setGroup, setMembers, setPosts } from "../../redux/groupSlice"
 
 export const getUserGroups = async(token) => {
     try {
@@ -198,6 +198,75 @@ export const InviteUser = async(token, member, groupId) => {
         const res = await axios.post(`${apiUrl}/group/add-members/${groupId}`, member, {
             headers: { token: `Bearer ${token}` },
         })
+        return res.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getGroupPosts = async(token, groupId, dispatch, params) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-all-posts/${groupId}`, {
+            headers: { token: `Bearer ${token}` },
+            params: params
+        })
+        dispatch(setPosts(res.data))
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getPendingPosts = async(token, groupId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-pending-post/${groupId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getAPostGroup = async (token, postId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-a-post/${postId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        // console.log(res.data)
+
+        return res.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const updatePostGroup = async (token, post, postId) => {
+    try {
+        await axios.post(`${apiUrl}/group/update-a-post/${postId}`, post, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const deletePostGroup = async (token, postId, groupId) => {
+    try {
+        await axios.delete(`${apiUrl}/group/delete-post/${groupId}/${postId}`, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const createPostGroup = async (token, post, groupId) => {
+    try {
+        const res = await axios.post(`${apiUrl}/group/create-post/${groupId}`, post, {
+            headers: {token: `Bearer ${token}`}
+        })
+
         return res.data;
     } catch (error) {
         console.log(error)

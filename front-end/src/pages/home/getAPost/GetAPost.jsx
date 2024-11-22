@@ -21,6 +21,7 @@ import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction';
 import LoadingSpinner from '../../../components/spinner/LoadingSpinner';
 import GetFeft from '../../../components/comment/GetFeft';
 import NavBar from '../../../components/navbar/NavBar';
+import { getAPostGroup } from '../../../api/group/group';
 
 const GetAPost = () => {
     const { postId } = useParams();
@@ -32,7 +33,8 @@ const GetAPost = () => {
 
     const profile = useSelector((state) => state?.auth?.profile)
 
-    const [post, setPost] = useState({})
+    const [postPromise, setPost] = useState({})
+    const [postGroup, setPostGroup] = useState({})
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
@@ -43,6 +45,8 @@ const GetAPost = () => {
     const [showFelter, setShowFelter] = useState(false)
 
     const [loading, setLoading] = useState(false)
+
+    const post = postPromise || postGroup;
 
     const handleMouseEnter = (postId) => {
         setHoveredPostId(postId);
@@ -172,8 +176,10 @@ const GetAPost = () => {
     const handleGetPost = async() => {
         try {
             const result = await getAPost(user?.token, postId);
+            const res = await getAPostGroup(user?.token, postId)
 
             setPost(result)
+            setPostGroup(res)
         } catch (error) {
             console.log(error);
         }
@@ -360,12 +366,12 @@ const GetAPost = () => {
                                     <div className='flex-1 flex border-t border-gray-300 py-1 mx-3.5 border-b'>
                                         <div
                                             className={`w-1/2 flex-1 flex items-center justify-center cursor-pointer py-1 rounded-md hover:bg-gray-100`}
-                                            onMouseEnter={() => handleMouseEnter(post.post?._id)}
+                                            onMouseEnter={() => handleMouseEnter(post?.post?._id)}
                                             onMouseLeave={handleMouseLeave}
                                         >
                                             {post?.is_feel === '1' ? (
                                                 <div className='w-full flex items-center justify-center py-1'
-                                                    onClick={() => handleUnLike(post.post?._id)}
+                                                    onClick={() => handleUnLike(post?.post?._id)}
                                                 >
                                                     <img className='h-6 w-6 ml-2'
                                                         src={require("../../../assets/icons/like-blue.png")}
@@ -377,7 +383,7 @@ const GetAPost = () => {
                                                 </div>
                                             ) : post?.is_feel === '2' ? (
                                                 <div className='w-full flex items-center justify-center py-1'
-                                                    onClick={() => handleUnLike(post.post?._id)}
+                                                    onClick={() => handleUnLike(post?.post?._id)}
                                                 >
                                                     <img className='h-6 w-6 ml-2'
                                                         src={require("../../../assets/icons/love.png")}

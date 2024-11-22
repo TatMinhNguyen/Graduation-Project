@@ -1,6 +1,7 @@
 const CommentModel = require("../models/CommentModel");
 const FeelModel = require("../models/FeelModel");
 const NotificationModel = require("../models/NotificationModel");
+const PostGroupModel = require("../models/PostGroupModel");
 const PostModel = require("../models/PostModel");
 const UserModel = require("../models/UserModel");
 const { sendNotification } = require("../socket/socket");
@@ -19,8 +20,9 @@ const feelController = {
             }
 
             const post = await PostModel.findById(postId);
+            const postGroup = await PostGroupModel.findById(postId)
 
-            if(!post){
+            if(!post && !postGroup){
                 return res.status(404).json({ error: "Post not found" });
             }
             
@@ -30,32 +32,38 @@ const feelController = {
                 type: type
             })
 
-            post.felt = post.felt + 1;
+            if(post){
+                post.felt = post.felt + 1;
+                await post.save();
 
-            await newFelt.save();
-            await post.save();
-
-            if(userId !== post.userId) {
-                const notification = new NotificationModel({
-                    sender: userId,
-                    receiver: post.userId,
-                    type: 'set_feel',
-                    postId: post._id,
-                    type_felt: newFelt.type,
-                    message: `expressed his feelings about your post.`
-                })
-
-                await notification.save();   
-                
-                const populatedNotification = await NotificationModel.findById(notification._id)
-                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                .populate('postId', 'description')               // Populate thông tin bài viết
-                .populate('commentId', 'content')                // Populate thông tin comment
-                .exec();
+                if(userId !== post.userId) {
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: post.userId,
+                        type: 'set_feel',
+                        postId: post._id,
+                        type_felt: newFelt.type,
+                        message: `expressed his feelings about your post.`
+                    })
     
-                // Gửi thông báo realtime qua socket
-                sendNotification([post.userId], populatedNotification); 
+                    await notification.save();   
+                    
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    // Gửi thông báo realtime qua socket
+                    sendNotification([post.userId], populatedNotification); 
+                }
             }
+            
+            if(postGroup){
+                postGroup.felt += 1;
+                await postGroup.save();
+            }
+            await newFelt.save();
 
             return res.status(200).json({message: 'Success!'});
         } catch (error) {
@@ -74,7 +82,9 @@ const feelController = {
             }
     
             const post = await PostModel.findById(postId);
-            if (!post) {
+            const postGroup = await PostGroupModel.findById(postId)
+
+            if(!post && !postGroup){
                 return res.status(404).json({ error: "Post not found" });
             }
     
@@ -86,9 +96,19 @@ const feelController = {
     
             // Xóa lượt like và cập nhật số lượng likes của bài viết
             await FeelModel.deleteOne({ _id: felt._id });
-            post.felt = post.felt - 1;
-    
-            await post.save();
+
+
+            if(post){
+                post.felt = post.felt - 1;
+        
+                await post.save();                
+            }
+
+
+            if(postGroup){
+                postGroup.felt -= 1;
+                await postGroup.save();
+            }
     
             return res.status(200).json({ message: 'Post unliked successfully!' });
         } catch (error) {
@@ -108,7 +128,9 @@ const feelController = {
             }
     
             const post = await PostModel.findById(postId);
-            if (!post) {
+            const postGroup = await PostGroupModel.findById(postId)
+
+            if(!post && !postGroup){
                 return res.status(404).json({ error: "Post not found" });
             }
     
@@ -123,26 +145,28 @@ const feelController = {
     
             await felt.save(); // Lưu lại cảm xúc đã cập nhật
 
-            if(userId !== post.userId) {
-                const notification = new NotificationModel({
-                    sender: userId,
-                    receiver: post.userId,
-                    type: 'update_feel',
-                    postId: post._id,
-                    type_felt: felt.type,
-                    message: `updated his feelings about your post.`
-                })
+            if(post){
+                if(userId !== post.userId) {
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: post.userId,
+                        type: 'update_feel',
+                        postId: post._id,
+                        type_felt: felt.type,
+                        message: `updated his feelings about your post.`
+                    })
 
-                await notification.save();   
-                
-                const populatedNotification = await NotificationModel.findById(notification._id)
-                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                .populate('postId', 'description')               // Populate thông tin bài viết
-                .populate('commentId', 'content')                // Populate thông tin comment
-                .exec();
-    
-                // Gửi thông báo realtime qua socket
-                sendNotification([post.userId], populatedNotification); 
+                    await notification.save();   
+                    
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    // Gửi thông báo realtime qua socket
+                    sendNotification([post.userId], populatedNotification); 
+                }                
             }
     
             return res.status(200).json({ message: 'Feel updated successfully!' });

@@ -336,7 +336,6 @@ const postController = {
             const postPromises = res.paginatedResults.results;
 
             const posts = postPromises.filter(post => post.userId == userId)
-            // await PostModel.find({ userId: userId });
 
             if(!posts) {
                 return res.status(404).json({ error: "Post not found" })

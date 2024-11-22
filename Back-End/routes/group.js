@@ -48,14 +48,14 @@ router.post('/search-suggest-user', middleware.verifyToken, groupController.sear
 router.post('/search-invite-user/:groupId', middleware.verifyToken, groupController.searchInviteUser)
 
 router.post('/create-post/:groupId',
-    upload.fields([{name: 'images'}]),
+    upload.fields([{name: 'images'}, { name: 'video', maxCount: 1 }]),
     middleware.verifyToken,
     postGroupController.createPost
 )
 
 router.post(
     '/update-a-post/:postId',
-    upload.fields([{ name: 'images'}]),
+    upload.fields([{ name: 'images'}, { name: 'video', maxCount: 1 }]),
     middleware.verifyToken, 
     postGroupController.updatePost
 )

@@ -14,8 +14,9 @@ import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useDispatch } from 'react-redux'
 import { createPost, getAllPosts } from '../../api/post/post'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { createPostGroup, getGroupPosts } from '../../api/group/group'
 
-const CreatePost = ({user, params, isCloseModal, profile }) => {
+const CreatePost = ({user, params, isCloseModal, profile, groupId}) => {
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
 
@@ -124,10 +125,16 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           if (video) {
             formData.append('video', video);
           }
-          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị    
+          formData.append('typeText', typeText); // Nếu typeText luôn có giá trị   
 
-          await createPost(user?.token, formData);
-
+          if(!groupId){
+            await createPost(user?.token, formData);
+          }
+          else{
+            await createPostGroup(user?.token, formData, groupId)
+            await getGroupPosts(user?.token, groupId, dispatch, params)
+          }
+          
           // Reset state after successful post
           isCloseModal(false);
           setText('');
@@ -138,6 +145,7 @@ const CreatePost = ({user, params, isCloseModal, profile }) => {
           
           // Refresh the post list
           handleGetListPosts();
+          
         } catch (error) {
           console.error('Errors:', error);
         }finally {

@@ -183,12 +183,11 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
         document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showModal]);
-
   return (
     <div className=''>
       {comments?.map((comment) => {
         return(
-          <div className='px-4 py-2 flex w-full '>
+          <div key={comment.commentId} className='px-4 py-2 flex w-full '>
             <div className='h-9 w-9 mr-3 mt-2'>
                 <img className='h-full w-full object-cover rounded-full shadow'
                     src={comment?.author?.authorAvatar}

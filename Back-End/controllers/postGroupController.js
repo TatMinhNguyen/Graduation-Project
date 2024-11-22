@@ -37,20 +37,33 @@ const postGroupController = {
                 });
             }) : [];
     
-            const [imageUploadResults] = await Promise.all([
+            const videoUploadPromise = req.files.video ? imagekit.upload({
+                file: req.files.video[0].buffer, // buffer video từ multer
+                fileName: req.files.video[0].originalname,
+                folder: '/videos' // Thư mục lưu video
+            }) : Promise.resolve(null);
+    
+            const [imageUploadResults, videoUploadResult] = await Promise.all([
                 Promise.all(imageUploadPromises),
+                videoUploadPromise
             ]);
     
             const imageUrls = imageUploadResults.map(uploadResult => ({
                 url: uploadResult.url,
                 fileId: uploadResult.fileId
             }));
+            
+            const videoUrl = videoUploadResult ? { 
+                url: videoUploadResult.url, 
+                fileId: videoUploadResult.fileId 
+            } : null;
     
             const newPost = new PostGroupModel({
                 groupId: group._id,
                 userId: user._id,
                 description: req.body.description,
                 images: imageUrls,
+                video: videoUrl,
                 typeText: req.body.typeText
             });
     
@@ -133,14 +146,61 @@ const postGroupController = {
                 });
             }) : [];
 
-            const [imageUploadResults] = await Promise.all([
+            const videoUploadPromise = req.files.video ? imagekit.upload({
+                file: req.files.video[0].buffer, // buffer video từ multer
+                fileName: req.files.video[0].originalname,
+                folder: '/videos' // Thư mục lưu video
+            }) : Promise.resolve(null);
+
+            const [imageUploadResults, videoUploadResult] = await Promise.all([
                 Promise.all(imageUploadPromises),
+                videoUploadPromise
             ]);
     
             const imageUrls = imageUploadResults.map(uploadResult => ({
                 url: uploadResult.url,
                 fileId: uploadResult.fileId
             }));
+
+            const videoUrl = videoUploadResult ? { 
+                url: videoUploadResult.url, 
+                fileId: videoUploadResult.fileId 
+            } : null;
+
+            if(videoUrl || videoId){               
+                let removeVideo = null;
+
+                if(videoUrl && post.video){
+                    removeVideo = post.video.fileId;
+                }
+
+                if(videoId){
+                    removeVideo = videoId;
+                }
+
+                if(removeVideo){
+                    // Xóa video trên ImageKit
+                    const videoDeletionPromise = post.video ? imagekit.deleteFile(removeVideo)
+                    : Promise.resolve(null);
+
+                    // const videoDeletionPromise = removeVideo ? imagekit.deleteFile(removeVideo) : Promise.resolve(null);
+
+                    // Chờ xóa tất cả các ảnh và video
+                    await Promise.all([
+                        // ...imageDeletionPromises,
+                        videoDeletionPromise
+                    ]);                    
+                }
+
+
+                //update DB
+                if(videoUrl){
+                    post.video = videoUrl
+                }else{
+                    post.video = null;
+                }
+            }
+
 
             if (imageUrls.length > 0 || imageIdsArray.length > 0) {
                 if (imageIdsArray.length > 0) {
@@ -188,7 +248,7 @@ const postGroupController = {
             }
 
             // Kiểm tra xem người dùng có phải là người tạo bài viết không
-            if (post.userId.toString() !== userId || group.createId.toString() !== userId) {
+            if (post.userId.toString() !== userId && group.createId.toString() !== userId) {
                 return res.status(403).json({ error: "You do not have permission to delete this post" });
             }
 
@@ -198,9 +258,14 @@ const postGroupController = {
                 return imagekit.deleteFile(imageId);
             });
 
+            // Xóa video trên ImageKit
+            const videoDeletionPromise = post.video ? imagekit.deleteFile(post.video.fileId)
+            : Promise.resolve(null);
+
             // Chờ xóa tất cả các ảnh và video
             await Promise.all([
                 ...imageDeletionPromises,
+                videoDeletionPromise
             ]);
 
             // Xóa bài viết khỏi database
@@ -226,7 +291,9 @@ const postGroupController = {
             }
 
             // Tìm tất cả các bài viết
-            let posts = res.paginatedResults.results;
+            const postPromises = res.paginatedResults.results;
+
+            let posts = postPromises.filter(post => post.groupId == groupId)
 
             // Loại bỏ các bài viết có id trùng với group.pendingPosts
             const pendingPostIds = group.pendingPosts.map(postId => postId.toString());
@@ -249,7 +316,7 @@ const postGroupController = {
                 const feel = feels[index];
                 return {
                     postId: post._id,
-                    groupId: group._id,
+                    groupId: post.groupId,
                     description: post.description,
                     images: post.images,
                     video: post.video,

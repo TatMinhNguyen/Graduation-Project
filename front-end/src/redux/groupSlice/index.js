@@ -4,6 +4,7 @@ const INIT = {
     groups:[],
     group: {},
     members:[],
+    posts:[],
 }
 
 const group = createSlice({
@@ -21,6 +22,10 @@ const group = createSlice({
       setMembers: (state, action) => {
         state.members = action.payload;
         return state;
+      },
+      setPosts:(state, action) => {
+        state.posts = action.payload;
+        return state;
       }
     },
 })
@@ -29,6 +34,7 @@ export const {
     setGroups,
     setGroup,
     setMembers,
+    setPosts,
   } = group.actions
 
 export default group.reducer
