@@ -210,7 +210,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     <div>
         {posts?.map((post) => {
             return (
-                <div key={post?.postId} 
+                <div key={post.postId} 
                     className='bg-white mt-4 mb-4 border border-white shadow rounded-md flex-1 items-center'
                 >
                     <div className=' flex-1 flex items-center'>

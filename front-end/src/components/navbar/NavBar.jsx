@@ -26,7 +26,7 @@ const NavBar = ({user}) => {
     const avatarRef = useRef(null);
     const notificationRef = useRef(null)
 
-    const scountNotifications = notifications?.filter((noti) => noti.read === false)
+    const scountNotifications = notifications?.filter((noti) => noti?.read === false)
 
     useEffect(() => {
         // Kiểm tra xem có kết nối thành công hay không

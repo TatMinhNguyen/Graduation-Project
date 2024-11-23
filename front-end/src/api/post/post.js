@@ -9,7 +9,6 @@ export const getAllPosts = async (token, dispatch, params) => {
             params: params
         });
         // console.log(res.data)
-
         dispatch(setAllPosts(res.data));
     } catch (error) {
         console.log(error);
