@@ -11,6 +11,7 @@ import VideoCall from './VideoCall';
 
 const GetMessages = () => {
   const chat = useSelector((state) => state.chat.chat)
+//   console.log(chat?.members)
   const { chatId } = useParams();
   const imageInputRef = useRef(null);
   const loadMoreTopRef = useRef(null);
@@ -191,7 +192,7 @@ const GetMessages = () => {
         {showVideoCall && (
             <VideoCall 
                 myId={user?.userId} 
-                remoteId={chat?.userId}
+                remoteId={[chat?.members]}
                 roomId={chatId}
                 isCloseModal={() => setShowVideoCall(false)}
             />

@@ -1,135 +1,198 @@
-import React, { useRef, useEffect } from "react";
-import Pusher from "pusher-js";
-
-const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY , {
-  cluster: process.env.REACT_APP_PUSHER_CLUSTER ,
-  encrypted: true,
-});
+import React, { useRef, useEffect, useState } from "react";
+import socket from "../../socket";
 
 const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerConnection = useRef(
-    new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-      ],
-    })
-  );
+  const peerConnectionRef = useRef({}); // Quản lý nhiều peer connections
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
 
-    useEffect(() => {
-        // Setup local stream
-        navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-            localVideoRef.current.srcObject = stream;
-            stream.getTracks().forEach((track) => {
-            peerConnection.current.addTrack(track, stream);
+  const config = {
+    iceServers: [
+      {
+        urls: "stun:stun.l.google.com:19302", // STUN server
+      },
+    ],
+  };
+
+  useEffect(() => {
+    // Join socket room khi component mount
+    socket.emit("join", { userId: myId });
+
+    // Lắng nghe các sự kiện socket
+    socket.on("receive-offer", handleReceiveOffer);
+    socket.on("receive-answer", handleReceiveAnswer);
+    socket.on("receive-candidate", handleReceiveCandidate);
+
+    return () => {
+      // Cleanup socket khi component unmount
+      socket.off("receive-offer", handleReceiveOffer);
+      socket.off("receive-answer", handleReceiveAnswer);
+      socket.off("receive-candidate", handleReceiveCandidate);
+    };
+  }, [myId]);
+
+  const startCall = async (receiverIds) => {
+    try {
+      // Lấy stream từ camera/microphone
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setLocalStream(stream);
+      localVideoRef.current.srcObject = stream;
+
+      // Tạo PeerConnection cho từng receiver
+      for (const receiverId of receiverIds) {
+        console.log(receiverId)
+        const peerConnection = new RTCPeerConnection(config);
+        peerConnectionRef.current[receiverId] = peerConnection;
+
+        // Thêm local tracks vào PeerConnection
+        stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+
+        // Tạo offer và gửi qua socket
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit("send-offer", {
+          offer: peerConnection.localDescription,
+          to: receiverId,
+          from: myId,
+        });
+
+        // Lắng nghe ICE candidates
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit("send-candidate", {
+              candidate: event.candidate,
+              to: receiverId,
             });
-        });
-
-        // Handle remote stream
-        peerConnection.current.ontrack = (event) => {
-        remoteVideoRef.current.srcObject = event.streams[0];
-        };
-
-        // Listen for signals via Pusher
-        const channel = pusher.subscribe(`room-${roomId}`);
-        channel.bind("signal", async ({ signal, from }) => {
-        try {
-            if (signal.type === "offer") {
-            await peerConnection.current.setRemoteDescription(signal);
-            const answer = await peerConnection.current.createAnswer();
-            await peerConnection.current.setLocalDescription(answer);
-            sendSignal(answer, roomId, from);
-            } else if (signal.type === "answer") {
-            await peerConnection.current.setRemoteDescription(signal);
-            } else if (signal.candidate) {
-            await peerConnection.current.addIceCandidate(signal);
-            }
-        } catch (error) {
-            console.error("Error handling signal:", error);
-        }
-        });
-
-        // Handle ICE candidates
-        peerConnection.current.onicecandidate = (event) => {
-        if (event.candidate) {
-            sendSignal(event.candidate, roomId);
-        }
-        };
-
-        // Cleanup on component unmount
-        return () => {
-        channel.unsubscribe();
-        endCall();
-        };
-    }, [roomId]);
-
-    const sendSignal = (signal, roomId, to) => {
-        fetch("/api/call/signal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId, signal, to }),
-        });
-    };
-
-    const startCall = async () => {
-        try {
-          // Bước 1: Tạo Offer cho WebRTC
-          const offer = await peerConnection.current.createOffer();
-          await peerConnection.current.setLocalDescription(offer);
-      
-          // Gửi tín hiệu offer qua Pusher/Socket.IO
-          sendSignal(offer, roomId);
-      
-          // Bước 2: Gửi thông tin cuộc gọi tới backend
-          const response = await fetch("/api/call/start", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              callerId: myId,
-              receiverId: remoteId,
-              roomId,
-            }),
-          });
-      
-          if (response.ok) {
-            console.log("Call initiated and notification sent.");
-          } else {
-            console.error("Failed to initiate call or send notification.");
           }
-        } catch (error) {
-          console.error("Error starting call:", error);
+        };
+
+        // Nhận remote stream
+        peerConnection.ontrack = (event) => {
+          setRemoteStream(event.streams[0]);
+          remoteVideoRef.current.srcObject = event.streams[0];
+        };
+      }
+    } catch (error) {
+      console.error("Error starting call:", error);
+    }
+  };
+
+  const handleReceiveOffer = async ({ offer, from }) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setLocalStream(stream);
+      localVideoRef.current.srcObject = stream;
+
+      const peerConnection = new RTCPeerConnection(config);
+
+      peerConnectionRef.current[from] = peerConnection;
+
+      stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+
+      socket.emit("send-answer", {
+        answer: peerConnection.localDescription,
+        to: from,
+      });
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("send-candidate", {
+            candidate: event.candidate,
+            to: from,
+          });
         }
-    }; 
+      };
 
-    const endCall = () => {
-        // Stop all tracks
-        if (localVideoRef.current?.srcObject) {
-            localVideoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-        }
+      peerConnection.ontrack = (event) => {
+        setRemoteStream(event.streams[0]);
+        remoteVideoRef.current.srcObject = event.streams[0];
+      };
+    } catch (error) {
+      console.error("Error handling offer:", error);
+    }
+  };
 
-        if (peerConnection.current) {
-            peerConnection.current.close();
-            peerConnection.current = null;
-        }
+  const handleReceiveAnswer = async ({ answer, from }) => {
+    const peerConnection = peerConnectionRef.current[from];
+    if (peerConnection) {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    }
+  };
 
-        // Clear video refs
-        if (localVideoRef.current) localVideoRef.current.srcObject = null;
-        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+  const handleReceiveCandidate = async ({ candidate, from }) => {
+    const peerConnection = peerConnectionRef.current[from];
+    if (peerConnection) {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+  };
 
-        // Trigger modal close
-        if (isCloseModal) isCloseModal();
-    };
-
+  const endCall = () => {
+    try {
+      console.log("Ending call...");
+  
+      // Stop all local media tracks (video and audio)
+      if (localStream) {
+        localStream.getTracks().forEach((track) => {
+          console.log(`Stopping ${track.kind} track.`);
+          track.stop(); // Stop track (video or audio)
+        });
+        setLocalStream(null); // Clear the local stream
+      }
+  
+      // Close all PeerConnections
+      if (peerConnectionRef.current) {
+        Object.values(peerConnectionRef.current).forEach((peerConnection) => {
+          if (peerConnection) {
+            // Stop all tracks sent via PeerConnection
+            peerConnection.getSenders().forEach((sender) => {
+              if (sender.track) {
+                console.log(`Stopping track from sender: ${sender.track.kind}`);
+                sender.track.stop();
+              }
+            });
+            peerConnection.close(); // Close the PeerConnection
+            console.log("PeerConnection closed.");
+          }
+        });
+        peerConnectionRef.current = {}; // Reset PeerConnection reference
+      }
+  
+      // Clear video elements
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = null; // Detach local stream
+        console.log("Local video element cleared.");
+      }
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = null; // Detach remote stream
+        console.log("Remote video element cleared.");
+      }
+  
+      // Trigger modal close (if defined)
+      if (typeof isCloseModal === "function") {
+        isCloseModal();
+        console.log("Modal closed.");
+      }
+  
+      console.log("Call ended. Camera and microphone are now off.");
+    } catch (error) {
+      console.error("Error ending the call:", error);
+    }
+  };
+  
   return (
-    <div>
+    <div className="video-call">
       <div>
-        <video ref={localVideoRef} autoPlay muted></video>
-        <video ref={remoteVideoRef} autoPlay></video>
+        <video ref={localVideoRef} autoPlay muted className="local-video" />
+        <video ref={remoteVideoRef} autoPlay className="remote-video" />
       </div>
-      <button onClick={startCall}>Start Call</button>
+      <button onClick={() => startCall(remoteId)}>Start Call</button>
       <button onClick={endCall}>End Call</button>
     </div>
   );

@@ -25,13 +25,16 @@ const socketConfig = (server) => {
 
     // Nhận tín hiệu offer và chuyển tiếp
     socket.on("send-offer", ({ offer, to, from }) => {
-      const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
-      if (receiverSocketId) {
+      // console.log(to)
+      to?.forEach((receiverId) => {
+        const receiverSocketId = userSocketMap[receiverId]; // Lấy socket.id của từng người
+        if (receiverSocketId) {
           io.to(receiverSocketId).emit("receive-offer", { offer, from });
-          console.log(`Forwarded offer from ${from} to ${to}`);
-      } else {
-          console.error(`User ${to} is not connected`);
-      }
+          console.log(`Forwarded offer from ${socket.id} to ${receiverId}`);
+        } else {
+          console.error(`User1 ${receiverId} is not connected`);
+        }
+      });
   });
   
 
@@ -42,7 +45,7 @@ const socketConfig = (server) => {
           io.to(receiverSocketId).emit("receive-answer", { answer, from: socket.id });
           console.log(`Forwarded answer from ${socket.id} to ${to}`);
       } else {
-          console.error(`User ${to} is not connected`);
+          console.error(`User2 ${to} is not connected`);
       }
     });
 
@@ -53,7 +56,7 @@ const socketConfig = (server) => {
             io.to(receiverSocketId).emit("receive-candidate", { candidate, from: socket.id });
             console.log(`Forwarded candidate from ${socket.id} to ${to}`);
         } else {
-            console.error(`User ${to} is not connected`);
+            console.error(`User3 ${to} is not connected`);
         }
     });
 
