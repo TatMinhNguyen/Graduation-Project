@@ -33,6 +33,13 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
     };
   }, [myId]);
 
+  useEffect(() => {
+    if (remoteStream && remoteVideoRef.current) {
+      console.log("Remote video stream attached:", remoteStream);
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);  
+
   const startCall = async (receiverIds) => {
     try {
       // Lấy stream từ camera/microphone
@@ -42,12 +49,16 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
 
       // Tạo PeerConnection cho từng receiver
       for (const receiverId of receiverIds) {
-        console.log(receiverId)
+        // console.log(receiverId)
         const peerConnection = new RTCPeerConnection(config);
         peerConnectionRef.current[receiverId] = peerConnection;
 
         // Thêm local tracks vào PeerConnection
-        stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+        stream.getTracks().forEach((track) => {
+          console.log("Adding track:", track);
+          peerConnection.addTrack(track, stream);
+        });
+        
 
         // Tạo offer và gửi qua socket
         const offer = await peerConnection.createOffer();
@@ -62,6 +73,7 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
         // Lắng nghe ICE candidates
         peerConnection.onicecandidate = (event) => {
           if (event.candidate) {
+            console.log("Sending ICE candidate:", event.candidate);
             socket.emit("send-candidate", {
               candidate: event.candidate,
               to: receiverId,
@@ -71,9 +83,13 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
 
         // Nhận remote stream
         peerConnection.ontrack = (event) => {
-          setRemoteStream(event.streams[0]);
-          remoteVideoRef.current.srcObject = event.streams[0];
+          console.log("ontrack event:", event.streams);
+          if (event.streams && event.streams[0]) {
+            setRemoteStream(event.streams[0]);
+            remoteVideoRef.current.srcObject = event.streams[0];
+          }
         };
+        
       }
     } catch (error) {
       console.error("Error starting call:", error);
@@ -90,7 +106,11 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
 
       peerConnectionRef.current[from] = peerConnection;
 
-      stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+      stream.getTracks().forEach((track) => {
+        console.log("Adding track:", track);
+        peerConnection.addTrack(track, stream);
+      });
+      
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
       const answer = await peerConnection.createAnswer();
@@ -103,6 +123,7 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
 
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
+          console.log("Sending ICE candidate:", event.candidate);
           socket.emit("send-candidate", {
             candidate: event.candidate,
             to: from,
@@ -111,9 +132,13 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
       };
 
       peerConnection.ontrack = (event) => {
-        setRemoteStream(event.streams[0]);
-        remoteVideoRef.current.srcObject = event.streams[0];
+        console.log("ontrack event:", event.streams);
+        if (event.streams && event.streams[0]) {
+          setRemoteStream(event.streams[0]);
+          remoteVideoRef.current.srcObject = event.streams[0];
+        }
       };
+      
     } catch (error) {
       console.error("Error handling offer:", error);
     }
@@ -127,6 +152,7 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
   };
 
   const handleReceiveCandidate = async ({ candidate, from }) => {
+    console.log("Received ICE candidate:", candidate);
     const peerConnection = peerConnectionRef.current[from];
     if (peerConnection) {
       await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
@@ -190,7 +216,7 @@ const VideoCall = ({ myId, remoteId, roomId, isCloseModal }) => {
     <div className="video-call">
       <div>
         <video ref={localVideoRef} autoPlay muted className="local-video" />
-        <video ref={remoteVideoRef} autoPlay className="remote-video" />
+        <video ref={remoteVideoRef} autoPlay muted className="remote-video" />
       </div>
       <button onClick={() => startCall(remoteId)}>Start Call</button>
       <button onClick={endCall}>End Call</button>

@@ -8,9 +8,9 @@ const socketConfig = (server) => {
   // Tạo một instance của Socket.IO
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",  // Bạn có thể giới hạn các domain nếu cần
+      origin: "*",  // Bạn có thể giới hạn các domain nếu cần
       methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true,
+      credentials: false,
     }
   });
 
