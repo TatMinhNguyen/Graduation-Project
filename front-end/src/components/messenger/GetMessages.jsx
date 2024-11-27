@@ -29,7 +29,7 @@ const GetMessages = () => {
     index: 20,
   })
 
-//   console.log(messages)
+  const remoteIds = chat?.members?.filter((member) => member !== user?.userId); 
 
   const dispatch = useDispatch();
 
@@ -192,7 +192,7 @@ const GetMessages = () => {
         {showVideoCall && (
             <VideoCall 
                 myId={user?.userId} 
-                remoteId={[chat?.members]}
+                receiverIds={[remoteIds]}
                 roomId={chatId}
                 isCloseModal={() => setShowVideoCall(false)}
             />
