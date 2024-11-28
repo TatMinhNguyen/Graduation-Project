@@ -19,6 +19,8 @@ import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import GetFeft from '../comment/GetFeft'
 import { deletePostGroup, getGroupPosts } from '../../api/group/group'
+import ShowModal from './ShowModal'
+import ReportPost from './ReportPost'
 
 const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const group = useSelector((state) => state.group.group)
@@ -33,6 +35,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const [selectedPost, setSelectedPost] = useState(null)
     const [editModal, setEditModal] = useState(false);
     const [showFelter, setShowFelter] = useState(false)
+    const [reportModal, setReportModal] = useState(false)
   
     const modalRef = useRef(null);
     const navigation = useNavigate();
@@ -104,17 +107,17 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
     
-        if (rect.bottom > viewportHeight - 50) {
+        if (rect.bottom > viewportHeight - 100) {
             setIsAbove(true);
             setModalPosition({
-                top: rect.top + window.scrollY - 90,
-                left: rect.left + window.scrollX - 50,
+                top: rect.top + window.scrollY - 100,
+                left: rect.left + window.scrollX - 220,
             });
         } else {
             setIsAbove(false);
             setModalPosition({
-                top: rect.bottom + window.scrollY + 5,
-                left: rect.left + window.scrollX - 120,
+                top: rect.bottom + window.scrollY + 15,
+                left: rect.left + window.scrollX - 220,
             });
         }
     
@@ -180,6 +183,12 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
         setSelectedPost(post)
     }
 
+    const handleReportModal = (post) =>{
+        setShowModal(null)
+        setReportModal(true)
+        setSelectedPost(post)
+    }
+
     const handleShowGetFelt = (post) => {
         setShowFelter(true)
         setSelectedPost(post)
@@ -205,7 +214,6 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             document.body.classList.remove('overflow-hidden');
         };
     }, [editModal, showFelter]);
-
   return (
     <div>
         {posts?.map((post) => {
@@ -241,57 +249,17 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                             />
                         </div>                             
                         {showModal === post?.postId && (
-                            <div
-                                ref={modalRef}
-                                className='absolute bg-white border border-gray-200 rounded shadow-2xl z-10'
-                                style={{
-                                    top: modalPosition.top,
-                                    left: modalPosition.left,
-                                }}                       
-                            >
-                                <div className='relative'>
-                                    <div
-                                        className={`absolute transform rotate-45 w-3 h-3 bg-white border-gray-200 ${
-                                            isAbove ? 'bottom-[-6px] border-b border-r' : 'top-[-6px] border-l border-t'
-                                        } left-[132px]`}>
-                                    </div>
-                                    <div className='py-2 px-1.5'>
-                                        {user?.userId === post?.author?.authorId && (
-                                            <div className='flex hover:bg-gray-100 px-2 rounded'
-                                                onClick={() => handleEditModal(post)}
-                                            >
-                                                <img className='w-5 h-5 mr-3 mt-1'
-                                                    src={require('../../assets/icons/edit1.png')}
-                                                    alt=''
-                                                />
-                                                <p className='py-1 font-medium cursor-pointer text-black'>Edit post </p>
-                                            </div>                                            
-                                        )}
-                                        {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && (
-                                            <div className='flex hover:bg-gray-100 px-2 rounded'
-                                                // onClick={() => handleEditModal(post)}
-                                            >
-                                                <img className='w-5 h-5 mr-3 mt-2'
-                                                    src={require('../../assets/icons/report-post.png')}
-                                                    alt=''
-                                                />
-                                                <p className='py-1 font-medium cursor-pointer text-black'>Report post </p>
-                                            </div>                                             
-                                        )}
-                                       {(user?.userId === post?.author?.authorId || user?.userId === group?.createId) && (
-                                            <div className='flex hover:bg-red-50 px-2 rounded'
-                                                    onClick={() => handleShowComfirmDelete(post)}
-                                            >
-                                                <img className='w-5 h-5 mr-3 mt-1'
-                                                    src={require('../../assets/icons/delete.png')}
-                                                    alt=''
-                                                />
-                                                <p className='py-1 font-medium cursor-pointer text-red-600'>Delete post </p>
-                                            </div>                                        
-                                       )}
-                                    </div>                         
-                                </div>
-                            </div>
+                            <ShowModal
+                                modalRef={modalRef}
+                                modalPosition={modalPosition}
+                                isAbove={isAbove}
+                                user={user}
+                                post={post}
+                                group={group}
+                                handleEditModal={()=>handleEditModal(post)}
+                                handleReportModal={() => handleReportModal(post)}
+                                handleShowComfirmDelete={() => handleShowComfirmDelete(post)}
+                            />
                         )}
                         {showDelete && selectedPost?.postId === post?.postId && (
                             <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
@@ -338,7 +306,12 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 isCloseModal = {() => setEditModal(false)}
                             />
                         )}
+                        {reportModal && selectedPost?.postId === post?.postId && (
+                            <ReportPost
 
+                                isCloseModal = {() => setReportModal(false)}
+                            />
+                        )}
                     </div>
                     <div  className='cursor-pointer'>
                         {post?.typeText === false ?(

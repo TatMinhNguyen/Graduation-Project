@@ -8,6 +8,7 @@ import { getMyProfile } from '../../api/profile/profile';
 import CreatePost from '../../components/post/CreatePost';
 import RightBar from '../../components/rightbar/RightBar';
 import LeftBar from '../../components/leftbar/LeftBar';
+import { clearGroup } from '../../redux/groupSlice';
 
 const Home = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -74,6 +75,7 @@ const Home = () => {
     if(user?.token) {
       handleGetListPosts();
       handleGetProfile();
+      dispatch(clearGroup())
     }
   }, [params, dispatch]);
 

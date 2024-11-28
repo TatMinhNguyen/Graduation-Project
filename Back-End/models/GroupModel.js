@@ -28,6 +28,14 @@ const groupSchema = new mongoose.Schema(
         },
         postsReported: {
             type: Array
+        },
+        isVerify: {
+            type: Boolean,
+            default: true
+        },
+        isReported: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

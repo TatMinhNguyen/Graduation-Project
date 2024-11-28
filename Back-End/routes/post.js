@@ -36,4 +36,6 @@ router.post(
     postController.updatePost
 )
 
+router.post('/report-post/:postId', middleware.verifyToken, postController.reportPost)
+
 module.exports = router;

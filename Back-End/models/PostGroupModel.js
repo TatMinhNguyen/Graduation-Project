@@ -37,6 +37,14 @@ const postGroupSchema = new mongoose.Schema(
         reported:{
             type: Number,
             default: 0          
+        },
+        isVerify: {
+            type: Boolean,
+            default: true
+        },
+        isReported: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

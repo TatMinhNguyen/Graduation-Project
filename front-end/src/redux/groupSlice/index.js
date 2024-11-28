@@ -19,6 +19,9 @@ const group = createSlice({
         state.group = action.payload;
         return state
       },
+      clearGroup: (state) => {
+        state.group = {}
+      },
       setMembers: (state, action) => {
         state.members = action.payload;
         return state;
@@ -35,6 +38,7 @@ export const {
     setGroup,
     setMembers,
     setPosts,
+    clearGroup,
   } = group.actions
 
 export default group.reducer

@@ -29,6 +29,10 @@ const postSchema = new mongoose.Schema(
         typeText: {
             type: Boolean,
             default: true
+        },
+        isReported: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

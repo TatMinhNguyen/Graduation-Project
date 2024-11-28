@@ -1,6 +1,7 @@
 const FeelModel = require("../models/FeelModel");
 const NotificationModel = require("../models/NotificationModel");
-const PostModel = require("../models/PostModel")
+const PostModel = require("../models/PostModel");
+const ReportPostModel = require("../models/ReportPostModel");
 const UserModel = require("../models/UserModel");
 const { sendNotification } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
@@ -213,6 +214,8 @@ const postController = {
             const postId = req.params.postId;
             const userId = req.user.id;
 
+            const user = await UserModel.findById(userId);
+
             // Tìm bài viết
             const post = await PostModel.findById(postId);
 
@@ -221,7 +224,7 @@ const postController = {
             }
 
             // Kiểm tra xem người dùng có phải là người tạo bài viết không
-            if (post.userId.toString() !== userId) {
+            if (post.userId.toString() !== userId && !user.isAdmin) {
                 return res.status(403).json({ error: "You do not have permission to delete this post" });
             }
 
@@ -378,7 +381,37 @@ const postController = {
         } catch (error) {
             return res.status(500).json({ error: error.message});
         }
-    }
+    },
 
+    reportPost: async(req, res) => {
+        try {
+           const userId = req.user.id;
+           const postId = req.params.postId;
+           const {content, type} = req.body;
+           
+           const post = await PostModel.findById(postId)
+
+           if(!post) {
+               return res.status(404).json({ error: "Post not found" })
+           }
+
+           const newReport = new ReportPostModel({
+                userId: userId,
+                postId: postId,
+                content: content,
+                type: type,
+           })
+
+           await newReport.save();
+
+           post.isReported = true;
+
+           await post.save();
+
+           return res.status(200).json({message: 'Report success'})
+        } catch (error) {
+            return res.status(500).json({ error: error.message});
+        }
+    }
 }
 module.exports = postController
