@@ -21,6 +21,7 @@ import GetFeft from '../comment/GetFeft'
 import { deletePostGroup, getGroupPosts } from '../../api/group/group'
 import ShowModal from './ShowModal'
 import ReportPost from './ReportPost'
+import ComfirmReport from './ComfirmReport'
 
 const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const group = useSelector((state) => state.group.group)
@@ -36,7 +37,8 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const [editModal, setEditModal] = useState(false);
     const [showFelter, setShowFelter] = useState(false)
     const [reportModal, setReportModal] = useState(false)
-  
+    const [notiSuccess, setNotiSuccess] = useState(false)
+
     const modalRef = useRef(null);
     const navigation = useNavigate();
     const dispatch = useDispatch();
@@ -308,8 +310,15 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                         )}
                         {reportModal && selectedPost?.postId === post?.postId && (
                             <ReportPost
-
+                                user = {user}
+                                postId = {selectedPost?.postId}
                                 isCloseModal = {() => setReportModal(false)}
+                                setNotiSuccess={() => setNotiSuccess(true)}
+                            />
+                        )}
+                        {notiSuccess && (
+                            <ComfirmReport
+                            setNotiSuccess={() => setNotiSuccess(false)}
                             />
                         )}
                     </div>

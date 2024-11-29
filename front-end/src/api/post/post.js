@@ -72,3 +72,13 @@ export const deletePost = async (token, postId) => {
         console.log(error)
     }
 }
+
+export const reportPost = async (token, postId, data) => {
+    try {
+        await axios.post(`${apiUrl}/post/report-post/${postId}`, data, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}

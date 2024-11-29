@@ -1,10 +1,31 @@
 import React, { useState } from 'react'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { reportPost } from '../../api/post/post'
 
-const ReportPost = ({isCloseModal}) => {
+const ReportPost = ({isCloseModal, user, postId, setNotiSuccess}) => {
     const [type, setType] = useState(null)
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false);
+
+
+    const handleReportPost = async() => {
+        const data = {
+            content: content,
+            type: type
+        }
+        setLoading(true)
+        try {
+            await reportPost(user?.token, postId, data)
+            isCloseModal()
+            setNotiSuccess()
+            setContent('')
+            setType(null)
+        } catch (error) {
+            console.log(error)
+        } finally{
+            setLoading(false)
+        }
+    }
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh]">
@@ -117,7 +138,7 @@ const ReportPost = ({isCloseModal}) => {
                     </div>
                 ) : (
                     <button
-                        // onClick={handleCreatePost}
+                        onClick={handleReportPost}
                         className={`w-full text-white font-medium py-2 px-4 rounded-lg ${type ? 'bg-customBlue' : 'bg-blue-300'}`}
                         disabled={!(type)}
                     >
