@@ -5,20 +5,37 @@ const LeftBar = ({profile}) => {
   const navigate = useNavigate();
   return (
     <div className='w-[22vw] -mt-3'>
-      <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 w-full rounded-md'
-        onClick={()=> navigate(`/get-profile/${profile?._id}`)}
-      >
-        <div className='h-9 w-9'>
-          <img className='h-full w-full object-cover rounded-full hover:opacity-90'
-            src={profile?.profilePicture}
-            alt='avatar'
-          />
-        </div> 
-        <p className='ml-3 font-medium'>
-          {profile?.username}  
-        </p>       
-      </div>
+      {!profile?.isAdmin && (
+        <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 w-full rounded-md'
+          onClick={()=> navigate(`/get-profile/${profile?._id}`)}
+        >
+          <div className='h-9 w-9'>
+            <img className='h-full w-full object-cover rounded-full hover:opacity-90'
+              src={profile?.profilePicture}
+              alt='avatar'
+            />
+          </div> 
+          <p className='ml-3 font-medium'>
+            {profile?.username}  
+          </p>       
+        </div>        
+      )}
 
+      {profile?.isAdmin && (
+        <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md'
+          onClick={() => navigate('/admin/reported-posts')}
+        >
+          <div className='h-9 w-9'>
+            <img className='h-full w-full object-cover rounded-full hover:opacity-90'
+              src={require('../../assets/icons/protection.png')}
+              alt='avatar'
+            />
+          </div> 
+          <p className='ml-3 font-medium'>
+            Admin 
+          </p>       
+        </div>        
+      )}
       <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md'
         onClick={() => navigate('/friends')}
       >

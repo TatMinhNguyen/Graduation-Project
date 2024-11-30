@@ -3,7 +3,8 @@ import authReducer from "./authSlice";
 import searchReducer from './searchSlice'
 import postReducer from "./postSlice";
 import chatReducer from './chatSlice';
-import groupReducer from './groupSlice'
+import groupReducer from './groupSlice';
+import adminReducer from './adminSlice';
 
 import {
   persistStore,
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   post: postReducer,
   chat: chatReducer,
   group: groupReducer,
+  admin: adminReducer
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

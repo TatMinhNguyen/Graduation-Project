@@ -56,7 +56,7 @@ const adminController = {
                     images: post.images,
                     video: post.video,
                     typeText: post.typeText,
-                    createdAt: report?.createdAt, // Thời điểm bị báo cáo
+                    createdAt: post?.createdAt, // Thời điểm bị báo cáo
                     author: {
                         authorId: author?._id,
                         authorName: author?.username,

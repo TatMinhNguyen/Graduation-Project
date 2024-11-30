@@ -292,6 +292,21 @@ const NavBar = ({user}) => {
                                 </p>
                             </div>
                         </div>
+                        {user?.isAdmin && (
+                            <button
+                                className='flex w-full px-2 py-1.5 text-left text-black hover:bg-gray-100 flex-1 flex items-center rounded-md mb-1'
+                                onClick={()=> navigation('/admin/reported-posts')}
+                            >
+                                <div className='p-1.5 bg-gray-200 rounded-full mr-2'>
+                                    <img
+                                        src={require('../../assets/icons/admin-panel.png')}
+                                        alt=''
+                                        className='w-5 h-5 '
+                                    />                                
+                                </div>
+                                Admin
+                            </button>                            
+                        )}
                         <button
                             className='flex w-full px-2 py-1.5 text-left text-black hover:bg-gray-100 flex-1 flex items-center rounded-md mb-1'
                             onClick={handleShowChangePassword}

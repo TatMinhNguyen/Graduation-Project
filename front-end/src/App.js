@@ -33,6 +33,8 @@ import ViewGroup from './components/group/ViewGroup';
 import GetMembersRequest from './components/group/GetMembersRequest';
 import GetPendingPosts from './components/group/GetPendingPosts';
 import GetReportPosts from './components/group/GetReportPosts';
+import Admin from './pages/admin/Admin';
+import GetPostReported from './components/admin/GetPostReported';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -82,7 +84,10 @@ function App() {
           <Route path='member-requests' element={<GetMembersRequest/>}/>
           <Route path='pending-posts' element={<GetPendingPosts/>}/>
           <Route path='reported-posts' element={<GetReportPosts/>}/>
-        </Route>   
+        </Route>  
+        <Route path='/admin' element={<Admin/>}>
+            <Route path='reported-posts' element={<GetPostReported/>}/>
+        </Route> 
       </Routes>
     </Router>
   );
