@@ -9,4 +9,6 @@ router.post('/keep-post/:postId', middleware.verifyToken, adminController.keepPo
 
 router.delete('/delete-post/:postId', middleware.verifyToken, adminController.deletePost)
 
+router.get('/get-report-post/:postId', middleware.verifyToken, adminController.getContentReport)
+
 module.exports = router;

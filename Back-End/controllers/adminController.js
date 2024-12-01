@@ -138,6 +138,37 @@ const adminController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
+    },
+
+    getContentReport: async(req, res) => {
+        try {
+            const postId = req.params.postId
+            const reports = await ReportPostModel.find({ postId }).sort({ createdAt: -1 });
+
+            // Lấy thông tin tác giả từ UserModel
+            const userPromises = reports.map((post) => UserModel.findById(post.userId));
+            const authors = await Promise.all(userPromises);
+
+            const results = reports.map((post, index) => {
+                const author = authors[index];
+                return {
+                    _id: post._id,
+                    postId: post.postId,
+                    content: post.content,
+                    type: post.type,
+                    createdAt: post?.createdAt, // Thời điểm bị báo cáo
+                    author: {
+                        authorId: author?._id,
+                        authorName: author?.username,
+                        authorAvatar: author?.profilePicture,
+                    },
+                };
+            });
+
+            res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 }
 

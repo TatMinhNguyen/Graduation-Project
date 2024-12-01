@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getReportPosts } from '../../api/admin/admin'
+import { deletePost, getReportPosts, keepPost } from '../../api/admin/admin'
 import { useNavigate } from 'react-router-dom'
 import { convertNewlinesToBreaks, timeAgo } from '../../utils'
 import { SixPictures } from '../CssPictures/SixPictures'
@@ -14,13 +14,36 @@ import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer2 } from '../CssPictures/VideoPlayer2'
 import VideoPlayer from '../CssPictures/VideoPlayer'
+import LoadingSpinner from '../spinner/LoadingSpinner'
+import GetDetailReportPosts from './GetDetailReportPosts'
 
 const GetPostReported = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
     const posts = useSelector((state) => state.admin.posts)
 
+    const [showModal, setShowModal] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [selectedPost, setSelectedPost] = useState(null)
+    const [showDetailReport, setShowDetail] = useState(false)
+
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const handleShowComfirmDelete = (post) => {
+        setShowModal(true)
+        setSelectedPost(post)
+    }
+
+    const handleCancel = () => {
+        setShowModal(false)
+        setSelectedPost(null) 
+        setShowDetail(false)   
+    }
+
+    const handleShowDetail = (post) => {
+        setShowDetail(true)
+        setSelectedPost(post)
+    }
 
     const handleGetPosts = async() => {
         try {
@@ -32,6 +55,28 @@ const GetPostReported = () => {
 
     const handleGetUser = async(userId) => {
         navigate(`/get-profile/${userId}`)
+    }
+
+    const handleKeepPost = async (postId) => {
+        try {
+            await keepPost(user?.token, postId)
+            handleGetPosts();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleDeletePost = async (postId) => {
+        setLoading(true)
+        try {
+            await deletePost(user?.token, postId)
+            handleGetPosts();
+            handleCancel();
+        } catch (error) {
+            console.log(error)
+        } finally{
+            setLoading(false)
+        }
     }
 
       /* eslint-disable */
@@ -59,10 +104,12 @@ const GetPostReported = () => {
                     <div key={post.postId} 
                         className='flex items-center justify-center'
                     >
-                        <div className='bg-white w-1/2 my-2.5 border border-white shadow rounded-md'>
+                        <div className='bg-white w-3/5 my-2.5 border border-white shadow rounded-md'>
                             <div className='border-b mx-3 py-2 text-gray-500'>
                                 This post has been reported.
-                                <span className='text-customBlue text-[13px] ml-2 border-b border-customBlue italic cursor-pointer hover:text-purple-700 hover:border-purple-700'>
+                                <span className='text-customBlue text-[13px] ml-2 border-b border-customBlue italic cursor-pointer hover:text-purple-700 hover:border-purple-700'
+                                    onClick={()=> handleShowDetail(post)}
+                                >
                                     detail
                                 </span>
                             </div>
@@ -157,19 +204,57 @@ const GetPostReported = () => {
                             <div className='mx-3 py-4 border-t'>                          
                                 <div className='flex items-center justify-center'>
                                     <button className='bg-customBlue hover:bg-blue-600 font-medium mr-2 w-1/2 py-1 pb-1.5 rounded-md text-white'
-                                    // onClick={() => handleApprove(member._id)}
+                                        onClick={() => handleKeepPost(post.postId)}
                                     >
                                         Keep
                                     </button>
                                     <button className='bg-gray-200 hover:bg-gray-300 font-medium ml-2 w-1/2 py-1 pb-1.5 rounded-md'
-                                    // onClick={() => handleDecline(member._id)}
+                                        onClick={() => handleShowComfirmDelete(post)}
                                     >
                                         Remove
                                     </button>
                                 </div>                                 
                             </div>
+                            {showModal && selectedPost?.postId === post?.postId && (
+                                <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
+                                    <div className='w-1/3 bg-white p-4 rounded shadow-2xl border border-gray-100'>
+                                        <h2 className='flex justify-center text-lg italic font-semibold mb-2 pb-2 border-b border-gray-300'>
+                                            Delete {selectedPost?.author?.authorName}'s Post
+                                        </h2>
+                                        <p className='text-sm text-gray-600 mb-5'>
+                                            Are you sure you want to delete this post?
+                                        </p>
+                                        {loading ? (
+                                            <div className='flex justify-center'>
+                                                <LoadingSpinner/>
+                                            </div>
+                                        ):(
+                                            <div className='flex justify-end space-x-4'>
+                                                <button 
+                                                    className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
+                                                    onClick={()=> handleCancel()}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
+                                                        onClick={() => handleDeletePost(selectedPost?.postId)}
+                                                    >
+                                                    Delete
+                                                </button>
+                                            </div>                                        
+                                        )}
+                                    </div>
+                                </div>
+                            )}                            
                         </div>
-
+                        {showDetailReport && selectedPost?.postId === post?.postId && (
+                            <GetDetailReportPosts
+                                user={user}
+                                post={post}
+                                isClose={()=> handleCancel()}
+                            />
+                        )}
                     </div>
                 )
             })}
