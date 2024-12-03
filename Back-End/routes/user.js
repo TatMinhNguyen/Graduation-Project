@@ -34,4 +34,6 @@ router.post('/unblock/:userId', middleware.verifyToken, userController.setUnBloc
 //get block
 router.get('/get-block', middleware.verifyToken, userController.getBlocks)
 
+router.post('/report/:userId', middleware.verifyToken, userController.reportUser)
+
 module.exports = router;

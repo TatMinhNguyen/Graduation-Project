@@ -30,7 +30,8 @@ const friendController = {
                 { 
                     _id: { $nin: excludeUsers }, // Loại bỏ các người dùng đã xác định
                     isVerify: true, // Chỉ lấy những người dùng đã xác thực
-                    isAdmin: { $ne: true }
+                    isAdmin: { $ne: true },
+                    isBan: false
                 },
                 { 
                     _id: 1, 

@@ -1,5 +1,6 @@
 const PostModel = require("../models/PostModel");
 const ReportPostModel = require("../models/ReportPostModel");
+const ReportUserModel = require("../models/ReportUserModel");
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
@@ -49,7 +50,7 @@ const adminController = {
             // Gộp thông tin bài viết, tác giả, và thông tin báo cáo
             const results = validPosts.map((post, index) => {
                 const author = authors[index];
-                const report = reportedPosts.find((report) => report.postId === post._id.toString());
+                // const report = reportedPosts.find((report) => report.postId === post._id.toString());
                 return {
                     postId: post._id,
                     description: post.description,
@@ -166,6 +167,178 @@ const adminController = {
             });
 
             res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    getReportedUsers : async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await UserModel.findById(userId);
+
+            if (!user || !user.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            // Lấy danh sách bài viết bị báo cáo từ ReportPostModel, sắp xếp theo thời gian báo cáo (createdAt)
+            const reportedUsers = await ReportUserModel.find().sort({ createdAt: -1 });
+
+            if (!reportedUsers || reportedUsers.length === 0) {
+                return res.status(404).json({ message: "Không có user nào bị báo cáo." });
+            }
+
+            // Nhóm bài viết theo userId và chỉ giữ báo cáo sớm nhất
+            const uniqueUsers = {};
+            reportedUsers.forEach((report) => {
+                if (!uniqueUsers[report.reportedUserId]) {
+                    uniqueUsers[report.reportedUserId] = report;
+                }
+            });
+            const filteredUsers = Object.values(uniqueUsers);
+
+            // Tạo mảng promises để lấy thông tin bài viết từ PostModel
+            const userPromises = filteredUsers.map((report) =>
+                UserModel.findOne({
+                    _id: report.reportedUserId,
+                    $or: [
+                        { isBan: { $exists: false } }, // Không tồn tại thuộc tính isBan
+                        { isBan: false }               // Hoặc isBan có giá trị là false
+                    ]
+                })
+            );            
+            const users = await Promise.all(userPromises);
+
+            // Loại bỏ các user không tồn tại 
+            const validUsers = users.filter((user) => user);
+
+            if (!validUsers || validUsers.length === 0) {
+                return res.status(404).json({ message: "Không có bài viết hợp lệ." });
+            }
+
+            const results = validUsers.map((user, index) => {
+                // const author = authors[index];
+                const report = reportedUsers.find((report) => report.reportedUserId === user._id.toString());
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    createdAt: report.createdAt
+                };
+            });
+
+            return res.status(200).json(results)
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    setBan: async(req, res) => {
+        try {
+            const userId = req.params.userId;
+
+            const admin = await UserModel.findById(req.user.id)
+
+            if (!admin || !admin.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            const user = await UserModel.findById(userId)
+
+            if(!user) {
+                return res.status(404).json({message: "User not found"})
+            }
+
+            user.isBan = true;
+
+            await user.save();
+
+            return res.status(200).json({message: "Ban success"})
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    unBan: async(req, res) => {
+        try {
+            const userId = req.params.userId;
+
+            const admin = await UserModel.findById(req.user.id)
+
+            if (!admin || !admin.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            const user = await UserModel.findById(userId)
+
+            if(!user) {
+                return res.status(404).json({message: "User not found"})
+            }
+
+            user.isBan = false;
+
+            await user.save();
+
+            return res.status(200).json({message: "unBan success"})            
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    getDetailReportUser : async(req, res) => {
+        try {
+            const reportedUserId = req.params.userId
+            const reports = await ReportUserModel.find({ reportedUserId }).sort({ createdAt: -1 });
+
+            // Lấy thông tin tác giả từ UserModel
+            const userPromises = reports.map((user) => UserModel.findById(user.reporterUserId));
+            const authors = await Promise.all(userPromises);
+
+            const results = reports.map((user, index) => {
+                const author = authors[index];
+                return {
+                    _id: user._id,
+                    reportedUserId: user.reportedUserId,
+                    content: user.content,
+                    type: user.type,
+                    createdAt: user?.createdAt, // Thời điểm bị báo cáo
+                    author: {
+                        authorId: author?._id,
+                        authorName: author?.username,
+                        authorAvatar: author?.profilePicture,
+                    },
+                };
+            });
+
+            return res.status(200).json(results);            
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    getBannedUser : async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await UserModel.findById(userId);
+
+            if (!user || !user.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            const baners = await UserModel.find({ isBan: true })
+
+            const results = baners.map((user, index) => {
+                // const author = authors[index];
+                // const report = reportedUsers.find((report) => report.reportedUserId === user._id.toString());
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    // createdAt: report.createdAt
+                };
+            });
+
+            return res.status(200).json(results)
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }

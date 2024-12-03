@@ -15,32 +15,42 @@ const searchController =  {
         try {
             const userId = req.user.id;
             const searchInput = req.query.q || ""; // Lấy từ khóa tìm kiếm từ query params
-            
+    
             // Loại bỏ dấu tiếng Việt khỏi từ khóa tìm kiếm
             const searchKeyword = removeVietnameseTones(searchInput).toLowerCase();
     
-            // Tìm tất cả các bài viết có description khớp với từ khóa tìm kiếm
+            // Lấy tất cả các bài viết, sau đó loại bỏ bài viết từ user bị cấm
             const posts = await PostModel.find()
                 .sort({ createdAt: -1 })
-                .then(posts => {
+                .then(async posts => {
+                    const userIds = posts.map(post => post.userId);
+                    const bannedUsers = await UserModel.find({ _id: { $in: userIds }, isBan: true }).select('_id');
+                    const bannedUserIds = new Set(bannedUsers.map(user => user._id.toString()));
+    
                     return posts.filter(post => {
                         const postDescription = removeVietnameseTones(post.description).toLowerCase();
-                        return postDescription.includes(searchKeyword);
+                        return postDescription.includes(searchKeyword) && !bannedUserIds.has(post.userId.toString());
                     });
                 });
     
-            // Tìm tất cả người dùng có username khớp với từ khóa tìm kiếm
+            // Lấy tất cả người dùng hợp lệ
             const users = await UserModel.find(
-                { isVerify: true, _id: { $nin: userId }, isAdmin: { $ne: true }},
+                { 
+                    isVerify: true, 
+                    _id: { $nin: userId }, 
+                    isAdmin: { $ne: true }, 
+                    isBan: false 
+                },
                 { 
                     _id: 1, 
                     username: 1, 
                     profilePicture: 1, 
                     friends: 1, 
                     friendsCount: 1, 
-                    isVerify: 1
+                    isVerify: 1 
                 }
-            ).sort({ createdAt: -1 })
+            )
+            .sort({ createdAt: -1 })
             .then(users => {
                 return users.filter(user => {
                     const username = removeVietnameseTones(user.username).toLowerCase();
@@ -48,15 +58,15 @@ const searchController =  {
                 });
             });
     
-            // Lấy danh sách bạn bè của người dùng đang đăng nhập
+            // Lấy danh sách bạn bè của người dùng hiện tại
             const currentUser = await UserModel.findById(userId);
             const friends = currentUser.friends;
     
-            // Lấy thông tin người dùng tương ứng với mỗi bài viết
+            // Lấy thông tin người dùng của từng bài viết
             const userIds = posts.map(post => post.userId);
-            const postUsers = await UserModel.find({ _id: { $in: userIds } });
+            const postUsers = await UserModel.find({ _id: { $in: userIds }, isBan: false });
     
-            // Lấy thông tin cảm xúc của userId đối với từng post
+            // Lấy thông tin cảm xúc của userId đối với từng bài viết
             const feelPromises = posts.map(post => FeelModel.findOne({ userId: userId, postId: post._id }));
             const feels = await Promise.all(feelPromises);
     
@@ -95,11 +105,11 @@ const searchController =  {
             });
     
             return res.status(200).json({ posts: postResults, users: userResults });
-    
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
     }
+    
     
 }
 

@@ -117,6 +117,10 @@ const authController = {
                 return res.status(404).json("Account Invalid");
             }
 
+            if(user.isBan) {
+                return res.status(404).json('Account banned')
+            }
+
             // Generate access token
             const accessToken = authController.generateAccessToken(user);
 

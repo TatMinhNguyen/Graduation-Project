@@ -253,7 +253,7 @@ const postController = {
         }
     },
 
-    //Get all post
+    // Get all post
     getPosts: async (req, res) => {
         try {
             const userId = req.user.id;
@@ -262,19 +262,30 @@ const postController = {
             const posts = res.paginatedResults.results;
 
             // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
-            const userPromises = posts.map(post => UserModel.findById(post.userId));
-            
+            const userPromises = posts.map(post =>
+                UserModel.findById(post.userId)
+            );
+
             // Chờ tất cả các lời hứa hoàn thành
             const users = await Promise.all(userPromises);
 
-            // Tạo một mảng các lời hứa để lấy thông tin cảm xúc của userId đối với từng post
-            const feelPromises = posts.map(post => FeelModel.findOne({ userId: userId, postId: post._id }));
+            // Loại bỏ bài viết của user bị cấm
+            const filteredPosts = posts.filter((post, index) => {
+                const user = users[index];
+                return user && !user.isBan; // Loại bỏ nếu user bị ban
+            });
+
+            // Lấy thông tin cảm xúc của userId đối với từng bài viết sau khi đã lọc
+            const feelPromises = filteredPosts.map(post =>
+                FeelModel.findOne({ userId: userId, postId: post._id })
+            );
 
             // Chờ tất cả các lời hứa hoàn thành
             const feels = await Promise.all(feelPromises);
 
-            const results = posts.map((post, index) => {
-                const user = users[index];
+            // Tạo kết quả cuối cùng
+            const results = filteredPosts.map((post, index) => {
+                const user = users.find(u => u && u._id.equals(post.userId)); // Tìm user tương ứng
                 const feel = feels[index];
                 return {
                     postId: post._id,
@@ -294,11 +305,12 @@ const postController = {
                 };
             });
 
-            return res.status(200).json(results);            
+            return res.status(200).json(results);
         } catch (error) {
-            return res.status(500).json({ error: error.message});
+            return res.status(500).json({ error: error.message });
         }
     },
+
 
     // GET A POST
     getAPost: async(req, res) => {

@@ -35,6 +35,7 @@ import GetPendingPosts from './components/group/GetPendingPosts';
 import GetReportPosts from './components/group/GetReportPosts';
 import Admin from './pages/admin/Admin';
 import GetPostReported from './components/admin/GetPostReported';
+import GetBannedUser from './components/admin/GetBannedUser';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -87,6 +88,7 @@ function App() {
         </Route>  
         <Route path='/admin' element={<Admin/>}>
             <Route path='reported-posts' element={<GetPostReported/>}/>
+            <Route path='reported-users' element={<GetBannedUser/>}/>
         </Route> 
       </Routes>
     </Router>

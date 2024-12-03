@@ -281,38 +281,54 @@ const postGroupController = {
     getPosts: async (req, res) => {
         try {
             const userId = req.user.id;
-
             const groupId = req.params.groupId;
-
+    
+            // Tìm group dựa trên groupId
             const group = await GroupModel.findById(groupId);
     
             if (!group) {
                 return res.status(404).json({ error: "Group not found" });
             }
-
-            // Tìm tất cả các bài viết
-            const postPromises = res.paginatedResults.results;
-
-            let posts = postPromises.filter(post => post.groupId == groupId)
-
-            // Loại bỏ các bài viết có id trùng với group.pendingPosts
-            const pendingPostIds = group.pendingPosts.map(postId => postId.toString());
-            posts = posts.filter(post => !pendingPostIds.includes(post._id.toString()));
-
-            // Tạo một mảng các lời hứa (promises) để lấy thông tin người dùng tương ứng với mỗi bài viết
+    
+            // Lấy tất cả các bài viết từ kết quả phân trang
+            let posts = res.paginatedResults.results.filter(post => post.groupId == groupId);
+    
+            // Loại bỏ các bài viết có ID nằm trong group.pendingPosts
+            const pendingPostIds = new Set(group.pendingPosts.map(postId => postId.toString()));
+            posts = posts.filter(post => !pendingPostIds.has(post._id.toString()));
+    
+            if (!posts.length) {
+                return res.status(404).json({ error: "No posts found in this group" });
+            }
+    
+            // Lấy thông tin người dùng của từng bài viết
             const userPromises = posts.map(post => UserModel.findById(post.userId));
-            
-            // Chờ tất cả các lời hứa hoàn thành
             const users = await Promise.all(userPromises);
-
-            // Tạo một mảng các lời hứa để lấy thông tin cảm xúc của userId đối với từng post
-            const feelPromises = posts.map(post => FeelModel.findOne({ userId: userId, postId: post._id }));
-
-            // Chờ tất cả các lời hứa hoàn thành
-            const feels = await Promise.all(feelPromises);
-
-            const results = posts.map((post, index) => {
+    
+            // Loại bỏ các bài viết từ user bị cấm
+            const validPosts = [];
+            const validUsers = [];
+            posts.forEach((post, index) => {
                 const user = users[index];
+                if (user && !user.isBan) {
+                    validPosts.push(post);
+                    validUsers.push(user);
+                }
+            });
+    
+            if (!validPosts.length) {
+                return res.status(404).json({ error: "No valid posts found in this group" });
+            }
+    
+            // Lấy thông tin cảm xúc của userId đối với từng bài viết hợp lệ
+            const feelPromises = validPosts.map(post =>
+                FeelModel.findOne({ userId: userId, postId: post._id })
+            );
+            const feels = await Promise.all(feelPromises);
+    
+            // Tạo kết quả trả về
+            const results = validPosts.map((post, index) => {
+                const user = validUsers[index];
                 const feel = feels[index];
                 return {
                     postId: post._id,
@@ -332,13 +348,13 @@ const postGroupController = {
                     }
                 };
             });
-
-            return res.status(200).json(results);            
+    
+            return res.status(200).json(results);
         } catch (error) {
-            return res.status(500).json({ error: error.message});
+            return res.status(500).json({ error: error.message });
         }
     },
-
+    
     getAPost: async(req, res) => {
         try {
             const postId = req.params.postId

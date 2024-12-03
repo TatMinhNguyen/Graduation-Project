@@ -1,10 +1,13 @@
 import React from 'react'
 import NavBar from '../../components/navbar/NavBar'
 import { useSelector } from 'react-redux'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 const Admin = () => {
   const user = useSelector((state) => state.auth.login?.currentUser)
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className='bg-gray-100 min-h-screen'>
@@ -19,6 +22,58 @@ const Admin = () => {
                     <h1 className='font-bold text-2xl ml-1 pb-3'>
                         Admin
                     </h1>
+                </div>
+                <div className='mt-3'>
+                    <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/admin/reported-posts` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
+                        onClick={() => navigate(`/admin/reported-posts`)}
+                    >
+                        {location.pathname === `/admin/reported-posts` ? (
+                            <div
+                            className="xtwfq29"
+                            style={{
+                                width: '20px',
+                                height: '20px',
+                                backgroundColor: '#0866FF',
+                                maskImage: `url(${require('../../assets/icons/post1.png')})`,
+                                maskSize: '20px 20px',
+                                maskPosition: '0px 0px',
+                            }}
+                            ></div>
+                        ) : (
+                            <img className='w-5 h-5'
+                            src={require('../../assets/icons/post.png')}
+                            alt=''
+                            />
+                        )}
+                        <p className={`ml-3 text-[16px] font-medium ${location.pathname === `/admin/reported-posts` ? 'text-customBlue' : ''}`}>
+                            Reported posts
+                        </p>
+                    </div>
+                    <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/admin/reported-users` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
+                        onClick={() => navigate(`/admin/reported-users`)}
+                    >
+                        {location.pathname === `/admin/reported-users` ? (
+                            <div
+                            className="xtwfq29"
+                            style={{
+                                width: '20px',
+                                height: '20px',
+                                backgroundColor: '#0866FF',
+                                maskImage: `url(${require('../../assets/icons/report-post.png')})`,
+                                maskSize: '20px 20px',
+                                maskPosition: '0px 0px',
+                            }}
+                            ></div>
+                        ) : (
+                            <img className='w-5 h-5'
+                            src={require('../../assets/icons/report.png')}
+                            alt=''
+                            />
+                        )}
+                        <p className={`ml-3 text-[16px] font-medium ${location.pathname === `/admin/reported-users` ? 'text-customBlue' : ''}`}>
+                            Reported users 
+                        </p>
+                    </div>
                 </div>
             </div>
             <div className='flex-1'></div>

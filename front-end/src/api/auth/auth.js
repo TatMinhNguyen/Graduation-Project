@@ -11,7 +11,15 @@ export const loginUser = async (user, dispatch, navigate) => {
         navigate("/");
     } catch (error) {
         console.log(error);
-        alert("Account or password is incorrect!");
+        if(error?.response.data === 'Account banned'){
+            alert("Your account has been banned! Please contact admin for more details.");
+        }
+        if(error?.response.data === 'Incorrect password or email'){
+            alert("Account or password is incorrect!");
+        }
+        if(error?.response.data === "Account Invalid"){
+            alert("Account Invalid");
+        } 
     }
 };
 

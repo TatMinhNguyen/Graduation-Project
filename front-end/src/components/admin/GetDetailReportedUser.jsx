@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { getContentReportPosts } from '../../api/admin/admin'
+import { getDetailReportUser } from '../../api/admin/admin'
+import { useSelector } from 'react-redux'
 
-const GetDetailReportPosts = ({user, post, isClose}) => {
-    const [data, setData] = useState([])
+const GetDetailReportedUser = ({user, isClose}) => {
+    const token = useSelector((state) => state.auth.login?.currentUser?.token)
+
+    const [datas, setData] = useState([])
 
     const handleGetReport = async() => {
         try {
-            const res = await getContentReportPosts(user?.token, post?.postId)
+            const res = await getDetailReportUser(token, user?._id)
             setData(res);
         } catch (error) {
             console.log(error)
@@ -15,7 +18,7 @@ const GetDetailReportPosts = ({user, post, isClose}) => {
 
     /* eslint-disable */
     useEffect(() => {
-        if(user?.token) {
+        if(token) {
             handleGetReport()
         }
     },[])
@@ -24,7 +27,7 @@ const GetDetailReportPosts = ({user, post, isClose}) => {
         <div className="bg-white rounded-lg shadow-lg w-full max-w-lg h-[80vh]">
             <div className="flex justify-end items-center p-3 py-2">
                 <h3 className="text-lg font-medium flex-1 flex items-center justify-center">
-                    Details of {post?.author?.authorName}'s post reports
+                    Details of {user?.username}'s reports
                 </h3>
                 <button  onClick={()=> isClose()}
                     className="w-7 h-7 bg-gray-200 rounded-full hover:bg-gray-300 flex items-center justify-center"
@@ -35,9 +38,9 @@ const GetDetailReportPosts = ({user, post, isClose}) => {
                         className='w-4 h-4 '
                     />
                 </button>
-            </div>
+            </div> 
             <div>
-                {data?.map((report) => (
+                {datas?.map((report) => (
                     <div key={report._id}>
                         <div className='pl-4 pr-1 pt-4 pb-1 flex items-center'>
                             <div className='w-9 h-9 overflow-hidden rounded-full'>
@@ -51,23 +54,21 @@ const GetDetailReportPosts = ({user, post, isClose}) => {
                                 <p className='text-sm text-gray-500 ml-2'>
                                     <strong className='font-medium text-black mr-0.5'>
                                         {report.author.authorName}    
-                                    </strong>  reported this post for  
+                                    </strong>  reported this user for  
                                     {report.type === 1 ? (
                                         <strong className='font-medium pl-1.5 text-black'>
-                                            nudity or sexual activity.
+                                            pretending to be someone.
                                         </strong>                                  
                                     ) : report.type === 2 ? (
-                                        <strong className='font-medium pl-1.5 text-black'>bullying or harassment.</strong>
+                                        <strong className='font-medium pl-1.5 text-black'>fake account.</strong>
                                     ) : report.type === 3 ? (
-                                        <strong className='font-medium pl-1.5 text-black'>suicide, self-injury or eating disorders.</strong>
+                                        <strong className='font-medium pl-1.5 text-black'>fake name.</strong>
                                     ) : report.type === 4 ? (
-                                        <strong className='font-medium pl-1.5 text-black'>violence, hate or exploitation.</strong>
+                                        <strong className='font-medium pl-1.5 text-black'>posting inappropriate things.</strong>
                                     ) : report.type === 5 ? (
-                                        <strong className='font-medium pl-1.5 text-black'>selling or promoting restricted items.</strong>
-                                    ) : report.type === 6 ? (
-                                        <strong className='font-medium pl-1.5 text-black'>scam, fraud or impersonation.</strong>
+                                        <strong className='font-medium pl-1.5 text-black'>harassment or bullying.</strong>
                                     ) : (
-                                        <strong className='font-medium pl-1.5 text-black'>don't like it.</strong>
+                                        <strong className='font-medium pl-1.5 text-black'>scam, fraud or impersonation.</strong>
                                     )}  
                                 </p>    
                             </div>                            
@@ -81,11 +82,11 @@ const GetDetailReportPosts = ({user, post, isClose}) => {
                             </div>
                         )}
                     </div>
-                ))}
-            </div>
+                ))}    
+            </div>          
         </div>
     </div>
   )
 }
 
-export default GetDetailReportPosts
+export default GetDetailReportedUser

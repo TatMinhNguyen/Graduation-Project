@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setPosts } from "../../redux/adminSlice";
+import { setPosts, setUsers } from "../../redux/adminSlice";
 
 export const getReportPosts = async (token, dispatch) => {
     try {
@@ -38,6 +38,48 @@ export const getContentReportPosts = async (token, postId) => {
         const res = await axios.get(`${apiUrl}/admin/get-report-post/${postId}`, {
             headers: { token: `Bearer ${token}` },
         });
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getReportedUser = async (token, dispatch) => {
+    try {
+        const res = await axios.get(`${apiUrl}/admin/get-reported-user`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        dispatch(setUsers(res.data))        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const setBan = async (token, userId) => {
+    try {
+        await axios.post(`${apiUrl}/admin/ban-user/${userId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        });      
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const unBan = async (token, userId) => {
+    try {
+        await axios.post(`${apiUrl}/admin/unban-user/${userId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        });      
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getDetailReportUser = async(token, userId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/admin/get-detail-report-user/${userId}`, {
+            headers: {token: `Bearer ${token}`}
+        })
         return res.data
     } catch (error) {
         console.log(error)

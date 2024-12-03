@@ -1,3 +1,4 @@
+const ReportUserModel = require("../models/ReportUserModel");
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
@@ -253,6 +254,33 @@ const userController = {
             return res.status(500).json({error: error.message})
         }
     },
+
+    reportUser: async(req, res) => {
+        try {
+           const currentUserId = req.user.id;
+           const targetUserId = req.params.userId;
+           const {content, type} = req.body;
+           
+           const user = await UserModel.findById(targetUserId)
+
+           if(!user) {
+               return res.status(404).json({ error: "User not found" })
+           }
+
+           const newReport = new ReportUserModel({
+                reporterUserId: currentUserId,
+                reportedUserId: targetUserId,
+                content: content,
+                type: type,
+           })
+
+           await newReport.save();
+
+           return res.status(200).json({message: 'Report success'})
+        } catch (error) {
+            return res.status(500).json({ error: error.message});
+        }
+    }
 }
 
 module.exports = userController

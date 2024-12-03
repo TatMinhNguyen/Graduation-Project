@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const INIT = {
     posts:[],
+    users:[]
 }
 
 const admin = createSlice({
@@ -12,11 +13,16 @@ const admin = createSlice({
             state.posts = action.payload;
             return state;
         },
+        setUsers: (state, action) => {
+            state.users = action.payload;
+            return state
+        }
     }
 })
 
 export const { 
     setPosts,
+    setUsers
   } = admin.actions
 
 export default admin.reducer
