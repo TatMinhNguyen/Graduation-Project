@@ -1,8 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { getUserGroups } from '../../api/group/group';
 
-const LeftBar = ({profile}) => {
+const LeftBar = ({profile, user}) => {
   const navigate = useNavigate();
+  const [groups, setGroups] = useState([])
+  console.log(groups)
+
+  const handleGetUserGroup = async () => {
+    try {
+      const result = await getUserGroups(user?.token)
+      setGroups(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  /* eslint-disable */
+  useEffect(()=> {
+    handleGetUserGroup();
+  },[])
   return (
     <div className='w-[22vw] -mt-3'>
       {!profile?.isAdmin && (
@@ -62,7 +79,7 @@ const LeftBar = ({profile}) => {
         </p>       
       </div>
 
-      <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md'
+      <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 rounded-md mb-1.5'
         onClick={() => navigate('/groups')}
       >
         <div className='h-9 w-9'
@@ -74,6 +91,24 @@ const LeftBar = ({profile}) => {
         </p>       
       </div>
 
+      <div className='border-t border-gray-300'>
+        <h1 className='font-medium text-gray-500 mt-1 ml-1'>
+          Your shortcuts
+        </h1>
+        <div>
+          {groups?.map((group) => (
+            <div key={group._id} className='flex items-center mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'>
+              <img className='w-10 h-10 rounded-md object-cover'
+                src={group.avatar}
+                alt=''
+              />
+              <h1 className='font-medium text-[15px] ml-3'>
+                {group.name}  
+              </h1> 
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

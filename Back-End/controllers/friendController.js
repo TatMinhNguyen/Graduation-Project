@@ -194,9 +194,9 @@ const friendController = {
                 return res.status(404).json({ message: 'Người dùng gửi lời mời không tồn tại.' });
             }
             // Kiểm tra xem có lời mời kết bạn từ requesterUser không
-            if (!currentUser.friendRequested.includes(userId)) {
+            if (!currentUser.friendRequested.some(id => id.toString() === userId)) {
                 return res.status(400).json({ message: 'Không có lời mời kết bạn từ người dùng này.' });
-            }
+            }            
 
             // Xóa ID khỏi danh sách friendRequested và friendRequesting
             currentUser.friendRequested = currentUser.friendRequested.filter(id => id.toString() !== userId);
@@ -257,7 +257,7 @@ const friendController = {
                 return res.status(404).json({ message: 'Người dùng gửi lời mời không tồn tại.' });
             }
             // Kiểm tra xem có lời mời kết bạn từ requesterUser không
-            if (!currentUser.friendRequested.includes(userId)) {
+            if (!currentUser.friendRequested.some(id => id.toString() === userId)) {
                 return res.status(400).json({ message: 'Không có lời mời kết bạn từ người dùng này.' });
             }
 

@@ -50,10 +50,13 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: []
     },
-    friendRequested: {
-      type: Array,
-      default: []
-    },
+    friendRequested: [
+      { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'UserModel', 
+        default: []
+      }
+    ],
     friendRequesting: {
       type: Array,
       default: []
