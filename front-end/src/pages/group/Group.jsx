@@ -152,7 +152,7 @@ const Group = () => {
                             {groupManages?.map((group) => (
                                 <div key={group._id}
                                     onClick={() => navigate(`/groups/${group._id}`)}
-                                    className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg'
+                                    className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg cursor-pointer'
                                 >
                                     <div className='w-12 h-12 min-w-[3rem] min-h-[3rem]'>
                                         <img className='w-full h-full object-cover rounded-md'
@@ -193,7 +193,7 @@ const Group = () => {
                             {groupJoined?.map((group) => (
                                 <div key={group._id}
                                     onClick={() => navigate(`/groups/${group._id}`)}
-                                    className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg'
+                                    className='flex-1 flex items-center py-1.5 px-2 hover:bg-gray-100 rounded-lg cursor-pointer'
                                 >
                                     <div className='w-12 h-12 min-w-[3rem] min-h-[3rem]'>
                                         <img className='w-full h-full object-cover rounded-md'

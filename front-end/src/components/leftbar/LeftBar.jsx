@@ -5,7 +5,6 @@ import { getUserGroups } from '../../api/group/group';
 const LeftBar = ({profile, user}) => {
   const navigate = useNavigate();
   const [groups, setGroups] = useState([])
-  console.log(groups)
 
   const handleGetUserGroup = async () => {
     try {
@@ -16,12 +15,16 @@ const LeftBar = ({profile, user}) => {
     }
   }
 
+  const handleGetGroup = async(groupId) => {
+    navigate(`/groups/${groupId}`)
+  }
+
   /* eslint-disable */
   useEffect(()=> {
     handleGetUserGroup();
   },[])
   return (
-    <div className='w-[22vw] -mt-3'>
+    <div className='w-[22vw] -mt-1 overflow-y-auto h-[91vh] no-scrollbar'>
       {!profile?.isAdmin && (
         <div className='flex items-center cursor-pointer hover:bg-gray-200 px-2 py-2 w-full rounded-md'
           onClick={()=> navigate(`/get-profile/${profile?._id}`)}
@@ -97,7 +100,9 @@ const LeftBar = ({profile, user}) => {
         </h1>
         <div>
           {groups?.map((group) => (
-            <div key={group._id} className='flex items-center mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'>
+            <div key={group._id} className='flex items-center mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'
+              onClick={()=> handleGetGroup(group._id)}
+            >
               <img className='w-10 h-10 rounded-md object-cover'
                 src={group.avatar}
                 alt=''

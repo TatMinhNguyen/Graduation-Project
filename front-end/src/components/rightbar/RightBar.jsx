@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { getFriends, getRequested } from '../../api/friends/friends'
 import { Link, useNavigate } from 'react-router-dom'
+import socket from '../../socket/index'
+import { createChat1vs1 } from '../../api/chat/chat'
 
 const RightBar = ({user}) => {
   const [requestFriends, setRequestFriends] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const navigate = useNavigate();
 
@@ -27,16 +30,37 @@ const RightBar = ({user}) => {
     }
   }
 
+  const handleCreateChat = async (userId) => {
+    try {
+        await createChat1vs1(user?.token, userId, navigate)
+    } catch (error) {
+        console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    // Lắng nghe sự kiện onlineUsers từ server
+    socket.on("onlineUsers", (users) => {
+      // console.log("Online users:", users);
+      setOnlineUsers(users);
+    });
+
+    // Cleanup
+    return () => {
+      socket.off("onlineUsers");
+    };
+  }, []);
+
   /* eslint-disable */
   useEffect(()=> {
     handleGetRequestFriends();
     handleGetFriends();
   },[])
   return (
-    <div className='w-[22vw] -mt-2'>
-      <div className='border-b border-gray-300 pb-1 mx-2'>
+    <div className='w-[22vw] -mt-2 overflow-y-auto h-[94vh] no-scrollbar relative'>
+      <div className=' pb-1 mx-2'>
         {requestFriends?.length > 0 && (
-          <div>
+          <div className='border-b border-gray-300'>
             <h1 className='font-medium text-gray-500 ml-1'>
               Friend requests
             </h1>
@@ -73,24 +97,34 @@ const RightBar = ({user}) => {
           </div>
         )}
       </div>
-      <div className='border-b border-gray-300 pb-2 mx-2 my-2'>
-        <h1 className='font-medium text-gray-500 ml-1'>
-          Contacts
-        </h1>         
-        {friends?.map((user) => (
-          <div key={user._id} className='flex items-center mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'>
-            <div className='h-10 w-10 mr-3'>
-              <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 fixed ml-8 mt-7'></div>
-              <img className='h-full w-full object-cover rounded-full hover:opacity-90'
-                src={user?.profilePicture}
-                alt="User Avatar" 
-              />            
-            </div>  
-            <h1 className='font-medium text-[15px]'>
-              {user.username}  
-            </h1>           
+      <div className=' pb-2 mx-2 my-2'>
+        {friends?.length > 0 && (
+          <div className=''>
+            <h1 className='font-medium text-gray-500 ml-1'>
+              Contacts
+            </h1>  
+            {friends?.map((user) => (
+              <div key={user._id} className='flex items-center mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'
+                onClick={() => handleCreateChat(user._id)}
+              >
+                <div className='h-10 w-10 mr-3'>
+                  {onlineUsers?.includes(user._id) && (
+                    <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
+                  )}
+                  <img className='h-full w-full object-cover rounded-full'
+                    src={user?.profilePicture}
+                    alt="User Avatar" 
+                  />            
+                </div>  
+                <h1 className='font-medium text-[15px]'>
+                  {user.username}  
+                </h1>           
+              </div>
+            ))}                        
           </div>
-        ))}
+        )}
+       
+
       </div>
     </div>
   )

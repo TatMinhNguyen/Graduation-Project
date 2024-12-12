@@ -297,9 +297,9 @@ const postGroupController = {
             const pendingPostIds = new Set(group.pendingPosts.map(postId => postId.toString()));
             posts = posts.filter(post => !pendingPostIds.has(post._id.toString()));
     
-            if (!posts.length) {
-                return res.status(404).json({ error: "No posts found in this group" });
-            }
+            // if (!posts.length) {
+            //     return res.status(404).json({ error: "No posts found in this group" });
+            // }
     
             // Lấy thông tin người dùng của từng bài viết
             const userPromises = posts.map(post => UserModel.findById(post.userId));
@@ -316,9 +316,9 @@ const postGroupController = {
                 }
             });
     
-            if (!validPosts.length) {
-                return res.status(404).json({ error: "No valid posts found in this group" });
-            }
+            // if (!validPosts.length) {
+            //     return res.status(404).json({ error: "No valid posts found in this group" });
+            // }
     
             // Lấy thông tin cảm xúc của userId đối với từng bài viết hợp lệ
             const feelPromises = validPosts.map(post =>

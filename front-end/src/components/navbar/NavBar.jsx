@@ -34,14 +34,14 @@ const NavBar = ({user}) => {
           console.log("Connected to server via WebSocket");
         });
 
+        socket.emit('online')
+
         socket.on("notification", (newNotification) => {
           console.log("New notification:", newNotification);
           // Cập nhật state thông báo
           setNotifications((prev) => [newNotification, ...prev]);
         }); 
 
-
-      
         return () => {
           socket.off("connect");
         };
@@ -249,7 +249,7 @@ const NavBar = ({user}) => {
                 </div>
                 {showModalNotification && (
                     <div ref={notificationRef} 
-                        className='absolute w-1/5 top-full mt-1 right-2 bg-white border border-white rounded-md shadow-xl z-50 p-3 px-0.5 max-h-[90vh] overflow-y-auto'
+                        className='absolute w-[24vw] top-full mt-1 right-2 bg-white border border-white rounded-md shadow-xl z-50 p-3 px-0.5 max-h-[90vh] overflow-y-auto'
                     >
                         <GetNotifications
                             notifications = {notifications}

@@ -7,7 +7,7 @@ import { timeAgoShort } from '../../utils';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 import socket from '../../socket';
 import GetDetailConversation from './GetDetailConversation';
-import VideoCall from './VideoCall';
+import VideoCall from './VideoCall/VideoCall';
 
 const GetMessages = () => {
   const chat = useSelector((state) => state.chat.chat)
@@ -190,7 +190,7 @@ const GetMessages = () => {
 
         {/*  */}
         {showVideoCall && (
-            <VideoCall 
+            <VideoCall
                 myId={user?.userId} 
                 receiverIds={[remoteIds]}
                 roomId={chatId}

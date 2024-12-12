@@ -25,7 +25,8 @@ const postController = {
                     folder: '/images' // Thư mục lưu ảnh
                 });
             }) : [];
-    
+            
+            //Upload video lên ImageKit
             const videoUploadPromise = req.files.video ? imagekit.upload({
                 file: req.files.video[0].buffer, // buffer video từ multer
                 fileName: req.files.video[0].originalname,

@@ -1,113 +1,82 @@
 const { Server } = require('socket.io');
 
 let io;
-
-let userSocketMap = {}; 
+const userSocketMap = {}; // Lưu trữ ánh xạ giữa userId và socketId
 
 const socketConfig = (server) => {
-  // Tạo một instance của Socket.IO
+  // Khởi tạo một instance của Socket.IO
   io = new Server(server, {
     cors: {
-      origin: "*",  // Bạn có thể giới hạn các domain nếu cần
+      origin: "*", // Có thể giới hạn origin sau này
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: false,
-    }
+    },
   });
 
   // Sự kiện kết nối
   io.on('connection', (socket) => {
     console.log(`User connected with socket ID: ${socket.id}`);
 
+    // Đăng ký userId và ánh xạ với socketId
     socket.on('register', (userId) => {
-      userSocketMap[userId] = socket.id;  // Ánh xạ userId từ DB với socket.id
+      if (!userId) return; // Validate userId
+
+      // Gán userId vào socket để xử lý disconnect dễ dàng hơn
+      socket.userId = userId;
+      userSocketMap[userId] = socket.id;
+
       console.log(`User ${userId} is mapped to socket ID ${socket.id}`);
     });
 
-    // Nhận tín hiệu offer và chuyển tiếp
-    socket.on("send-offer", ({ offer, to, from }) => {
-      // console.log(to)
-      to?.forEach((receiverId) => {
-        const receiverSocketId = userSocketMap[receiverId]; // Lấy socket.id của từng người
-        if (receiverSocketId) {
-          io.to(receiverSocketId).emit("receive-offer", { offer, from });
-          console.log(`Forwarded offer from ${socket.id} to ${receiverId}`);
-        } else {
-          console.error(`User1 ${receiverId} is not connected`);
-        }
-      });
-  });
-  
+    socket.on('online', () => {
+      emitOnlineUsers();
+    })
 
-    // Nhận tín hiệu answer và chuyển tiếp
-    socket.on("send-answer", ({ answer, to }) => {
-      const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
-      if (receiverSocketId) {
-          io.to(receiverSocketId).emit("receive-answer", { answer, from: socket.id });
-          console.log(`Forwarded answer from ${socket.id} to ${to}`);
-      } else {
-          console.error(`User2 ${to} is not connected`);
-      }
+    // Tham gia vào một phòng cụ thể
+    socket.on('join-room', ({ peerId }) => {
+      console.log(`${peerId} joined the room`);
+      socket.broadcast.emit('user-connected', peerId);
     });
 
-    // Nhận ICE candidate và chuyển tiếp
-    socket.on("send-candidate", ({ candidate, to }) => {
-        const receiverSocketId = userSocketMap[to]; // Lấy socket.id của người nhận
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit("receive-candidate", { candidate, from: socket.id });
-            console.log(`Forwarded candidate from ${socket.id} to ${to}`);
-        } else {
-            console.error(`User3 ${to} is not connected`);
-        }
-    });
-
-    // Ngắt kết nối
+    // Xử lý ngắt kết nối
     socket.on('disconnect', () => {
-      console.log(`User disconnected: ${socket.id}`);
-      // Xóa ánh xạ khi người dùng ngắt kết nối
-      for (let userId in userSocketMap) {
-        if (userSocketMap[userId] === socket.id) {
-          delete userSocketMap[userId];
-          console.log(`Socket ID ${socket.id} removed for user ${userId}`);
-        }
+      if (socket.userId) {
+        delete userSocketMap[socket.userId];
+        console.log(`User ${socket.userId} disconnected, socket ID ${socket.id} removed`);
+        emitOnlineUsers();
       }
     });
   });
+
+  // Phát danh sách online hiện tại
+  const emitOnlineUsers = () => {
+    io.emit('onlineUsers', Object.keys(userSocketMap));
+  };
 };
 
 const sendNotification = (receiverIds, notification) => {
-  receiverIds.forEach(userId => {
-    const socketId = userSocketMap[userId];  // Lấy socket.id từ ánh xạ userId
+  emitToUsers(receiverIds, 'notification', notification);
+};
+
+const sendMessage = (receiverIds, message) => {
+  emitToUsers(receiverIds, 'send-message', message);
+};
+
+const sendChats = (receiverIds) => {
+  emitToUsers(receiverIds, 'send-chat');
+};
+
+// Hàm chung để gửi dữ liệu đến một hoặc nhiều user
+const emitToUsers = (receiverIds, eventName, data = null) => {
+  receiverIds.forEach((userId) => {
+    const socketId = userSocketMap[userId];
     if (socketId) {
-      io.to(socketId).emit('notification', notification);  // Gửi thông báo tới client
-      console.log(`Notification sent to userId ${userId} with socket ID ${socketId}`);
+      io.to(socketId).emit(eventName, data);
+      console.log(`Event '${eventName}' sent to userId ${userId} with socket ID ${socketId}`);
     } else {
       console.log(`User ${userId} is not connected`);
     }
   });
 };
-
-const sendMessage = (receiverIds, message) => {
-  receiverIds.forEach(userId => {
-    const socketId = userSocketMap[userId];
-    if(socketId) {
-      io.to(socketId).emit('send-message', message);
-      console.log(`Message sent to userId ${userId} with socket ID ${socketId}`);
-    } else {
-      console.log(`User ${userId} is not connected`);
-    }
-  })
-}
-
-const sendChats = (receiverIds) => {
-  receiverIds.forEach(userId => {
-    const socketId = userSocketMap[userId];
-    if(socketId) {
-      io.to(socketId).emit('send-chat');
-      console.log(`Message sent to userId ${userId} with socket ID ${socketId}`);
-    } else {
-      console.log(`User ${userId} is not connected`);
-    }
-  })
-}
 
 module.exports = { socketConfig, sendNotification, sendMessage, sendChats };
