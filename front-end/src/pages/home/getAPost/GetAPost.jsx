@@ -22,6 +22,7 @@ import LoadingSpinner from '../../../components/spinner/LoadingSpinner';
 import GetFeft from '../../../components/comment/GetFeft';
 import NavBar from '../../../components/navbar/NavBar';
 import { getAPostGroup } from '../../../api/group/group';
+import socket from '../../../socket';
 
 const GetAPost = () => {
     const { postId } = useParams();
@@ -45,8 +46,23 @@ const GetAPost = () => {
     const [showFelter, setShowFelter] = useState(false)
 
     const [loading, setLoading] = useState(false)
+    const [onlineUsers, setOnlineUsers] = useState([]);
 
     const post = postPromise || postGroup;
+
+    useEffect(() => {
+        socket.emit('online')
+        // Lắng nghe sự kiện onlineUsers từ server
+        socket.on("onlineUsers", (users) => {
+          // console.log("Online users:", users);
+          setOnlineUsers(users);
+        });
+    
+        // Cleanup
+        return () => {
+          socket.off("onlineUsers");
+        };
+    }, []);
 
     const handleMouseEnter = (postId) => {
         setHoveredPostId(postId);
@@ -241,6 +257,9 @@ const GetAPost = () => {
                     <div className='py-2 h-[calc(100%)] p-0 '>
                         <div>
                             <div className='flex-1 flex items-center mx-3 mb-2'>
+                                {onlineUsers?.includes(post?.author?.authorId) && (
+                                    <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
+                                )}
                                 <div className='w-10 h-10'>
                                     <img className='h-full w-full object-cover rounded-full  hover:opacity-90'
                                         src= {post?.author?.authorAvatar}

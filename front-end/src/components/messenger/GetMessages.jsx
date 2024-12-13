@@ -11,7 +11,7 @@ import VideoCall from './VideoCall/VideoCall';
 
 const GetMessages = () => {
   const chat = useSelector((state) => state.chat.chat)
-//   console.log(chat?.members)
+//   console.log(chat)
   const { chatId } = useParams();
   const imageInputRef = useRef(null);
   const loadMoreTopRef = useRef(null);
@@ -24,6 +24,10 @@ const GetMessages = () => {
   const [showConversation, setShowConversation] = useState(false)
   const [showVideoCall, setShowVideoCall] = useState(false)
 
+    const [onlineUsers, setOnlineUsers] = useState([]);
+
+    const onlineUserSet = new Set(onlineUsers);
+
   const [params, setParams] = useState({
     page: 1,
     index: 20,
@@ -32,6 +36,25 @@ const GetMessages = () => {
   const remoteIds = chat?.members?.filter((member) => member !== user?.userId); 
 
   const dispatch = useDispatch();
+
+  const filteredMembers = chat?.members.filter((memberId) => memberId !== user?.userId);
+
+  // Kiểm tra nếu có ít nhất 1 id trong filteredMembers trùng với onlineUser
+  const isOnline = filteredMembers.some((memberId) => onlineUserSet?.has(memberId));
+
+  useEffect(() => {
+    socket.emit('online')
+    // Lắng nghe sự kiện onlineUsers từ server
+    socket.on("onlineUsers", (users) => {
+    //   console.log("Online users:", users);
+      setOnlineUsers(users);
+    });
+
+    // Cleanup
+    return () => {
+      socket.off("onlineUsers");
+    };
+  }, []);
 
   const handleGetMess = async () => {
     try {
@@ -150,6 +173,9 @@ const GetMessages = () => {
     <div className="relative flex flex-col ">
         {/* Header cố định */}
         <div className='fixed w-[calc(65vw-12px)] flex items-center h-[7vh] min-h-14 bg-white rounded-t-lg border border-white shadow z-10'>
+            {isOnline && (
+                <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[30px] ml-[40px]'></div>
+            )}
             <div className='w-10 h-10 ml-3'>
                 <img className='h-full w-full object-cover rounded-full'
                     src={chat?.avatar}

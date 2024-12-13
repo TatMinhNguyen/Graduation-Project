@@ -18,6 +18,7 @@ import ChangeBackground from '../../components/changeProfile/ChangeBackground';
 import ChangeProfile from '../../components/changeProfile/ChangeProfile';
 import { acceptRequest, cancelFriend, cancelRequest, refuseRequest, requestFriends } from '../../api/friends/friends';
 import { createChat1vs1 } from '../../api/chat/chat';
+import socket from '../../socket';
 
 const Profile = () => {
     const { userId } = useParams();
@@ -38,9 +39,24 @@ const Profile = () => {
     const [isAbove, setIsAbove] = useState(false);
     const [confirmationModal, setConfirmationModal] = useState(false);
 
+    const [onlineUsers, setOnlineUsers] = useState([]);
+
     const navigation = useNavigate();
     const dispatch = useDispatch();
     const modalRef = useRef(null);
+
+    useEffect(() => {
+        // Lắng nghe sự kiện onlineUsers từ server
+        socket.on("onlineUsers", (users) => {
+          // console.log("Online users:", users);
+          setOnlineUsers(users);
+        });
+    
+        // Cleanup
+        return () => {
+          socket.off("onlineUsers");
+        };
+    }, []);
 
     const handleThreeDotsClick = (event) => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -184,7 +200,6 @@ const Profile = () => {
         handleGetUser();
     },[userId, dispatch])
 
-    // console.log(profile)
 
     useEffect(() => {
         window.scrollTo(0, 0); // Cuộn lên đầu trang khi component được render
@@ -269,6 +284,9 @@ const Profile = () => {
                                     className='w-6 h-6 '
                                 />
                             </div>                            
+                        )}
+                        {userId !== user?.userId && onlineUsers?.includes(userId) && (
+                            <div className='w-7 h-7 border-4 border-white rounded-full bg-green-600 absolute ml-44 mt-12'></div>
                         )}
                         {showEditAvatar && (
                             <ChangeAvatar

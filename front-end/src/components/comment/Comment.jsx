@@ -5,6 +5,7 @@ import { deleteComment, editcomment, getComments } from '../../api/comment/comme
 import { useDispatch } from 'react-redux';
 import { ImageComment } from '../CssPictures/ImageComment';
 import LoadingSpinner from '../spinner/LoadingSpinner';
+import socket from '../../socket';
 
 export const Comment = ({comments, user, authorPost, postId, profile}) => {
 
@@ -28,7 +29,22 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Lắng nghe sự kiện onlineUsers từ server
+    socket.on("onlineUsers", (users) => {
+      // console.log("Online users:", users);
+      setOnlineUsers(users);
+    });
+
+    // Cleanup
+    return () => {
+      socket.off("onlineUsers");
+    };
+  }, []);
 
   const handleInput = (e) => {
     setDescription(e.target.value);
@@ -188,6 +204,9 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
       {comments?.map((comment) => {
         return(
           <div key={comment.commentId} className='px-4 py-2 flex w-full '>
+            {onlineUsers?.includes(comment?.author?.authorId) && (
+                <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[33px] ml-[26px]'></div>
+            )}
             <div className='h-9 w-9 mr-3 mt-2'>
                 <img className='h-full w-full object-cover rounded-full shadow'
                     src={comment?.author?.authorAvatar}

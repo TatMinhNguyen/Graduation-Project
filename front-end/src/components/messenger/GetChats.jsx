@@ -11,6 +11,9 @@ const GetChats = () => {
     const { chatId } = useParams();
 
     const [showCreateGroupChat, setShowCreateGroupChat] = useState(false)
+    const [onlineUsers, setOnlineUsers] = useState([]);
+
+    const onlineUserSet = new Set(onlineUsers);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -22,6 +25,19 @@ const GetChats = () => {
           console.log(error)
       }
     }
+
+    useEffect(() => {
+        // Lắng nghe sự kiện onlineUsers từ server
+        socket.on("onlineUsers", (users) => {
+        //   console.log("Online users:", users);
+          setOnlineUsers(users);
+        });
+    
+        // Cleanup
+        return () => {
+          socket.off("onlineUsers");
+        };
+    }, []);
   
     /* eslint-disable */
     useEffect(() => {
@@ -90,11 +106,19 @@ const GetChats = () => {
             </div>
             <div className='mt-4'>
                 {chats?.map((chat) => {
+                    // Loại bỏ currentId ra khỏi mảng members
+                    const filteredMembers = chat.members.filter((memberId) => memberId !== user?.userId);
+
+                    // Kiểm tra nếu có ít nhất 1 id trong filteredMembers trùng với onlineUser
+                    const isOnline = filteredMembers.some((memberId) => onlineUserSet.has(memberId));
                     return (
                         <div key={chat._id}
                             className={`flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
                             onClick={() => navigate(`/messenger/${chat._id}`)}
                         >
+                            {isOnline && (
+                                <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
+                            )}
                             <div className='w-10 h-10'>
                                 <img className='h-full w-full object-cover rounded-full'
                                     src={chat.avatar}

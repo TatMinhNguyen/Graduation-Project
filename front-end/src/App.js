@@ -43,6 +43,7 @@ function App() {
   useEffect(() => {
     if (user?.userId) {  // userId từ DB
       socket.emit('register', user.userId); 
+      socket.emit('online')
     }
   }, [user]);
 

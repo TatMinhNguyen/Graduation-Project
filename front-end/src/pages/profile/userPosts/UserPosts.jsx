@@ -18,6 +18,7 @@ import { setFelt, unFelt, updateFelt } from '../../../api/reaction/reaction'
 import EditPost from '../../../components/post/EditPost'
 import LoadingSpinner from '../../../components/spinner/LoadingSpinner'
 import GetFeft from '../../../components/comment/GetFeft'
+import socket from '../../../socket'
 
 const UserPosts = () => {
     const userId = useOutletContext()
@@ -38,17 +39,31 @@ const UserPosts = () => {
     const [showDelete, setShowDelete] = useState(false)
     const [selectedPost, setSelectedPost] = useState(null)
     const [editModal, setEditModal] = useState(false);
-  
+    
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [hoveredPostId, setHoveredPostId] = useState(null);
+
     const modalRef = useRef(null);
     const navigation = useNavigate();
     const dispatch = useDispatch();
 
     const limit = {
         page: 1,
-        limit: 10,   
+        limit: 20,   
     }
 
-    const [hoveredPostId, setHoveredPostId] = useState(null);
+    useEffect(() => {
+        // Lắng nghe sự kiện onlineUsers từ server
+        socket.on("onlineUsers", (users) => {
+        //   console.log("Online users:", users);
+          setOnlineUsers(users);
+        });
+    
+        // Cleanup
+        return () => {
+          socket.off("onlineUsers");
+        };
+    }, []);
 
     const handleShowGetFelt = (post) => {
         setShowFelter(true)
@@ -219,8 +234,10 @@ const UserPosts = () => {
                                 className='bg-white mt-0 mb-4 border border-white shadow rounded-md flex-1 items-center'
                             >
                                 <div className=' flex-1 flex items-center'>
-                                    <div  
-                                        className='flex mx-3 my-2 cursor-pointer'>
+                                    <div className='flex mx-3 my-2 cursor-pointer'>
+                                        {onlineUsers?.includes(post?.author?.authorId) && (
+                                            <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
+                                        )}
                                         <div className='w-10 h-10'>
                                             <img className='h-full w-full object-cover rounded-full shadow hover:opacity-90'
                                                 src= {post?.author?.authorAvatar}

@@ -22,6 +22,7 @@ import { deletePostGroup, getGroupPosts } from '../../api/group/group'
 import ShowModal from './ShowModal'
 import ReportPost from './ReportPost'
 import ComfirmReport from './ComfirmReport'
+import socket from '../../socket'
 
 const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const group = useSelector((state) => state.group.group)
@@ -39,6 +40,8 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const [reportModal, setReportModal] = useState(false)
     const [notiSuccess, setNotiSuccess] = useState(false)
 
+    const [onlineUsers, setOnlineUsers] = useState([]);
+
     const modalRef = useRef(null);
     const navigation = useNavigate();
     const dispatch = useDispatch();
@@ -52,6 +55,19 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const handleMouseLeave = () => {
         setHoveredPostId(null);
     };
+
+    useEffect(() => {
+        // Lắng nghe sự kiện onlineUsers từ server
+        socket.on("onlineUsers", (users) => {
+        //   console.log("Online users:", users);
+          setOnlineUsers(users);
+        });
+    
+        // Cleanup
+        return () => {
+          socket.off("onlineUsers");
+        };
+    }, []);
 
     const handleLike = async(postId, type) => {
         try {
@@ -225,7 +241,11 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                 >
                     <div className=' flex-1 flex items-center'>
                         <div onClick={() => handleGetUser(post?.author?.authorId)} 
-                            className='flex mx-3 my-2 cursor-pointer'>
+                            className='flex mx-3 my-2 cursor-pointer'
+                        >
+                            {onlineUsers?.includes(post?.author?.authorId) && (
+                                <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
+                            )}
                             <div className='w-10 h-10'>
                                 <img className='h-full w-full object-cover rounded-full shadow hover:opacity-90'
                                     src= {post?.author?.authorAvatar}
