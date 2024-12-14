@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { addMess, getAChat, getMess, getUserChat } from '../../api/chat/chat';
 import { useDispatch, useSelector } from 'react-redux';
 import InputEmoji from "react-input-emoji";
@@ -7,7 +7,6 @@ import { timeAgoShort } from '../../utils';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 import socket from '../../socket';
 import GetDetailConversation from './GetDetailConversation';
-import VideoCall from './VideoCall/VideoCall';
 
 const GetMessages = () => {
   const chat = useSelector((state) => state.chat.chat)
@@ -22,7 +21,6 @@ const GetMessages = () => {
   const [imagePreview, setImagePreview] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showConversation, setShowConversation] = useState(false)
-  const [showVideoCall, setShowVideoCall] = useState(false)
 
     const [onlineUsers, setOnlineUsers] = useState([]);
 
@@ -33,14 +31,15 @@ const GetMessages = () => {
     index: 20,
   })
 
-  const remoteIds = chat?.members?.filter((member) => member !== user?.userId); 
+//   const remoteIds = chat?.members?.filter((member) => member !== user?.userId); 
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const filteredMembers = chat?.members.filter((memberId) => memberId !== user?.userId);
+  const filteredMembers = chat?.members?.filter((memberId) => memberId !== user?.userId);
 
   // Kiểm tra nếu có ít nhất 1 id trong filteredMembers trùng với onlineUser
-  const isOnline = filteredMembers.some((memberId) => onlineUserSet?.has(memberId));
+  const isOnline = filteredMembers?.some((memberId) => onlineUserSet?.has(memberId));
 
   useEffect(() => {
     socket.emit('online')
@@ -189,7 +188,7 @@ const GetMessages = () => {
             </div>
             <div className='flex-1'></div>
             <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'
-                onClick={() => setShowVideoCall(true)}
+                onClick={() => navigate(`/room/${chat?._id}`)}
             >
                 <img className='h-5 w-5 object-cover rounded-full'
                     src={require('../../assets/icons/call.png')}
@@ -214,15 +213,6 @@ const GetMessages = () => {
             </div>        
         </div>
 
-        {/*  */}
-        {showVideoCall && (
-            <VideoCall
-                myId={user?.userId} 
-                receiverIds={[remoteIds]}
-                roomId={chatId}
-                isCloseModal={() => setShowVideoCall(false)}
-            />
-        )}
         {showConversation && (
             <GetDetailConversation
                 chat = {chat}

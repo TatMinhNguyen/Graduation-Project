@@ -33,9 +33,10 @@ const socketConfig = (server) => {
     })
 
     // Tham gia vào một phòng cụ thể
-    socket.on('join-room', ({ peerId }) => {
-      console.log(`${peerId} joined the room`);
-      socket.broadcast.emit('user-connected', peerId);
+    socket.on('join-room', ({ roomId, peerId }) => {
+      console.log(`${peerId} joined room ${roomId}`);
+      socket.join(roomId);
+      socket.broadcast.to(roomId).emit('user-connected', peerId);
     });
 
     // Xử lý ngắt kết nối

@@ -36,6 +36,7 @@ import GetReportPosts from './components/group/GetReportPosts';
 import Admin from './pages/admin/Admin';
 import GetPostReported from './components/admin/GetPostReported';
 import GetBannedUser from './components/admin/GetBannedUser';
+import Room from './pages/call/Room';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -65,6 +66,7 @@ function App() {
           <Route path='' element={<GetNoConversation />} />
           <Route path=':chatId' element={<GetMessages />} />
         </Route>
+        <Route path='/room/:roomId' element={<Room/>}/>
         <Route path="/search" element={<Search />} >
           <Route path='posts' element={<SearchPosts/>}/>
           <Route path='users' element={<SearchUsers/>}/>
