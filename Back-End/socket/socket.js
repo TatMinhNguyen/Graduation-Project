@@ -34,10 +34,26 @@ const socketConfig = (server) => {
 
     // Tham gia vào một phòng cụ thể
     socket.on('join-room', ({ roomId, peerId }) => {
-      console.log(`${peerId} joined room ${roomId}`);
+      console.log(`User ${peerId} joined room ${roomId}`);
       socket.join(roomId);
       socket.broadcast.to(roomId).emit('user-connected', peerId);
     });
+
+    socket.on('leave-room', ({ roomId, peerId }) => {
+      console.log(`User ${peerId} left room ${roomId}`);
+      
+      // Broadcast cho các user khác trong room biết
+      socket.to(roomId).emit('user-disconnected', peerId);
+    
+      // Rời khỏi room
+      socket.leave(roomId);
+    });   
+    
+    socket.on('end-call', ({ roomId }) => {
+      console.log(`Call ended in room: ${roomId}`);
+      socket.to(roomId).emit('end-call'); // Gửi sự kiện cho tất cả user trong room
+    });
+    
 
     // Xử lý ngắt kết nối
     socket.on('disconnect', () => {

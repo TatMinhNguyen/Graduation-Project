@@ -1,90 +1,141 @@
 import React, { useEffect, useRef, useState } from 'react';
 import NavBar from '../../components/navbar/NavBar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import socket from '../../socket';
 import Peer from 'peerjs';
+import { getAChat } from '../../api/chat/chat';
 
 const Room = () => {
   const user = useSelector((state) => state.auth.login?.currentUser);
-  // const chat = useSelector((state) => state.chat.chat)
+  const chat = useSelector((state) => state.chat.chat);
   const { roomId } = useParams();
 
-  // const videoRef = useRef(null); // Tham chiếu thẻ video
   const peerInstance = useRef();
-  const [stream, setStream] = useState(null); // Lưu trữ stream
-
-  const [remoteStreams, setRemoteStreams] = useState([]); // Stream từ người khác
-
-  //Lọc các phần tử có active: true
-  const filteredArr = remoteStreams.filter(item => item.active);
-
-  const remoteStreamFiltes = [...new Set(filteredArr)];
-  // console.log(remoteStreamFiltes)
-
-  // const [peerId, setPeerId] = useState('');
-
-  // const remoteIds = chat?.members?.filter((member) => member !== user?.userId); 
+  const [stream, setStream] = useState(null);
+  const [remoteStreams, setRemoteStreams] = useState([]);
+  console.log(remoteStreams)
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Hàm quay lại trang trước và tắt stream
+  const handleGetAChat = async () => {
+    await getAChat(user?.token, roomId, dispatch);
+  };
+
   const handleGoBack = () => {
+    // Gửi sự kiện rời khỏi phòng
+    socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+
+    // Gửi sự kiện thông báo kết thúc cuộc gọi
+    // socket.emit('end-call', { roomId });
+
+    // Dừng stream video/audio
     stopStream();
+
+    // Hủy Peer.js instance
+    peerInstance.current?.destroy();
+
+    // Điều hướng về trang trước
     navigate(-1);
   };
 
-  // Hàm tắt camera và microphone
   const stopStream = () => {
     if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
+      stream?.getTracks().forEach((track) => track.stop());
     }
   };
 
-  // Lấy stream từ camera và microphone
-  /* eslint-disable */
+   /* eslint-disable */
   useEffect(() => {
     const startMedia = async () => {
       try {
-        // 1. Bật camera và microphone
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
         });
         setStream(mediaStream);
 
-        // 3. Khởi tạo Peer.js
         peerInstance.current = new Peer();
         peerInstance.current.on('open', (id) => {
           console.log('My peer ID:', id);
-          // setPeerId(id);
-
-          // Gửi thông báo tham gia phòng
           socket.emit('join-room', { roomId, peerId: id });
         });
 
-        // 4. Nhận kết nối video từ Peer
         peerInstance.current.on('call', (call) => {
-          call.answer(mediaStream); // Trả lời call với stream của mình
+          call.answer(mediaStream);
           call.on('stream', (remoteStream) => {
-            setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
+            setRemoteStreams((prevStreams) => {
+              const isExist = prevStreams.some(
+                (remote) => remote.peerId === call.peer
+              );
+        
+              if (!isExist) {
+                return [...prevStreams, { peerId: call.peer, stream: remoteStream }];
+              }
+        
+              return prevStreams;
+            });
           });
         });
 
-        // 5. Khi có user mới trong phòng
+        socket.on('end-call', () => {
+          console.log('Call ended by the other user.');
+          
+          // Dừng stream video/audio
+          stream?.getTracks().forEach((track) => track.stop());
+        
+          // Hủy Peer.js instance
+          peerInstance.current?.destroy();
+        
+          // Điều hướng về trang trước
+          // navigate(-1);
+        });        
+
         socket.on('user-connected', (newPeerId) => {
           console.log('User connected:', newPeerId);
           const call = peerInstance.current.call(newPeerId, mediaStream);
-          call.on('stream', (remoteStream) => {
-            setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
+          call?.on('stream', (remoteStream) => {
+            setRemoteStreams((prevStreams) => {
+              // Kiểm tra nếu peerId đã tồn tại
+              const isExist = prevStreams.some(
+                (remote) => remote.peerId === newPeerId
+              );
+        
+              if (!isExist) {
+                return [...prevStreams, { peerId: newPeerId, stream: remoteStream }];
+              }
+        
+              return prevStreams; // Nếu đã tồn tại, không thêm nữa
+            });
           });
         });
 
-        // 6. Cleanup khi component unmount
+        // Xử lý khi user rời phòng
+        socket.on('user-disconnected', (peerId) => {
+          console.log('User disconnected:', peerId);
+          setRemoteStreams((prevStreams) => {
+            const updatedStreams = prevStreams.filter((remote) => remote.peerId !== peerId);
+            console.log(updatedStreams)
+            // Kiểm tra số lượng người còn lại (chỉ còn 1 người là chính mình)
+            if (updatedStreams?.length === 0) {
+              console.log('Only one user left. Ending the call.');
+              // stopStream();
+              socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+              socket.emit('end-call', { roomId });
+              peerInstance.current?.destroy();
+              navigate(-1); // Điều hướng về màn hình trước
+            }
+        
+            return updatedStreams;
+          });
+        });               
+
         return () => {
           stopStream();
-          socket?.disconnect();
+          socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+          peerInstance.current?.destroy();
         };
       } catch (error) {
         console.error('Failed to access media devices:', error);
@@ -94,21 +145,23 @@ const Room = () => {
     startMedia();
   }, [roomId]);
 
+   /* eslint-disable */
+  useEffect(() => {
+    handleGetAChat();
+  }, []);
+
   return (
     <div className='bg-gray-100 h-screen overflow-y-scroll'>
-      {/* Navbar */}
       <div className='fixed top-0 w-[calc(100vw-15px)] z-50'>
         <NavBar user={user} />
       </div>
 
-      {/* Main Content */}
       <div className='pt-[9.5vh] relative'>
         <div className='h-[88.5vh] mt-0.5 mx-4 bg-black shadow-md rounded-md border relative'>
-          {/* Nút quay lại */}
           <div
             className='absolute right-0 top-0 p-3 bg-gray-500 m-3 rounded-full cursor-pointer hover:bg-gray-400 z-50'
             onClick={handleGoBack}
-            style={{ pointerEvents: 'auto' }} // Đảm bảo nút nhận sự kiện
+            style={{ pointerEvents: 'auto' }}
           >
             <img
               src={require('../../assets/icons/cancel.png')}
@@ -117,7 +170,22 @@ const Room = () => {
             />
           </div>
 
-          {/* Video Stream */}
+          <div className='absolute top-0 left-0 flex items-center mt-2 z-50'>
+            <div className='w-10 h-10 ml-3'>
+              <img
+                className='h-full w-full object-cover rounded-full'
+                src={chat?.avatar}
+                alt=''
+              />
+            </div>
+            <div className='ml-3'>
+              <h1 className='font-medium text-[16px] text-white'>{chat?.name}</h1>
+              <p className='text-white text-[15px]'>
+                {remoteStreams?.length + 1} {remoteStreams?.length + 1 === 1 ? 'person' : 'people'}
+              </p>
+            </div>
+          </div>
+
           {stream && (
             <ReactPlayer
               url={stream}
@@ -129,36 +197,36 @@ const Room = () => {
                 borderRadius: '10px',
                 overflow: 'hidden',
                 pointerEvents: 'none',
-                position: 'absolute', // Đặt vị trí tuyệt đối
-                bottom: '5px', // Cách đáy 20px
-                right: '5px', // Cách phải 20px
-                zIndex: '10', // Đảm bảo video hiển thị trên cùng
-                backgroundColor: '#000'
+                position: 'absolute',
+                bottom: '5px',
+                right: '5px',
+                zIndex: '10',
+                transform: 'scaleX(-1)',
               }}
             />
           )}
-          {/* Video từ người dùng khác */}
-          {remoteStreamFiltes?.map((remoteStream, index) => {
-            if (remoteStream instanceof MediaStream) {
-              return (
-                <ReactPlayer
-                  key={index}
-                  url={remoteStream}
-                  playing={true}
-                  muted={false}
-                  width='25%'
-                  height='25%'
-                  style={{
-                    position: 'absolute',
-                    bottom: `${(index + 1) * 30}px`,
-                    left: '10px',
-                    borderRadius: '10px',
-                  }}
-                />
-              );
-            }
-            return null;  // Nếu remoteStream không phải là MediaStream, trả về null
-          })}
+
+          <div className={`absolute grid ${remoteStreams?.length === 1 ? 'grid-cols-1' : remoteStreams?.length === 2 ? 'grid-cols-2' : 'grid-cols-3'} gap-2 w-full h-full`}>
+            {remoteStreams?.map((remoteStream, index) => {
+              if (remoteStream.stream instanceof MediaStream) {
+                return (
+                  <ReactPlayer
+                    key={index}
+                    url={remoteStream.stream}
+                    playing={true}
+                    muted={false}
+                    width="100%"
+                    height="100%"
+                    style={{
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                    }}
+                  />
+                );
+              }
+              return null;
+            })}
+          </div>
 
         </div>
       </div>

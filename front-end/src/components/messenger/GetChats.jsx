@@ -113,7 +113,7 @@ const GetChats = () => {
                     const isOnline = filteredMembers.some((memberId) => onlineUserSet.has(memberId));
                     return (
                         <div key={chat._id}
-                            className={`flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
+                            className={`relative flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
                             onClick={() => navigate(`/messenger/${chat._id}`)}
                         >
                             {isOnline && (
