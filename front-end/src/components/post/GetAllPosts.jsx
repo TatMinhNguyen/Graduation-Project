@@ -12,7 +12,7 @@ import { VideoPlayer3 } from '../CssPictures/VideoPlayer3'
 import { VideoPlayer4 } from '../CssPictures/VideoPlayer4'
 import { VideoPlayer5 } from '../CssPictures/VideoPlayer5'
 import { useNavigate } from 'react-router-dom'
-import { deletePost, getAllPosts } from '../../api/post/post'
+import { deletePost, getAllPosts, getFriendsPosts } from '../../api/post/post'
 import { useDispatch, useSelector } from 'react-redux'
 import EditPost from './EditPost'
 import { setFelt, unFelt, updateFelt } from '../../api/reaction/reaction'
@@ -23,6 +23,7 @@ import ShowModal from './ShowModal'
 import ReportPost from './ReportPost'
 import ComfirmReport from './ComfirmReport'
 import socket from '../../socket'
+import ReportUser from '../changeProfile/ReportUser'
 
 const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const group = useSelector((state) => state.group.group)
@@ -39,6 +40,10 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const [showFelter, setShowFelter] = useState(false)
     const [reportModal, setReportModal] = useState(false)
     const [notiSuccess, setNotiSuccess] = useState(false)
+    const [reportUser, setReportUser] = useState(false)
+
+    const [reportUserSuccess, setReportUserSuccess] = useState(false)
+    const [reportPostSuccess, setReportPostSuccess] = useState(false)
 
     const [onlineUsers, setOnlineUsers] = useState([]);
 
@@ -79,7 +84,8 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             setHoveredPostId(null);
 
             if(!groupId){
-                await getAllPosts(user?.token, dispatch, params)
+                await getAllPosts(user?.token, dispatch, params);
+                await getFriendsPosts(user?.token, dispatch, params);
             }else{
                 await getGroupPosts(user?.token, groupId, dispatch, params)
             }
@@ -95,6 +101,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
 
             if(!groupId){
                 await getAllPosts(user?.token, dispatch, params)
+                await getFriendsPosts(user?.token, dispatch, params);
             }else{
                 await getGroupPosts(user?.token, groupId, dispatch, params)
             }
@@ -113,6 +120,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
 
             if(!groupId){
                 await getAllPosts(user?.token, dispatch, params)
+                await getFriendsPosts(user?.token, dispatch, params);
             }else{
                 await getGroupPosts(user?.token, groupId, dispatch, params)
             }       
@@ -204,7 +212,15 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const handleReportModal = (post) =>{
         setShowModal(null)
         setReportModal(true)
+        setReportPostSuccess(true)
         setSelectedPost(post)
+    }
+
+    const handleReportUser = (user) => {
+        setShowModal(null)
+        setReportUser(true)
+        setReportUserSuccess(true)
+        setSelectedPost(user)
     }
 
     const handleShowGetFelt = (post) => {
@@ -281,6 +297,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 handleEditModal={()=>handleEditModal(post)}
                                 handleReportModal={() => handleReportModal(post)}
                                 handleShowComfirmDelete={() => handleShowComfirmDelete(post)}
+                                handleReportUser={() => handleReportUser(post)}
                             />
                         )}
                         {showDelete && selectedPost?.postId === post?.postId && (
@@ -336,9 +353,21 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 setNotiSuccess={() => setNotiSuccess(true)}
                             />
                         )}
+                        {reportUser && selectedPost?.postId === post?.postId && (
+                            <ReportUser
+                                user={user}
+                                userId={selectedPost?.author?.authorId}
+                                isCloseModal = {() => setReportUser(false)}
+                                setNotiSuccess={() => setNotiSuccess(true)}                              
+                            />
+                        )}
                         {notiSuccess && (
                             <ComfirmReport
-                            setNotiSuccess={() => setNotiSuccess(false)}
+                                setNotiSuccess={() => setNotiSuccess(false)}
+                                reportPostSuccess={reportPostSuccess}
+                                reportUserSuccess={reportUserSuccess}
+                                setReportPostSuccess={() => setReportUserSuccess(false)}
+                                setReportUserSuccess={() => setReportUserSuccess(false)}
                             />
                         )}
                     </div>

@@ -81,13 +81,22 @@ const NavBar = ({user}) => {
         }
     }
 
-    const handleLogOut = async() => {
+    const handleLogOut = async () => {
         try {
-            await logOut(user?.token, dispatch, navigation)
+            // Gửi sự kiện 'logout' lên server
+            if (socket) {
+                socket.emit('logout');
+                // socket.disconnect(); // Ngắt kết nối socket
+            }
+            
+            // Gọi API logout (nếu cần thực hiện logout trên server)
+            await logOut(user?.token, dispatch, navigation);
+            
+            console.log('User logged out successfully');
         } catch (error) {
-            console.log(error)
+            console.log('Logout error:', error);
         }
-    }
+    };    
 
     /* eslint-disable */
     useEffect(() => {
@@ -181,10 +190,10 @@ const NavBar = ({user}) => {
         <div className='flex items-center' style={{ flex: '30%' }}>
             <div className='flex-1'></div>  {/* Đây là phần tử đệm để đẩy các phần tử khác sang phải */}
             <div className='mr-5 flex items-center'>
-                <div className={`h-10 w-10 ${location.pathname === `/` ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'}  flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
+                <div className={`h-10 w-10 ${(location.pathname === `/` || location.pathname === `/friends's-posts`) ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-200 hover:bg-gray-300'}  flex items-center justify-center rounded-3xl ml-3 cursor-pointer`}
                         onClick={() => navigation('/')}
                 >
-                    {location.pathname === `/` ? 
+                    {(location.pathname === `/` || location.pathname === `/friends's-posts`) ? 
                     (
                         <img className='h-6'
                             src={require("../../assets/icons/home-blue.png")}

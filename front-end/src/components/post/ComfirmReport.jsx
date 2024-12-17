@@ -1,8 +1,10 @@
 import React from 'react'
 
-const ComfirmReport = ({setNotiSuccess}) => {
+const ComfirmReport = ({setNotiSuccess, reportPostSuccess, reportUserSuccess, setReportPostSuccess, setReportUserSuccess}) => {
     const handleCloseModal = () => {
         setNotiSuccess();
+        setReportPostSuccess();
+        setReportUserSuccess();
     }
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-15 flex items-center justify-center z-50">
@@ -31,9 +33,16 @@ const ComfirmReport = ({setNotiSuccess}) => {
                     <h3 className='font-medium'>
                         Reported to admin
                     </h3>
-                    <p className='text-[14px] text-gray-600'> 
-                        You notified an admin about this post.
-                    </p>
+                    {reportPostSuccess && ! reportUserSuccess && (
+                        <p className='text-[14px] text-gray-600'> 
+                            You notified an admin about this post.
+                        </p>                        
+                    )}
+                    {!reportPostSuccess && reportUserSuccess && (
+                        <p className='text-[14px] text-gray-600'> 
+                            You notified an admin about this profile.
+                        </p>                        
+                    )}
                 </div>
             </div>
             <div className='p-2 px-3 pt-6'>

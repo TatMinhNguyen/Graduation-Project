@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getFriends, getRequested } from '../../api/friends/friends'
+import { acceptRequest, getFriends, getRequested, refuseRequest } from '../../api/friends/friends'
 import { Link, useNavigate } from 'react-router-dom'
 import socket from '../../socket/index'
 import { createChat1vs1 } from '../../api/chat/chat'
@@ -8,6 +8,9 @@ const RightBar = ({user}) => {
   const [requestFriends, setRequestFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
+
+  const [accepted, setAccepted] = useState([])
+  const [refused, setRefused] = useState([])
 
   const navigate = useNavigate();
 
@@ -36,6 +39,24 @@ const RightBar = ({user}) => {
     } catch (error) {
         console.log(error)
     }
+  }
+
+  const handleAccept = async (e, userId) => {
+    e.stopPropagation();
+    await acceptRequest(user?.token, userId)
+    setAccepted(prev => ({
+      ...prev,
+      [userId]: true
+    }));
+  }
+
+  const handleRefuse = async (e, userId) => {
+    e.stopPropagation();
+    await refuseRequest(user?.token, userId)
+    setRefused(prev => ({
+      ...prev,
+      [userId]: true
+    }))
   }
 
   useEffect(() => {
@@ -81,16 +102,28 @@ const RightBar = ({user}) => {
                   <p className='text-[13px] text-gray-500'>
                     {user?.mutualFriends} mutual friends
                   </p>
-                  <div className='flex'>
-                    <button className='mr-4 mt-1 px-8 py-1.5 bg-customBlue rounded-md font-medium text-[14px] text-white'
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Confirm
-                    </button>
-                    <button className='mt-1 px-9 py-1.5 bg-gray-300 rounded-md font-medium text-[14px]'>
-                      Delete
-                    </button>
-                  </div>
+                  {accepted[user._id] ? (
+                    <p className='text-[14px] text-gray-600'>
+                        Request accepted.
+                    </p>
+                  ) : refused[user._id] ? (
+                    <p className='text-[14px] text-gray-600'>
+                      Request denied.
+                    </p>                    
+                  ) : (
+                    <div className='flex'>
+                      <button className='mr-4 mt-1 px-8 py-1.5 bg-customBlue rounded-md font-medium text-[14px] text-white'
+                        onClick={(e) => handleAccept(e, user._id)}
+                      >
+                        Confirm
+                      </button>
+                      <button className='mt-1 px-9 py-1.5 bg-gray-300 rounded-md font-medium text-[14px]'
+                        onClick={(e) => handleRefuse(e, user._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>                    
+                  )}
                 </div>               
               </div>
             ))}

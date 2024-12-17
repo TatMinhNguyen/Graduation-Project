@@ -28,6 +28,20 @@ const socketConfig = (server) => {
       console.log(`User ${userId} is mapped to socket ID ${socket.id}`);
     });
 
+    // Lắng nghe sự kiện logout
+    socket.on('logout', () => {
+      if (socket.userId) {
+        console.log(`User ${socket.userId} logged out`);
+        
+        // Xóa user khỏi danh sách userSocketMap
+        delete userSocketMap[socket.userId];
+        emitOnlineUsers();
+
+        // Ngắt kết nối socket
+        // socket.disconnect(true);
+      }
+    });
+
     socket.on('online', () => {
       emitOnlineUsers();
     })

@@ -7,7 +7,6 @@ const ReportPost = ({isCloseModal, user, postId, setNotiSuccess}) => {
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false);
 
-
     const handleReportPost = async() => {
         const data = {
             content: content,

@@ -37,6 +37,8 @@ import Admin from './pages/admin/Admin';
 import GetPostReported from './components/admin/GetPostReported';
 import GetBannedUser from './components/admin/GetBannedUser';
 import Room from './pages/call/Room';
+import GetPosts from './pages/home/getPosts/GetAllPosts';
+import GetFriendPosts from './pages/home/getPosts/GetFriendPosts';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -51,7 +53,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home />} >
+          <Route path='' element={<GetPosts />} />
+          <Route path="friends's-posts" element={<GetFriendPosts />} />
+        </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/set-verify-code" element={<VerifyCode />} />

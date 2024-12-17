@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const INIT =  {
     posts: [],
     userPosts: [],
+    friendsPosts:[],
     comments: []
 }
 
@@ -16,10 +17,14 @@ const post = createSlice({
       },
       setUserPost: (state, action) => {
         state.userPosts = action.payload;
-        return state
+        return state;
       },
       setComments: (state, action) => {
         state.comments = action.payload;
+        return state;
+      },
+      setFriendsPosts:(state, action) => {
+        state.friendsPosts = action.payload;
         return state;
       }
     },
@@ -28,7 +33,8 @@ const post = createSlice({
 export const { 
     setAllPosts,
     setUserPost,
-    setComments
+    setComments,
+    setFriendsPosts
   } = post.actions
   
 export default post.reducer

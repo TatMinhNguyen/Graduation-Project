@@ -425,6 +425,73 @@ const postController = {
         } catch (error) {
             return res.status(500).json({ error: error.message});
         }
-    }
+    },
+
+    getFriendPosts: async (req, res) => {
+        try {
+            const userId = req.user.id;
+    
+            // 1. Tìm danh sách bạn bè của user
+            const user = await UserModel.findById(userId).populate("friends");
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            const friendIds = user.friends;
+    
+            // 2. Lấy tất cả bài viết từ những người trong danh sách bạn bè
+            const posts = res.paginatedResults.results.filter(post =>
+                friendIds.some(friendId => friendId.toString() === post.userId.toString())
+            );            
+    
+            // 3. Tạo một mảng các lời hứa để lấy thông tin người dùng
+            const userPromises = posts.map(post =>
+                UserModel.findById(post.userId)
+            );
+    
+            // Chờ tất cả các lời hứa hoàn thành
+            const users = await Promise.all(userPromises);
+    
+            // 4. Loại bỏ bài viết của user bị cấm
+            const filteredPosts = posts.filter((post, index) => {
+                const user = users[index];
+                return user && !user.isBan; // Loại bỏ nếu user bị ban
+            });
+    
+            // 5. Lấy thông tin cảm xúc của userId đối với từng bài viết sau khi đã lọc
+            const feelPromises = filteredPosts.map(post =>
+                FeelModel.findOne({ userId: userId, postId: post._id })
+            );
+    
+            const feels = await Promise.all(feelPromises);
+    
+            // 6. Tạo kết quả cuối cùng
+            const results = filteredPosts.map((post, index) => {
+                const user = users.find(u => u && u._id.equals(post.userId)); // Tìm user tương ứng
+                const feel = feels[index];
+                return {
+                    postId: post._id,
+                    description: post.description,
+                    images: post.images,
+                    video: post.video,
+                    comment: post.comment,
+                    felt: post.felt,
+                    typeText: post.typeText,
+                    createdAt: post.createdAt,
+                    is_feel: feel ? feel.type : -1,
+                    author: {
+                        authorId: user._id,
+                        authorName: user.username,
+                        authorAvatar: user.profilePicture
+                    }
+                };
+            });
+    
+            return res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+    
 }
 module.exports = postController

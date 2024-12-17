@@ -15,7 +15,7 @@ const Room = () => {
   const peerInstance = useRef();
   const [stream, setStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState([]);
-  console.log(remoteStreams)
+  console.log(stream)
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -44,6 +44,7 @@ const Room = () => {
   const stopStream = () => {
     if (stream) {
       stream?.getTracks().forEach((track) => track.stop());
+      setStream(null)
     }
   };
 
@@ -84,13 +85,13 @@ const Room = () => {
           console.log('Call ended by the other user.');
           
           // Dừng stream video/audio
-          stream?.getTracks().forEach((track) => track.stop());
+          stopStream();
         
           // Hủy Peer.js instance
           peerInstance.current?.destroy();
         
           // Điều hướng về trang trước
-          // navigate(-1);
+          navigate(-1);
         });        
 
         socket.on('user-connected', (newPeerId) => {
@@ -117,15 +118,16 @@ const Room = () => {
           console.log('User disconnected:', peerId);
           setRemoteStreams((prevStreams) => {
             const updatedStreams = prevStreams.filter((remote) => remote.peerId !== peerId);
-            console.log(updatedStreams)
+            // console.log(updatedStreams)
             // Kiểm tra số lượng người còn lại (chỉ còn 1 người là chính mình)
             if (updatedStreams?.length === 0) {
               console.log('Only one user left. Ending the call.');
-              // stopStream();
-              socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+              stopStream();
               socket.emit('end-call', { roomId });
+              // socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+              
               peerInstance.current?.destroy();
-              navigate(-1); // Điều hướng về màn hình trước
+              // navigate(-1); // Điều hướng về màn hình trước
             }
         
             return updatedStreams;
@@ -134,7 +136,7 @@ const Room = () => {
 
         return () => {
           stopStream();
-          socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
+          // socket.emit('leave-room', { roomId, peerId: peerInstance.current?.id });
           peerInstance.current?.destroy();
         };
       } catch (error) {

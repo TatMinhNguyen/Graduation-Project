@@ -20,6 +20,13 @@ router.get(
     postController.getPosts
 )
 
+router.get(
+    '/get-friend-posts',
+    middleware.verifyToken,
+    middleware.paginatedResult(PostModel),
+    postController.getFriendPosts
+)
+
 router.get('/get-a-post/:postId', middleware.verifyToken, postController.getAPost)
 
 router.get(

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleEditModal, handleShowComfirmDelete, handleReportModal}) => {
+const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleEditModal, handleShowComfirmDelete, handleReportModal, handleReportUser}) => {
   return (
     <div
         ref={modalRef}
@@ -29,15 +29,26 @@ const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleE
                     </div>                                            
                 )}
                 {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && user?.isAdmin === false && (
-                    <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
-                        onClick={() => handleReportModal()}
-                    >
-                        <img className='w-5 h-5 mr-3 mt-2'
-                            src={require('../../assets/icons/report-post.png')}
-                            alt=''
-                        />
-                        <p className='py-1 font-medium cursor-pointer text-black'>Report post </p>
-                    </div>                                             
+                    <>
+                        <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
+                            onClick={() => handleReportModal()}
+                        >
+                            <img className='w-5 h-5 mr-3 mt-2'
+                                src={require('../../assets/icons/report-post.png')}
+                                alt=''
+                            />
+                            <p className='py-1 font-medium cursor-pointer text-black'>Report post </p>
+                        </div>   
+                        <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
+                            onClick={() => handleReportUser()}
+                        >
+                            <img className='w-5 h-5 mr-3 mt-2'
+                                src={require('../../assets/icons/user-report.png')}
+                                alt=''
+                            />
+                            <p className='py-1 font-medium cursor-pointer text-black'>Report profile </p>
+                        </div>                 
+                    </>                           
                 )}
                 {(user?.userId === post?.author?.authorId || user?.userId === group?.createId || user?.isAdmin) && (
                     <div className='flex hover:bg-red-50 px-2 py-1 rounded'

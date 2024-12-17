@@ -56,3 +56,13 @@ export const changeProfile = async(token, profile) => {
         console.log(error)
     }    
 }
+
+export const reportUser = async (token, userId, data) => {
+    try {
+        await axios.post(`${apiUrl}/user/report/${userId}`, data, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}
