@@ -272,3 +272,45 @@ export const createPostGroup = async (token, post, groupId) => {
         console.log(error)
     }
 }
+
+export const reportPostGroup = async (token, postId, data) => {
+    try {
+        await axios.post(`${apiUrl}/group/report-post/${postId}`, data, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}
+
+export const getReportPosts = async (token, groupId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-post-reported/${groupId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getContentReportPosts = async (token, postId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/group/get-detail-report/${postId}`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const keepPost = async (token, postId) => {
+    try {
+        await axios.post(`${apiUrl}/group/keep-post/${postId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        }); 
+    } catch (error) {
+        console.log(error)
+    }
+}

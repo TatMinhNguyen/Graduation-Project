@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {  useDispatch, useSelector } from 'react-redux'
-import { getUserChat } from '../../api/chat/chat'
+import { createChat1vs1, getUserChat, searchMembers } from '../../api/chat/chat'
 import { useNavigate, useParams } from 'react-router-dom'
 import socket from '../../socket'
 import CreateGroupChat from './CreateGroupChat'
@@ -13,10 +13,21 @@ const GetChats = () => {
     const [showCreateGroupChat, setShowCreateGroupChat] = useState(false)
     const [onlineUsers, setOnlineUsers] = useState([]);
 
+    const [searchInput, setSearchInput] = useState('')
+    const [resultSearch, setResultSearch] = useState([])
+
+    const [isSearched, setIsSearched] = useState(false)
+
     const onlineUserSet = new Set(onlineUsers);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const handleSearched = () => {
+        setSearchInput('')
+        setIsSearched(false)
+        setResultSearch([])
+    }
   
     const handleGetUserChats = async() => {
       try {
@@ -24,6 +35,24 @@ const GetChats = () => {
       } catch (error) {
           console.log(error)
       }
+    }
+
+    const handleCreateChat = async(userId) => {
+        await createChat1vs1(user?.token, userId, navigate)
+        setIsSearched(false)
+        setSearchInput('')
+        setResultSearch([])
+    }
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+
+        const data = {
+            searchInput: searchInput
+        }
+        const result = await searchMembers(user?.token, data)
+
+        setResultSearch(result);
     }
 
     useEffect(() => {
@@ -82,101 +111,139 @@ const GetChats = () => {
                     isClose = {() => setShowCreateGroupChat(false)}
                 />
             )}
-            <div className='w-full px-2'>
+            <div className='w-full px-2 flex items-center'>
+                {isSearched && (
+                    <div className='w-9 h-9 flex items-center justify-center mr-1 mt-2 hover:bg-gray-100 rounded-full cursor-pointer'
+                        onClick={handleSearched}
+                    >
+                        <img className='w-4 h-4'
+                            src={require('../../assets/icons/arrow.png')}
+                            alt=''
+                        />                    
+                    </div>                    
+                )}
                 <form className='flex-1 flex items-center mt-2 bg-gray-100 mx-auto rounded-3xl'
-                        // onSubmit={handleSearch}
+                        onSubmit={handleSearch}
                 >
-                    <button>
+                    <div>
                         <img className='w-5 h-5 ml-3 mt-0.5'
                             src = {require('../../assets/icons/search.png')}
                             alt=''
                         />                    
-                    </button>
+                    </div>
                     <input
                         type='text'
                         id='search'
                         name='search'
                         placeholder='Search messenger'
-                        // value={searchInput}
-                        // onChange={(e) => setSearchInput(e.target.value)}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onClick={() => setIsSearched(true)}
                         className='flex-grow w-full pl-3 pr-1 py-1.5 mb-0.5 rounded-3xl bg-gray-100 overflow-hidden
                                     focus:outline-none'
                     />
                 </form>
             </div>
-            <div className='mt-4'>
-                {chats?.map((chat) => {
-                    // Loại bỏ currentId ra khỏi mảng members
-                    const filteredMembers = chat.members.filter((memberId) => memberId !== user?.userId);
-
-                    // Kiểm tra nếu có ít nhất 1 id trong filteredMembers trùng với onlineUser
-                    const isOnline = filteredMembers.some((memberId) => onlineUserSet.has(memberId));
-                    return (
-                        <div key={chat._id}
-                            className={`relative flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
-                            onClick={() => navigate(`/messenger/${chat._id}`)}
+            {isSearched ? (
+                <div className='mt-3 overflow-y-auto h-[73.1vh]'>
+                    {resultSearch?.length === 0 && (
+                        <div className='flex items-center justify-center h-[20vh] text-gray-600'>
+                            No search results found for "{searchInput}"
+                        </div>
+                    )}
+                    {resultSearch?.map((user) => (
+                        <div key={user.userId}
+                            className='px-2 flex items-center p-2 rounded-lg cursor-pointer hover:bg-gray-200'
+                            onClick={() => handleCreateChat(user.userId)}
                         >
-                            {isOnline && (
-                                <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
-                            )}
-                            <div className='w-10 h-10'>
+                            <div className='w-9 h-9'>
                                 <img className='h-full w-full object-cover rounded-full'
-                                    src={chat.avatar}
+                                    src={user.profilePicture}
                                     alt=''
                                 />                                
                             </div>
-                            <div className='ml-3'>
-                                <h1 className={`text-[15px] font-medium`}>
-                                    {chat.name}
-                                </h1>
-                                {chat.firstMessage === null ? (
-                                    <div className={`text-[13.5px] font-medium`}>
-                                        Please send a message to {chat.name}.
-                                    </div>
-                                ) : (
-                                    <div>
-                                        {chat.firstMessage?.image !== null ? (
-                                            <div className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}>
-                                                {chat.firstMessage?.senderId._id === user?.userId ? (
-                                                    <p>
-                                                        You have sent 1 photo to {chat.name}.
-                                                    </p>
-                                                ) : (
-                                                    <p>
-                                                        {chat.firstMessage?.senderId.username} have sent 1 photo to you.
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}
-                                                style={{ 
-                                                    maxWidth: '20vw', 
-                                                    overflow: 'hidden', 
-                                                    whiteSpace: 'nowrap', 
-                                                    textOverflow: 'ellipsis',
-                                                    display: 'block' // Đảm bảo rằng nó là block hoặc inline-block để xử lý ellipsis
-                                                }}
-                                            >
-                                                {chat.firstMessage?.senderId._id === user?.userId ? (
-                                                    <p style={{ display: 'inline', margin: 0 }}>
-                                                        You: {chat.firstMessage?.text}
-                                                    </p>
-                                                ) : (
-                                                    <p style={{ display: 'inline', margin: 0 }}>
-                                                        {chat.firstMessage?.senderId.username}: {chat.firstMessage?.text}
-                                                    </p>
-                                                )}
-                                            </div>
+                            <h1 className={`text-[15px] font-base ml-3`}>
+                                {user.username}
+                            </h1>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className='mt-3 overflow-y-auto h-[73.1vh]'>
+                    {chats?.map((chat) => {
+                        // Loại bỏ currentId ra khỏi mảng members
+                        const filteredMembers = chat.members.filter((memberId) => memberId !== user?.userId);
 
-                                        )}
-                                    </div>
+                        // Kiểm tra nếu có ít nhất 1 id trong filteredMembers trùng với onlineUser
+                        const isOnline = filteredMembers.some((memberId) => onlineUserSet.has(memberId));
+                        return (
+                            <div key={chat._id}
+                                className={`relative flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
+                                onClick={() => navigate(`/messenger/${chat._id}`)}
+                            >
+                                {isOnline && (
+                                    <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
                                 )}
-                            </div>
-                        </div>                      
-                    )
-                })}
-            </div>
+                                <div className='w-10 h-10'>
+                                    <img className='h-full w-full object-cover rounded-full'
+                                        src={chat.avatar}
+                                        alt=''
+                                    />                                
+                                </div>
+                                <div className='ml-3'>
+                                    <h1 className={`text-[15px] font-medium`}>
+                                        {chat.name}
+                                    </h1>
+                                    {chat.firstMessage === null ? (
+                                        <div className={`text-[13.5px] font-medium`}>
+                                            Please send a message to {chat.name}.
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            {chat.firstMessage?.image !== null ? (
+                                                <div className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}>
+                                                    {chat.firstMessage?.senderId._id === user?.userId ? (
+                                                        <p>
+                                                            You have sent 1 photo to {chat.name}.
+                                                        </p>
+                                                    ) : (
+                                                        <p>
+                                                            {chat.firstMessage?.senderId.username} have sent 1 photo to you.
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}
+                                                    style={{ 
+                                                        maxWidth: '20vw', 
+                                                        overflow: 'hidden', 
+                                                        whiteSpace: 'nowrap', 
+                                                        textOverflow: 'ellipsis',
+                                                        display: 'block' // Đảm bảo rằng nó là block hoặc inline-block để xử lý ellipsis
+                                                    }}
+                                                >
+                                                    {chat.firstMessage?.senderId._id === user?.userId ? (
+                                                        <p style={{ display: 'inline', margin: 0 }}>
+                                                            You: {chat.firstMessage?.text}
+                                                        </p>
+                                                    ) : (
+                                                        <p style={{ display: 'inline', margin: 0 }}>
+                                                            {chat.firstMessage?.senderId.username}: {chat.firstMessage?.text}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>                      
+                        )
+                    })}
+                </div>
+            )}
+
         </div>
     )
 }

@@ -24,6 +24,7 @@ import ReportPost from './ReportPost'
 import ComfirmReport from './ComfirmReport'
 import socket from '../../socket'
 import ReportUser from '../changeProfile/ReportUser'
+import ReportPostGroup from './ReportPostGroup'
 
 const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const group = useSelector((state) => state.group.group)
@@ -39,6 +40,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const [editModal, setEditModal] = useState(false);
     const [showFelter, setShowFelter] = useState(false)
     const [reportModal, setReportModal] = useState(false)
+    const [reportPostGroup, setReportPostGroup] = useState(false)
     const [notiSuccess, setNotiSuccess] = useState(false)
     const [reportUser, setReportUser] = useState(false)
 
@@ -137,13 +139,13 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             setIsAbove(true);
             setModalPosition({
                 top: rect.top + window.scrollY - 100,
-                left: rect.left + window.scrollX - 220,
+                left: rect.left + window.scrollX - 320,
             });
         } else {
             setIsAbove(false);
             setModalPosition({
                 top: rect.bottom + window.scrollY + 15,
-                left: rect.left + window.scrollX - 220,
+                left: rect.left + window.scrollX - 320,
             });
         }
     
@@ -212,6 +214,13 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
     const handleReportModal = (post) =>{
         setShowModal(null)
         setReportModal(true)
+        setReportPostSuccess(true)
+        setSelectedPost(post)
+    }
+
+    const handleReportPostGroup = (post) => {
+        setShowModal(null)
+        setReportPostGroup(true)
         setReportPostSuccess(true)
         setSelectedPost(post)
     }
@@ -298,6 +307,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 handleReportModal={() => handleReportModal(post)}
                                 handleShowComfirmDelete={() => handleShowComfirmDelete(post)}
                                 handleReportUser={() => handleReportUser(post)}
+                                handleReportPostGroup={() => handleReportPostGroup(post)}
                             />
                         )}
                         {showDelete && selectedPost?.postId === post?.postId && (
@@ -350,6 +360,14 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 user = {user}
                                 postId = {selectedPost?.postId}
                                 isCloseModal = {() => setReportModal(false)}
+                                setNotiSuccess={() => setNotiSuccess(true)}
+                            />
+                        )}
+                        {reportPostGroup && selectedPost?.postId === post?.postId && (
+                            <ReportPostGroup
+                                user = {user}
+                                postId = {selectedPost?.postId}
+                                isCloseModal = {() => setReportPostGroup(false)}
                                 setNotiSuccess={() => setNotiSuccess(true)}
                             />
                         )}

@@ -51,7 +51,7 @@ const Group = () => {
             <h1 className='font-bold text-2xl ml-1 pb-3 mt-[50px]'>
                 Groups
             </h1>
-            <div className='w-full px-1 mb-4'>
+            {/* <div className='w-full px-1 mb-4'>
                 <form className='flex-1 flex items-center mt-2 bg-gray-100 mx-auto rounded-3xl'
                         // onSubmit={handleSearch}
                 >
@@ -72,7 +72,7 @@ const Group = () => {
                                     focus:outline-none'
                     />
                 </form>
-            </div>
+            </div> */}
             <div className='overflow-y-auto h-[76vh] no-scrollbar'>
                 <div className=''>
                     <div className={`flex-1 flex items-center p-2 ${location.pathname === `/groups` ? 'bg-blue-100' : 'hover:bg-gray-100'}  rounded-md mt-0.5 cursor-pointer`}

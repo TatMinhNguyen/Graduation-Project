@@ -116,7 +116,7 @@ const ViewAdminGroup = () => {
             Members requests
           </p>
         </div>
-        <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/groups/${groupId}/pending-posts` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
+        {/* <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/groups/${groupId}/pending-posts` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
           onClick={() => navigate(`/groups/${groupId}/pending-posts`)}
         >
           {location.pathname === `/groups/${groupId}/pending-posts` ? (
@@ -140,7 +140,7 @@ const ViewAdminGroup = () => {
           <p className={`ml-3 text-[16px] font-medium ${location.pathname === `/groups/${groupId}/pending-posts` ? 'text-customBlue' : ''}`}>
             Pending approvals
           </p>
-        </div>
+        </div> */}
         <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/groups/${groupId}/reported-posts` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
           onClick={() => navigate(`/groups/${groupId}/reported-posts`)}
         >

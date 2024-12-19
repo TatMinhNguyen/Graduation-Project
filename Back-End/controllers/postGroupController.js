@@ -3,6 +3,7 @@ const GroupModel = require("../models/GroupModel");
 const PostGroupModel = require("../models/PostGroupModel");
 const imagekit = require("../utils/imagekitConfig");
 const FeelModel = require("../models/FeelModel");
+const ReportPostGroupModel = require("../models/ReportPostGroupModel");
 
 const postGroupController = {
     //Create a post
@@ -69,11 +70,11 @@ const postGroupController = {
     
             await newPost.save();
 
-            if(group.type === false) {
-                if(group.createId.toString() !== userId){
-                    group.pendingPosts.push(newPost._id)
-                }    
-            }
+            // if(group.type === false) {
+            //     if(group.createId.toString() !== userId){
+            //         group.pendingPosts.push(newPost._id)
+            //     }    
+            // }
 
             await group.save();
 
@@ -439,7 +440,154 @@ const postGroupController = {
         } catch (error) {
             return res.status(500).json({ error: error.message});
         }
-    }
+    },
+
+    reportPost: async(req, res) => {
+        try {
+           const userId = req.user.id;
+           const postId = req.params.postId;
+           const {content, type} = req.body;
+           
+           const post = await PostGroupModel.findById(postId)
+
+           if(!post) {
+               return res.status(404).json({ error: "Post not found" })
+           }
+
+           const newReport = new ReportPostGroupModel({
+                userId: userId,
+                postId: postId,
+                groupId: post.groupId,
+                content: content,
+                type: type,
+           })
+
+           await newReport.save();
+
+           post.isReported = true;
+
+           await post.save();
+
+           return res.status(200).json({message: 'Report success'})
+        } catch (error) {
+            return res.status(500).json({ error: error.message});
+        }
+    },
+
+    getPostReported: async (req, res) => {
+        try {
+            const groupId = req.params.groupId;
+
+            // Lấy danh sách bài viết bị báo cáo từ ReportPostModel, sắp xếp theo thời gian báo cáo (createdAt)
+            const reportedPosts = await ReportPostGroupModel.find({ groupId: groupId }).sort({ createdAt: -1 });
+
+            if (!reportedPosts || reportedPosts.length === 0) {
+                return res.status(404).json({ message: "Không có bài viết nào bị báo cáo." });
+            }
+
+            // Nhóm bài viết theo postId và chỉ giữ báo cáo sớm nhất
+            const uniqueReports = {};
+            reportedPosts.forEach((report) => {
+                if (!uniqueReports[report.postId]) {
+                    uniqueReports[report.postId] = report;
+                }
+            });
+            const filteredReports = Object.values(uniqueReports);
+
+            // Tạo mảng promises để lấy thông tin bài viết từ PostModel
+            const postPromises = filteredReports.map((report) =>
+                PostGroupModel.findOne({ _id: report.postId, isReported: true })
+            );
+            const posts = await Promise.all(postPromises);
+
+            // Loại bỏ các bài viết không tồn tại hoặc không có isReported === true
+            const validPosts = posts.filter((post) => post);
+
+            if (!validPosts || validPosts.length === 0) {
+                return res.status(404).json({ message: "Không có bài viết hợp lệ." });
+            }
+
+            // Lấy thông tin tác giả từ UserModel
+            const userPromises = validPosts.map((post) => UserModel.findById(post.userId));
+            const authors = await Promise.all(userPromises);
+
+            // Gộp thông tin bài viết, tác giả, và thông tin báo cáo
+            const results = validPosts.map((post, index) => {
+                const author = authors[index];
+                // const report = reportedPosts.find((report) => report.postId === post._id.toString());
+                return {
+                    postId: post._id,
+                    groupId: post.groupId,
+                    description: post.description,
+                    images: post.images,
+                    video: post.video,
+                    typeText: post.typeText,
+                    createdAt: post?.createdAt, // Thời điểm bị báo cáo
+                    author: {
+                        authorId: author?._id,
+                        authorName: author?.username,
+                        authorAvatar: author?.profilePicture,
+                    },
+                };
+            });
+
+            return res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    getContentReport: async(req, res) => {
+        try {
+            const postId = req.params.postId
+            const reports = await ReportPostGroupModel.find({ postId }).sort({ createdAt: -1 });
+
+            // Lấy thông tin tác giả từ UserModel
+            const userPromises = reports.map((post) => UserModel.findById(post.userId));
+            const authors = await Promise.all(userPromises);
+
+            const results = reports.map((post, index) => {
+                const author = authors[index];
+                return {
+                    _id: post._id,
+                    postId: post.postId,
+                    content: post.content,
+                    type: post.type,
+                    createdAt: post?.createdAt, // Thời điểm bị báo cáo
+                    author: {
+                        authorId: author?._id,
+                        authorName: author?.username,
+                        authorAvatar: author?.profilePicture,
+                    },
+                };
+            });
+
+            res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    keepPost : async(req, res) => {
+        try {
+            const postId = req.params.postId;
+
+            const post = await PostGroupModel.findById(postId)
+
+            if(!post){
+                return res.status(404).json({ error: "Post not found" })
+            }         
+
+            post.isReported = false;
+
+            await post.save();
+
+            return res.status(200).json({message: "Keep"})
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },    
+
 }
 
 module.exports = postGroupController

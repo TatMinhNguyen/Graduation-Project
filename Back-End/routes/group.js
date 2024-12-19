@@ -72,4 +72,11 @@ router.get(
 router.get('/get-a-post/:postId', middleware.verifyToken, postGroupController.getAPost)
 router.get('/get-pending-post/:groupId', middleware.verifyToken, postGroupController.getPendingPost)
 
+router.post('/report-post/:postId', middleware.verifyToken, postGroupController.reportPost);
+
+router.get('/get-post-reported/:groupId', middleware.verifyToken, postGroupController.getPostReported)
+router.get('/get-detail-report/:postId', middleware.verifyToken, postGroupController.getContentReport)
+
+router.post('/keep-post/:postId', middleware.verifyToken, postGroupController.keepPost)
+
 module.exports = router;

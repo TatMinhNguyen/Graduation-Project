@@ -75,7 +75,7 @@ const GetSuggestGroups = () => {
   }, []);
 
   return (
-    <div className='py-2 px-10'>
+    <div className='py-2 px-10 pt-16'>
       <h1 className='text-[18px] font-medium mb-2'>
         Suggestions
       </h1>

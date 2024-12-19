@@ -1,10 +1,10 @@
 import React from 'react'
 
-const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleEditModal, handleShowComfirmDelete, handleReportModal, handleReportUser}) => {
+const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleEditModal, handleShowComfirmDelete, handleReportModal, handleReportUser, handleReportPostGroup}) => {
   return (
     <div
         ref={modalRef}
-        className='absolute w-[250px] bg-white border border-gray-200 rounded-md shadow-2xl z-10'
+        className='absolute w-[350px] bg-white border border-gray-200 rounded-md shadow-2xl z-10'
         style={{
             top: modalPosition.top,
             left: modalPosition.left,
@@ -14,7 +14,7 @@ const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleE
             <div
                 className={`absolute transform rotate-45 w-4 h-4 bg-white border-gray-200 ${
                     isAbove ? 'bottom-[-7px] border-b border-r' : 'top-[-8px] border-l border-t'
-                } left-[230px]`}>
+                } left-[330px]`}>
             </div>
             <div className='py-2.5 px-2 '>
                 {user?.userId === post?.author?.authorId && (
@@ -28,7 +28,7 @@ const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleE
                         <p className='py-1 font-medium cursor-pointer text-black'>Edit post </p>
                     </div>                                            
                 )}
-                {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && user?.isAdmin === false && (
+                {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && user?.isAdmin === false && !post?.groupId && (
                     <>
                         <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
                             onClick={() => handleReportModal()}
@@ -48,6 +48,19 @@ const ShowModal = ({modalRef, modalPosition, user, post, group, isAbove, handleE
                             />
                             <p className='py-1 font-medium cursor-pointer text-black'>Report profile </p>
                         </div>                 
+                    </>                           
+                )}
+                {user?.userId !== post?.author?.authorId && user?.userId !== group?.createId && user?.isAdmin === false && post?.groupId && (
+                    <>
+                        <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
+                            onClick={() => handleReportPostGroup()}
+                        >
+                            <img className='w-5 h-5 mr-3 mt-2'
+                                src={require('../../assets/icons/report-post.png')}
+                                alt=''
+                            />
+                            <p className='py-1 font-medium cursor-pointer text-black'>Report post to group admin</p>
+                        </div>                  
                     </>                           
                 )}
                 {(user?.userId === post?.author?.authorId || user?.userId === group?.createId || user?.isAdmin) && (
