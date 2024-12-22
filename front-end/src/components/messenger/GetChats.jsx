@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {  useDispatch, useSelector } from 'react-redux'
-import { createChat1vs1, getUserChat, searchMembers } from '../../api/chat/chat'
+import { checkMessages, createChat1vs1, getUserChat, searchMembers } from '../../api/chat/chat'
 import { useNavigate, useParams } from 'react-router-dom'
 import socket from '../../socket'
 import CreateGroupChat from './CreateGroupChat'
@@ -35,6 +35,13 @@ const GetChats = () => {
       } catch (error) {
           console.log(error)
       }
+    }
+
+    const handleCheckMessage = async(chatId) => {
+        await checkMessages(user?.token, chatId)
+        navigate(`/messenger/${chatId}`)
+        
+        await getUserChat(user?.token, dispatch)
     }
 
     const handleCreateChat = async(userId) => {
@@ -179,7 +186,7 @@ const GetChats = () => {
                         return (
                             <div key={chat._id}
                                 className={`relative flex items-center p-2 py-2.5 ${chat._id === chatId ? "bg-neutral-200" : "hover:bg-gray-200"}  rounded-lg cursor-pointer`}
-                                onClick={() => navigate(`/messenger/${chat._id}`)}
+                                onClick={() => handleCheckMessage(chat._id)}
                             >
                                 {isOnline && (
                                     <div className='w-3 h-3 border-2 border-white rounded-full bg-green-600 absolute mt-[29px] ml-[29px]'></div>
@@ -195,13 +202,13 @@ const GetChats = () => {
                                         {chat.name}
                                     </h1>
                                     {chat.firstMessage === null ? (
-                                        <div className={`text-[13.5px] font-medium`}>
+                                        <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}>
                                             Please send a message to {chat.name}.
                                         </div>
                                     ) : (
                                         <div>
                                             {chat.firstMessage?.image !== null ? (
-                                                <div className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}>
+                                                <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}>
                                                     {chat.firstMessage?.senderId._id === user?.userId ? (
                                                         <p>
                                                             You have sent 1 photo to {chat.name}.
@@ -214,7 +221,7 @@ const GetChats = () => {
                                                 </div>
                                             ) : (
                                                 <div
-                                                    className={`${chat.read === false ? "text-[13.5px] font-medium" : "text-[13.5px]"}`}
+                                                    className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}
                                                     style={{ 
                                                         maxWidth: '20vw', 
                                                         overflow: 'hidden', 

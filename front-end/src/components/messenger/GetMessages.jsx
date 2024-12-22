@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { addMess, getAChat, getMess, getUserChat } from '../../api/chat/chat';
+import { addMess, checkMessages, getAChat, getMess, getUserChat } from '../../api/chat/chat';
 import { useDispatch, useSelector } from 'react-redux';
 import InputEmoji from "react-input-emoji";
 import { timeAgoShort } from '../../utils';
@@ -58,6 +58,7 @@ const GetMessages = () => {
   const handleGetMess = async () => {
     try {
         await getMess(user?.token, chatId, params, dispatch);
+        await checkMessages(user?.token, chatId)
     } catch (error) {
         console.error('Errors:', error);
     }
@@ -126,6 +127,11 @@ const GetMessages = () => {
     await getAChat(user?.token, chatId, dispatch)
   }
 
+  const handleCall = () => {
+    navigate(`/room/${chat?._id}`)
+    socket.emit('create-room', chat?._id, filteredMembers);
+  }
+
   /* eslint-disable */
   useEffect(() => {
     socket.on('send-message', () => {
@@ -188,7 +194,7 @@ const GetMessages = () => {
             </div>
             <div className='flex-1'></div>
             <div className='p-1.5 hover:bg-gray-100 rounded-full mr-2 cursor-pointer'
-                onClick={() => navigate(`/room/${chat?._id}`)}
+                onClick={() => handleCall()}
             >
                 <img className='h-5 w-5 object-cover rounded-full'
                     src={require('../../assets/icons/call.png')}

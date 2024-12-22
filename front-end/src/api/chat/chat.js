@@ -41,6 +41,16 @@ export const createChat1vs1 = async (token, userId, navigate) => {
     }
 }
 
+export const checkMessages = async (token, chatId) => {
+    try {
+        await axios.post(`${apiUrl}/chat/check-message/${chatId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const getMess = async (token, chatId, params, dispatch) => {
     try {
         const res = await axios.get(`${apiUrl}/chat/get-message/${chatId}`, {

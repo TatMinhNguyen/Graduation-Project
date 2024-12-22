@@ -7,11 +7,17 @@ import ChangePassword from '../changeProfile/ChangePassword';
 import socket from '../../socket';
 import { getNotification } from '../../api/notification/notification';
 import GetNotifications from '../notification/GetNotifications';
+import callSound from "../../assets/sounds/call.mp4";
+import { getAChat } from '../../api/chat/chat';
 
 const NavBar = ({user}) => {
     const profile = useSelector((state) => state?.auth?.profile)
+    const chat = useSelector((state) => state.chat.chat)
 
     const location = useLocation();
+
+    const [incomingCall, setIncomingCall] = useState(null); // Lưu thông tin cuộc gọi
+    const [audio, setAudio] = useState(null); // Lưu âm thanh gọi
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showModalNotification, setShowModalNotification] = useState(false);
@@ -28,6 +34,7 @@ const NavBar = ({user}) => {
 
     const scountNotifications = notifications?.filter((noti) => noti?.read === false)
 
+     /* eslint-disable */
     useEffect(() => {
         // Kiểm tra xem có kết nối thành công hay không
         socket.on("connect", () => {
@@ -37,7 +44,7 @@ const NavBar = ({user}) => {
         socket.emit('online')
 
         socket.on("notification", (newNotification) => {
-          console.log("New notification:", newNotification);
+        //   console.log("New notification:", newNotification);
           // Cập nhật state thông báo
           setNotifications((prev) => [newNotification, ...prev]);
         }); 
@@ -46,6 +53,45 @@ const NavBar = ({user}) => {
           socket.off("connect");
         };
     }, []);
+
+     /* eslint-disable */
+    useEffect(() => {
+        // Lắng nghe sự kiện 'room-invitation'
+        socket.on("room-invitation", (roomId) => {
+          setIncomingCall({ roomId });
+          const callAudio = new Audio(callSound); // Đường dẫn âm thanh
+          callAudio.loop = true; // Lặp âm thanh
+          callAudio.play();
+          setAudio(callAudio);
+
+          handleGetAChat(roomId);
+        });
+    
+        // Cleanup khi component unmount
+        return () => {
+          socket.off("room-invitation");
+          if (audio) audio.pause();
+        };
+    }, [socket, audio]);
+
+    const handleAccept = () => {
+        if (incomingCall?.roomId) {
+          navigation(`/room/${incomingCall?.roomId}`); // Chuyển đến phòng
+          if (audio) audio.pause(); // Dừng âm thanh
+          setIncomingCall(null); // Xóa thông tin cuộc gọi
+        }
+    };
+    
+    const handleDecline = () => {
+        if (audio) audio.pause(); // Dừng âm thanh
+        setIncomingCall(null); // Ẩn thông báo
+    };
+    
+    // if (!incomingCall) return null; // Không hiển thị nếu không có cuộc gọi
+
+    const handleGetAChat = async (chatId) => {
+        await getAChat(user?.token, chatId, dispatch)
+    }
 
     const handleGetNotifications = async () => {
         try {
@@ -348,6 +394,49 @@ const NavBar = ({user}) => {
                         user={user}
                         isCloseModal = {() => setShowChangePassword(false)}
                     />
+                )}
+                {incomingCall && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg p-4 w-1/4 shadow-lg text-center">
+                          <h2 className="text-lg font-bold mb-5">Incoming call</h2>
+                          <div className='flex flex-col items-center justify-center h-full'>
+                            <img
+                                src={chat?.avatar}
+                                alt='Avatar'
+                                className='w-24 h-24 object-cover rounded-full'
+                            />
+                            <h1 className='text-black font-bold text-xl mt-1'>
+                                {chat?.name} is calling you
+                            </h1>
+                            </div>
+                          <div className="mt-4 flex justify-around">
+                            <button
+                              className="my-2 flex flex-col justify-center"
+                              onClick={handleAccept}
+                            >
+                                <img className='w-10 h-10'
+                                    src={require("../../assets/icons/phone-call.png")}
+                                    alt=''
+                                />
+                                <p className='text-sm mt-1 font-medium'>
+                                    Accept
+                                </p>
+                            </button>
+                            <button
+                              className="my-2 flex flex-col justify-center"
+                              onClick={handleDecline}
+                            >
+                                <img className='w-10 h-10'
+                                    src={require("../../assets/icons/cancel-red.png")}
+                                    alt=''
+                                />
+                                <p className='text-sm mt-1 font-medium'>
+                                    Decline
+                                </p>
+                            </button>
+                          </div>
+                        </div>
+                    </div>
                 )}
           </div>
 

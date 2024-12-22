@@ -23,16 +23,22 @@ import GetFeft from '../../../components/comment/GetFeft';
 import NavBar from '../../../components/navbar/NavBar';
 import { getAPostGroup } from '../../../api/group/group';
 import socket from '../../../socket';
+import { getAChat } from '../../../api/chat/chat';
+import callSound from "../../../assets/sounds/call.mp4";
 
 const GetAPost = () => {
     const { postId } = useParams();
     const user = useSelector((state) => state.auth.login?.currentUser)
     const comments = useSelector((state) => state.post.comments)
+    const chat = useSelector((state) => state.chat.chat)
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const profile = useSelector((state) => state?.auth?.profile)
+
+    const [incomingCall, setIncomingCall] = useState(null); // Lưu thông tin cuộc gọi
+    const [audio, setAudio] = useState(null); // Lưu âm thanh gọi    
 
     const [postPromise, setPost] = useState({})
     const [postGroup, setPostGroup] = useState({})
@@ -63,6 +69,43 @@ const GetAPost = () => {
           socket.off("onlineUsers");
         };
     }, []);
+
+     /* eslint-disable */
+     useEffect(() => {
+        // Lắng nghe sự kiện 'room-invitation'
+        socket.on("room-invitation", (roomId) => {
+          setIncomingCall({ roomId });
+          const callAudio = new Audio(callSound); // Đường dẫn âm thanh
+          callAudio.loop = true; // Lặp âm thanh
+          callAudio.play();
+          setAudio(callAudio);
+
+          handleGetAChat(roomId);
+        });
+    
+        // Cleanup khi component unmount
+        return () => {
+          socket.off("room-invitation");
+          if (audio) audio.pause();
+        };
+    }, [socket, audio]);
+
+    const handleAccept = () => {
+        if (incomingCall?.roomId) {
+          navigate(`/room/${incomingCall?.roomId}`); // Chuyển đến phòng
+          if (audio) audio.pause(); // Dừng âm thanh
+          setIncomingCall(null); // Xóa thông tin cuộc gọi
+        }
+    };
+    
+    const handleDecline = () => {
+        if (audio) audio.pause(); // Dừng âm thanh
+        setIncomingCall(null); // Ẩn thông báo
+    };
+
+    const handleGetAChat = async (chatId) => {
+        await getAChat(user?.token, chatId, dispatch)
+    }
 
     const handleMouseEnter = (postId) => {
         setHoveredPostId(postId);
@@ -379,6 +422,49 @@ const GetAPost = () => {
                                         postId={post?.post?._id}
                                         isCloseModal = {() => setShowFelter(false)}
                                     />
+                                )}
+                                {incomingCall && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-lg p-4 w-1/4 shadow-lg text-center">
+                                        <h2 className="text-lg font-bold mb-5">Incoming call</h2>
+                                        <div className='flex flex-col items-center justify-center h-full'>
+                                            <img
+                                                src={chat?.avatar}
+                                                alt='Avatar'
+                                                className='w-24 h-24 object-cover rounded-full'
+                                            />
+                                            <h1 className='text-black font-bold text-xl mt-1'>
+                                                {chat?.name} is calling you
+                                            </h1>
+                                            </div>
+                                        <div className="mt-4 flex justify-around">
+                                            <button
+                                            className="my-2 flex flex-col justify-center"
+                                            onClick={handleAccept}
+                                            >
+                                                <img className='w-10 h-10'
+                                                    src={require("../../../assets/icons/phone-call.png")}
+                                                    alt=''
+                                                />
+                                                <p className='text-sm mt-1 font-medium'>
+                                                    Accept
+                                                </p>
+                                            </button>
+                                            <button
+                                            className="my-2 flex flex-col justify-center"
+                                            onClick={handleDecline}
+                                            >
+                                                <img className='w-10 h-10'
+                                                    src={require("../../../assets/icons/cancel-red.png")}
+                                                    alt=''
+                                                />
+                                                <p className='text-sm mt-1 font-medium'>
+                                                    Decline
+                                                </p>
+                                            </button>
+                                        </div>
+                                        </div>
+                                    </div>
                                 )}
                                 <div className='relative'>
                                     {/* Các nút hành động */}

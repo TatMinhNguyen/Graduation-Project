@@ -19,6 +19,7 @@ const chatSchema = new mongoose.Schema(
             type:Number,
             default:0
         },
+        readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' }],
         read: { type: Boolean, default: false }
     },
     { timestamps: true }

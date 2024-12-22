@@ -43,9 +43,12 @@ const messageController = {
                 senderId,
                 text,
                 image: imageUrl,
-            });  
+            }); 
+            
+            chat.readBy = [];  // Xóa hết những người đã đọc
 
-            chat.messageCount = chat.messageCount + 1
+            chat.messageCount = chat.messageCount + 1;
+            chat.read = false;
 
             await chat.save()
 
@@ -104,7 +107,37 @@ const messageController = {
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
+
+    checkMessages: async (req, res) => {
+        try {
+            const { chatId } = req.params;
+            const userId = req.user.id; // ID của người đang thực hiện hành động
+            
+            const chat = await ChatModel.findById(chatId);
+    
+            if (!chat) {
+                return res.status(404).json('Not Chat Found');
+            }
+    
+            // Nếu người dùng chưa đánh dấu chat là đã đọc
+            if (!chat.readBy.includes(userId)) {
+                chat.readBy.push(userId);  // Thêm user vào mảng readBy
+            }
+    
+            // Kiểm tra xem tất cả các thành viên đã đọc chưa
+            if (chat.readBy.length === chat.members.length) {
+                chat.read = true; // Đánh dấu chat là đã được tất cả các thành viên đọc
+            }
+    
+            // Cập nhật chat mà không thay đổi `updatedAt`
+            await chat.save({ timestamps: false });
+    
+            res.status(200).json({ message: "OK!" });
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    }    
         
 }
 

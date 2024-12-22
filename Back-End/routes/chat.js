@@ -45,4 +45,6 @@ router.post('/search-user/:chatId', middleware.verifyToken, chatController.searc
 
 router.post('/search-members', middleware.verifyToken, chatController.searchMembers)
 
+router.post('/check-message/:chatId', middleware.verifyToken, messageController.checkMessages);
+
 module.exports = router;
