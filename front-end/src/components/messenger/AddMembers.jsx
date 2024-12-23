@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
-import { addMemberes, searchUser } from '../../api/chat/chat';
-import { useSelector } from 'react-redux';
+import { addMemberes, getMess, getUserChat, searchUser } from '../../api/chat/chat';
+import { useDispatch, useSelector } from 'react-redux';
+import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
     const [searchInput, setInput] = useState('')
     const [data, setData] = useState([])
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const dispatch = useDispatch();
 
     const getNewMembersId = (selectedUsers) => {
         return selectedUsers.map(user => user.userId);
@@ -15,13 +19,26 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
     const newMembersId = getNewMembersId(selectedUsers);
 
     const handleAddMembers = async(e) => {
-        e.preventDefault();
-        const newMembers = {
-            newMembers: newMembersId
+        const params = {
+            page: 1,
+            index: 20,
         }
-        await addMemberes(user?.token, newMembers, chatId)
-        onCloseModal();
-        isCloseModal();
+        e.preventDefault();
+        setLoading(true)
+        try {
+            const newMembers = {
+                newMembers: newMembersId
+            }
+            await addMemberes(user?.token, newMembers, chatId)
+            await getMess(user?.token, chatId, params, dispatch);
+            await getUserChat(user?.token, dispatch)
+            onCloseModal();
+            isCloseModal();            
+        } catch (error) {
+            console.log(error)
+        }finally{
+            setLoading(false)
+        }
     }
 
     const handleSearch = async(e) => {
@@ -161,18 +178,25 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
                     ))}
                 </div>
                 <div className='flex-1 flex justify-center mt-1'>
-                    {newMembersId?.length > 0 ? (
-                        <button className={`bg-customBlue text-white w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}
-                            onClick={handleAddMembers}
-                        >
-                            Add people
-                        </button>                        
-                    ):(
-                        <div className={`flex justify-center bg-gray-100 text-gray-300 w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}>
-                            Add people
+                    {loading ? (
+                        <div className="flex justify-center">
+                            <LoadingSpinner/>
                         </div>
+                    ) : (
+                        <>
+                            {newMembersId?.length > 0 ? (
+                                <button className={`bg-customBlue text-white w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}
+                                    onClick={handleAddMembers}
+                                >
+                                    Add people
+                                </button>                        
+                            ):(
+                                <div className={`flex justify-center bg-gray-100 text-gray-300 w-11/12 py-1 pb-1.5 rounded-md font-medium text-[14px]`}>
+                                    Add people
+                                </div>
+                            )}                        
+                        </>
                     )}
-
                 </div>
             </div>
         </div>

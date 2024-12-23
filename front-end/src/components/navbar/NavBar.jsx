@@ -408,7 +408,7 @@ const NavBar = ({user}) => {
                             <h1 className='text-black font-bold text-xl mt-1'>
                                 {chat?.name} is calling you
                             </h1>
-                            </div>
+                          </div>
                           <div className="mt-4 flex justify-around">
                             <button
                               className="my-2 flex flex-col justify-center"

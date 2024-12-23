@@ -1,7 +1,7 @@
 const ChatModel = require("../models/ChatModel");
 const MessageModel = require("../models/MessageModel");
 const UserModel = require("../models/UserModel");
-const { sendChats } = require("../socket/socket");
+const { sendChats, sendMessage } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 function removeVietnameseTones(str) {
@@ -311,21 +311,49 @@ const chatController = {
                 return res.status(403).json({ message: "Bạn không phải là thành viên của nhóm chat này." });
             }
     
-            // Thêm thành viên mới nếu chưa có trong danh sách thành viên của nhóm
+            // Lọc danh sách thành viên mới chưa có trong nhóm
+            const addedMembers = [];
             newMembers.forEach(member => {
                 if (!chat.members.includes(member)) {
                     chat.members.push(member);
+                    addedMembers.push(member); // Lưu lại những người thực sự được thêm vào
                 }
             });
     
-            // Lưu lại nhóm chat
+            // Nếu không có ai mới được thêm vào, không cần tạo tin nhắn
+            if (addedMembers.length === 0) {
+                return res.status(200).json({ message: "Tất cả các thành viên đã có trong nhóm." });
+            }
+    
+            // Truy vấn để lấy thông tin username của các thành viên mới
+            const users = await UserModel.find({ _id: { $in: addedMembers } }, 'username'); // Chỉ lấy trường username
+            const usernames = users.map(user => user.username); // Lấy danh sách username
+    
+            // Tạo nội dung thông báo ai được thêm vào nhóm
+            const addedMembersText = usernames.join(', ');
+            const notificationMessage = `${addedMembersText} has been added to the chat group.`;
+    
+            // Tạo tin nhắn thông báo
+            const message = new MessageModel({
+                chatId: chat._id,
+                senderId: '66fbc2e6e600beb492a84969', // Người gửi là người thực hiện thêm
+                text: notificationMessage,
+                image: null,
+            });
+
+            sendMessage(chat.members, message)
+            sendChats(chat.members)
+    
+            // Lưu lại nhóm chat và tin nhắn
             await chat.save();
+            await message.save();
     
             return res.status(200).json({ message: "Thêm thành viên vào nhóm chat thành công" });
         } catch (error) {
             return res.status(500).json({ message: "Lỗi server", error });
         }
     },
+    
     
     removeMemberFromGroupChat: async (req, res) => {
         try {

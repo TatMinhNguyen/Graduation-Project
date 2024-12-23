@@ -233,7 +233,7 @@ const GetMessages = () => {
         <div className={`overflow-y-auto ${imagePreview ? 'h-[calc(72vh-90px)]' : 'h-[73vh]'}  flex flex-col-reverse px-3 pt-2`}>
             {messages?.map((message) => (
                 <div key={message._id}
-                    className={`flex ${message.senderId._id === user?.userId ? 'justify-end' : 'justify-start'} mb-2`}
+                    className={`flex ${message.senderId._id === user?.userId ? 'justify-end' : message.senderId._id === '66fbc2e6e600beb492a84969' ? "justify-center" : 'justify-start'} mb-2`}
                 >
                     {message.senderId._id === user?.userId ? (
                         <div className=' '>
@@ -259,7 +259,13 @@ const GetMessages = () => {
                                 </p>                                
                             </div>
                         </div>
-                    ):(
+                    ) : message.senderId._id === '66fbc2e6e600beb492a84969' ? (
+                        <div className='max-w-xs'>
+                            <p className='text-[12px] text-neutral-400 font-medium text-center'>
+                                {message.text}
+                            </p>
+                        </div>
+                    ) : (
                         <div>
                             {chat?.members?.length > 2 && (
                                 <div className='ml-11 mb-px'>

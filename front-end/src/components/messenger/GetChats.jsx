@@ -202,13 +202,13 @@ const GetChats = () => {
                                         {chat.name}
                                     </h1>
                                     {chat.firstMessage === null ? (
-                                        <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}>
+                                        <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13px] text-gray-500" : "text-[13px] font-medium"}`}>
                                             Please send a message to {chat.name}.
                                         </div>
                                     ) : (
                                         <div>
                                             {chat.firstMessage?.image !== null ? (
-                                                <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}>
+                                                <div className={`${chat.readBy?.includes(user?.userId) ? "text-[13px] text-gray-500" : "text-[13px] font-medium"}`}>
                                                     {chat.firstMessage?.senderId._id === user?.userId ? (
                                                         <p>
                                                             You have sent 1 photo to {chat.name}.
@@ -221,7 +221,7 @@ const GetChats = () => {
                                                 </div>
                                             ) : (
                                                 <div
-                                                    className={`${chat.readBy?.includes(user?.userId) ? "text-[13.5px]" : "text-[13.5px] font-medium"}`}
+                                                    className={`${chat.readBy?.includes(user?.userId) ? "text-[13px] text-gray-500" : "text-[13px] font-medium"}`}
                                                     style={{ 
                                                         maxWidth: '20vw', 
                                                         overflow: 'hidden', 
@@ -235,9 +235,18 @@ const GetChats = () => {
                                                             You: {chat.firstMessage?.text}
                                                         </p>
                                                     ) : (
-                                                        <p style={{ display: 'inline', margin: 0 }}>
-                                                            {chat.firstMessage?.senderId.username}: {chat.firstMessage?.text}
-                                                        </p>
+                                                        <>
+                                                            {chat.firstMessage?.senderId.username !== "Admin" ? (
+                                                                <p style={{ display: 'inline', margin: 0 }}>
+                                                                    {chat.firstMessage?.senderId.username}: {chat.firstMessage?.text}
+                                                                </p>                                                                
+                                                            ):(
+                                                                <p style={{ display: 'inline', margin: 0 }}>
+                                                                    {chat.firstMessage?.text}
+                                                                </p>
+                                                            )}
+                                                        </>
+
                                                     )}
                                                 </div>
 
@@ -245,6 +254,11 @@ const GetChats = () => {
                                         </div>
                                     )}
                                 </div>
+                                <div className='flex-1'></div>
+                                {!chat.readBy?.includes(user?.userId) && (
+                                    <div className='w-2.5 h-2.5 bg-blue-500 rounded-full mr-3'>
+                                    </div>                                    
+                                )}
                             </div>                      
                         )
                     })}
