@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import LoadingSpinner from '../spinner/LoadingSpinner';
-import { changePhoto, getAChat, getUserChat } from '../../api/chat/chat';
+import { changePhoto, getAChat, getMess, getUserChat } from '../../api/chat/chat';
 import { useNavigate } from 'react-router-dom';
 
 const ChangePhoto = ({isCloseModal, avatar, user, chatId, isClose}) => {
@@ -43,6 +43,10 @@ const ChangePhoto = ({isCloseModal, avatar, user, chatId, isClose}) => {
     const handleChangeAvatar = async(e) => {
         e.preventDefault();
         setLoading(true)
+        const params = {
+            page: 1,
+            index: 20,
+        }
         try {
             const formData = new FormData();
             if (image) {
@@ -56,6 +60,7 @@ const ChangePhoto = ({isCloseModal, avatar, user, chatId, isClose}) => {
             isClose();
 
             await getAChat(user?.token, chatId, dispatch)
+            await getMess(user?.token, chatId, params, dispatch);
             await getUserChat(user?.token, dispatch)
         } catch (error) {
             console.log(error)

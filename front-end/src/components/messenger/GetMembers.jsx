@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChat1vs1, deleteMember, getMembers, getUserChat, leaveGroup } from '../../api/chat/chat'
+import { createChat1vs1, deleteMember, getMembers, getMess, getUserChat, leaveGroup } from '../../api/chat/chat'
 import AddMembers from './AddMembers'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import { useNavigate } from 'react-router-dom'
@@ -52,13 +52,19 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
 
     const handleDeleteMembers = async (memberId) => {
         setLoading(true)
+        const params = {
+            page: 1,
+            index: 20,
+        }
         try {
             const member = {
                 memberId: memberId
             }
             await deleteMember(user?.token, member, chatId)
             
-            handleGetMembers();
+            await getMess(user?.token, chatId, params, dispatch);
+            await getUserChat(user?.token, dispatch)
+            isCloseModal()
         } catch (error) {
             console.log(error)
         } finally{

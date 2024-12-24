@@ -341,6 +341,8 @@ const chatController = {
                 image: null,
             });
 
+            chat.readBy = [];
+
             sendMessage(chat.members, message)
             sendChats(chat.members)
     
@@ -379,9 +381,28 @@ const chatController = {
     
             // Xóa thành viên khỏi danh sách
             chat.members = chat.members.filter(member => member.toString() !== memberId);
+
+            const user = await UserModel.findById(memberId).select("username");
+            const username = user.username;
+
+            const notificationMessage = `${username} has been removed from the group chat by the group leader.`;
     
-            // Lưu lại nhóm chat
+            // Tạo tin nhắn thông báo
+            const message = new MessageModel({
+                chatId: chat._id,
+                senderId: '66fbc2e6e600beb492a84969', // Người gửi là người thực hiện thêm
+                text: notificationMessage,
+                image: null,
+            });
+
+            chat.readBy = [];
+
+            sendMessage(chat.members, message)
+            sendChats(chat.members)
+    
+            // Lưu lại nhóm chat và tin nhắn
             await chat.save();
+            await message.save();
     
             return res.status(200).json({ message: "Xóa thành viên khỏi nhóm chat thành công" });
         } catch (error) {
@@ -421,8 +442,27 @@ const chatController = {
                 }
             }
     
-            // Lưu lại nhóm chat
+            const user = await UserModel.findById(userId).select("username");
+            const username = user.username;
+
+            const notificationMessage = `${username} has left the group chat.`;
+    
+            // Tạo tin nhắn thông báo
+            const message = new MessageModel({
+                chatId: chat._id,
+                senderId: '66fbc2e6e600beb492a84969', // Người gửi là người thực hiện thêm
+                text: notificationMessage,
+                image: null,
+            });
+
+            chat.readBy = [];
+
+            sendMessage(chat.members, message)
+            sendChats(chat.members)
+    
+            // Lưu lại nhóm chat và tin nhắn
             await chat.save();
+            await message.save();
     
             return res.status(200).json({ message: "Rời nhóm chat thành công" });
         } catch (error) {
@@ -487,7 +527,27 @@ const chatController = {
 
             chat.avatar = imageUrl
 
+            const user = await UserModel.findById(userId).select("username");
+            const username = user.username;
+
+            const notificationMessage = `${username} has changed the group chat's profile picture.`;
+    
+            // Tạo tin nhắn thông báo
+            const message = new MessageModel({
+                chatId: chat._id,
+                senderId: '66fbc2e6e600beb492a84969', // Người gửi là người thực hiện thêm
+                text: notificationMessage,
+                image: null,
+            });
+
+            chat.readBy = [];
+
+            sendMessage(chat.members, message)
+            sendChats(chat.members)
+    
+            // Lưu lại nhóm chat và tin nhắn
             await chat.save();
+            await message.save();
 
             return res.status(200).json({ message: 'Upload successfully.'});
         } catch (error) {
@@ -512,7 +572,27 @@ const chatController = {
             
             chat.name = newName;
 
+            const user = await UserModel.findById(userId).select("username");
+            const username = user.username;
+
+            const notificationMessage = `${username} changed the chat group name to ${newName}.`;
+    
+            // Tạo tin nhắn thông báo
+            const message = new MessageModel({
+                chatId: chat._id,
+                senderId: '66fbc2e6e600beb492a84969', // Người gửi là người thực hiện thêm
+                text: notificationMessage,
+                image: null,
+            });
+
+            chat.readBy = [];
+
+            sendMessage(chat.members, message)
+            sendChats(chat.members)
+    
+            // Lưu lại nhóm chat và tin nhắn
             await chat.save();
+            await message.save();
 
             return res.status(200).json({ message: 'Upload successfully.'});            
         } catch (error) {

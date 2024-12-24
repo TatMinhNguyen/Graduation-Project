@@ -48,7 +48,6 @@ const messageController = {
             chat.readBy = [];  // Xóa hết những người đã đọc
 
             chat.messageCount = chat.messageCount + 1;
-            chat.read = false;
 
             await chat.save()
 
@@ -123,11 +122,6 @@ const messageController = {
             // Nếu người dùng chưa đánh dấu chat là đã đọc
             if (!chat.readBy.includes(userId)) {
                 chat.readBy.push(userId);  // Thêm user vào mảng readBy
-            }
-    
-            // Kiểm tra xem tất cả các thành viên đã đọc chưa
-            if (chat.readBy.length === chat.members.length) {
-                chat.read = true; // Đánh dấu chat là đã được tất cả các thành viên đọc
             }
     
             // Cập nhật chat mà không thay đổi `updatedAt`

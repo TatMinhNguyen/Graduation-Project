@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import LoadingSpinner from '../spinner/LoadingSpinner'
-import { changeName, getAChat, getUserChat } from '../../api/chat/chat'
+import { changeName, getAChat, getMess, getUserChat } from '../../api/chat/chat'
 import { useNavigate } from 'react-router-dom'
 
 const ChangeName = ({chat, user, isCloseModal, isClose}) => {
@@ -21,6 +21,10 @@ const ChangeName = ({chat, user, isCloseModal, isClose}) => {
         const profile = {
             newName: username,
         }
+        const params = {
+            page: 1,
+            index: 20,
+        }
         try {
             await changeName(user?.token, profile, chat?._id, navigate)
             
@@ -28,6 +32,7 @@ const ChangeName = ({chat, user, isCloseModal, isClose}) => {
             isClose()
 
             await getAChat(user?.token, chat?._id, dispatch)
+            await getMess(user?.token, chat?._id, params, dispatch);
             await getUserChat(user?.token, dispatch)
         } catch (error) {
             console.log(error)
