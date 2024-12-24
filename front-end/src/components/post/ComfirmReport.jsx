@@ -1,13 +1,14 @@
 import React from 'react'
 
-const ComfirmReport = ({setNotiSuccess, reportPostSuccess, reportUserSuccess, setReportPostSuccess, setReportUserSuccess}) => {
+const ComfirmReport = ({setNotiSuccess, reportPostSuccess, reportUserSuccess, reportGroupSuccess, setReportUserSuccess, setReportPostSuccess, setReportGroupSuccess }) => {
     const handleCloseModal = () => {
         setNotiSuccess();
-        setReportPostSuccess();
         setReportUserSuccess();
+        setReportPostSuccess();
+        setReportGroupSuccess();
     }
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-15 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-85 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh]">
             <div className='flex flex-col items-center py-4'>
                 <img className='w-8 h-8'
@@ -33,14 +34,19 @@ const ComfirmReport = ({setNotiSuccess, reportPostSuccess, reportUserSuccess, se
                     <h3 className='font-medium'>
                         Reported to admin
                     </h3>
-                    {reportPostSuccess && ! reportUserSuccess && (
+                    {reportPostSuccess && ! reportUserSuccess && !reportGroupSuccess && (
                         <p className='text-[14px] text-gray-600'> 
                             You notified an admin about this post.
                         </p>                        
                     )}
-                    {!reportPostSuccess && reportUserSuccess && (
+                    {!reportPostSuccess && reportUserSuccess && !reportGroupSuccess && (
                         <p className='text-[14px] text-gray-600'> 
                             You notified an admin about this profile.
+                        </p>                        
+                    )}
+                    {!reportPostSuccess && !reportUserSuccess && reportGroupSuccess && (
+                        <p className='text-[14px] text-gray-600'> 
+                            You notified an admin about this group.
                         </p>                        
                     )}
                 </div>

@@ -384,8 +384,9 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                                 setNotiSuccess={() => setNotiSuccess(false)}
                                 reportPostSuccess={reportPostSuccess}
                                 reportUserSuccess={reportUserSuccess}
-                                setReportPostSuccess={() => setReportUserSuccess(false)}
+                                setReportPostSuccess={() => setReportPostSuccess(false)}
                                 setReportUserSuccess={() => setReportUserSuccess(false)}
+                                setReportGroupSuccess={()=> setReportUserSuccess(false)}
                             />
                         )}
                     </div>

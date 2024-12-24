@@ -74,6 +74,32 @@ const Admin = () => {
                             Reported users 
                         </p>
                     </div>
+
+                    <div className={`flex items-center px-2 py-2 rounded-md mb-1 cursor-pointer ${location.pathname === `/admin/reported-groups` ? 'bg-blue-100 hover:bg-blue-200' : 'hover:bg-gray-200'}`}
+                        onClick={() => navigate(`/admin/reported-groups`)}
+                    >
+                        {location.pathname === `/admin/reported-groups` ? (
+                            <div
+                            className="xtwfq29"
+                            style={{
+                                width: '20px',
+                                height: '20px',
+                                backgroundColor: '#0866FF',
+                                maskImage: `url(${require('../../assets/icons/team_blue.png')})`,
+                                maskSize: '20px 20px',
+                                maskPosition: '0px 0px',
+                            }}
+                            ></div>
+                        ) : (
+                            <img className='w-5 h-5'
+                            src={require('../../assets/icons/team.png')}
+                            alt=''
+                            />
+                        )}
+                        <p className={`ml-3 text-[16px] font-medium ${location.pathname === `/admin/reported-groups` ? 'text-customBlue' : ''}`}>
+                            Reported groups 
+                        </p>
+                    </div>
                 </div>
             </div>
             <div className='flex-1'></div>

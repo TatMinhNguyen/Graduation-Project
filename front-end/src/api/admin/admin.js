@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
-import { setPosts, setUsers } from "../../redux/adminSlice";
+import { setGroups, setPosts, setUsers } from "../../redux/adminSlice";
 
 export const getReportPosts = async (token, dispatch) => {
     try {
@@ -78,6 +78,48 @@ export const unBan = async (token, userId) => {
 export const getDetailReportUser = async(token, userId) => {
     try {
         const res = await axios.get(`${apiUrl}/admin/get-detail-report-user/${userId}`, {
+            headers: {token: `Bearer ${token}`}
+        })
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getReportGroups = async (token, dispatch) => {
+    try {
+        const res = await axios.get(`${apiUrl}/admin/get-reported-group`, {
+            headers: { token: `Bearer ${token}` },
+        });
+        dispatch(setGroups(res.data));
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const keepGroup = async (token, groupId) => {
+    try {
+        await axios.post(`${apiUrl}/admin/keep-group/${groupId}`, {}, {
+            headers: { token: `Bearer ${token}` },
+        }); 
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const deleteGroup = async (token, groupId) => {
+    try {
+        await axios.delete(`${apiUrl}/admin/delete-group/${groupId}`, {
+            headers: { token: `Bearer ${token}` },
+        }); 
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getDetailReportGroup = async(token, groupId) => {
+    try {
+        const res = await axios.get(`${apiUrl}/admin/get-detail-report-group/${groupId}`, {
             headers: {token: `Bearer ${token}`}
         })
         return res.data

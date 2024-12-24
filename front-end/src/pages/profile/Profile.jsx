@@ -19,6 +19,8 @@ import ChangeProfile from '../../components/changeProfile/ChangeProfile';
 import { acceptRequest, cancelFriend, cancelRequest, refuseRequest, requestFriends } from '../../api/friends/friends';
 import { createChat1vs1 } from '../../api/chat/chat';
 import socket from '../../socket';
+import ReportUser from '../../components/changeProfile/ReportUser';
+import ComfirmReport from '../../components/post/ComfirmReport';
 
 const Profile = () => {
     const { userId } = useParams();
@@ -35,9 +37,15 @@ const Profile = () => {
     const [friendStatus, setFriendStatus] = useState('');
 
     const [modalUnfriend, setModalUnfriend] = useState(false)
+    const [modalReport, setModalReport] = useState(false);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [isAbove, setIsAbove] = useState(false);
     const [confirmationModal, setConfirmationModal] = useState(false);
+
+    const [reportUser, setReportUser] = useState(false)
+    const [notiSuccess, setNotiSuccess] = useState(false)
+    
+    const [reportUserSuccess, setReportUserSuccess] = useState(false)
 
     const [onlineUsers, setOnlineUsers] = useState([]);
 
@@ -58,7 +66,7 @@ const Profile = () => {
         };
     }, []);
 
-    const handleThreeDotsClick = (event) => {
+    const handleClick = (event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
     
@@ -79,10 +87,26 @@ const Profile = () => {
         setModalUnfriend(true);
     };
 
+    const handleThreeDotsClick = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setModalPosition({
+            top: rect.bottom + window.scrollY + 15,
+            left: rect.left + window.scrollX - 80,
+        });
+
+        setModalReport(true);
+    }
+
     const handleUnfriendClick = () => {
         setConfirmationModal(true);
         setModalUnfriend(false); // Close the options modal
     };
+
+    const handleReportUser = () => {
+        setModalReport(false)
+        setReportUser(true)
+        setReportUserSuccess(true)
+    }
 
     const handleCancelUnfriend = () => {
         setConfirmationModal(false);
@@ -92,11 +116,12 @@ const Profile = () => {
     const handleClickOutside = (event) => {
         if (modalRef.current && !modalRef.current.contains(event.target)) {
             setModalUnfriend(false);
+            setModalReport(false)
         }
     };
 
     useEffect(() => {
-        if (modalUnfriend) {
+        if (modalUnfriend || modalReport) {
             document.addEventListener('mousedown', handleClickOutside);
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -105,7 +130,8 @@ const Profile = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-      }, [modalUnfriend]);
+      }, [modalUnfriend, modalReport]);
+
 
     const handleShowEditAvatar = () => {
         setShowEditAvatar(true)
@@ -360,7 +386,7 @@ const Profile = () => {
                                         </div> 
                                     ) : friendStatus === 'friends' ? (
                                         <div className='flex-1 flex items-center cursor-pointer bg-gray-200 pl-3 pr-3 py-2 rounded-md mr-3'
-                                            onClick={handleThreeDotsClick}
+                                            onClick={handleClick}
                                         >
                                             <img className='h-5 w-5 mr-1 mt-px'
                                                 src={require("../../assets/icons/check.png")}
@@ -394,7 +420,9 @@ const Profile = () => {
                                             Message
                                         </p>                                            
                                     </div>
-                                    <div className='flex items-center bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'>
+                                    <div className='flex items-center bg-gray-300 bg-gray-200 cursor-pointer px-2 py-2 rounded-md mr-5'
+                                        onClick={handleThreeDotsClick}
+                                    >
                                         <img className='h-6 w-6 mt-px'
                                             src={require("../../assets/icons/menu.png")}
                                             alt=''
@@ -439,6 +467,52 @@ const Profile = () => {
                                 </div>                                                             
                             </div>
                         </div>
+                    )}
+                    {modalReport && (
+                        <div
+                            ref={modalRef}
+                            className='absolute w-[300px] bg-white border border-gray-200 rounded shadow-2xl z-10'
+                            style={{
+                                top: modalPosition.top,
+                                left: modalPosition.left,
+                            }}                        
+                        >
+                            <div className='relative'>
+                                <div
+                                    className={`absolute transform rotate-45 w-4 h-4 bg-white border-gray-300
+                                         top-[-8px] border-l border-t
+                                    } left-[92px]`}>
+                                </div> 
+                                <div className=' py-2.5 px-2'>
+                                    <div className='flex hover:bg-gray-100 px-2 py-1 rounded'
+                                        onClick={() => handleReportUser()}
+                                    >
+                                        <img className='w-5 h-5 mr-3 mt-2'
+                                            src={require('../../assets/icons/user-report.png')}
+                                            alt=''
+                                        />
+                                        <p className='py-1 font-medium cursor-pointer text-black'>Report profile </p>
+                                    </div>                                    
+                                </div>                                                             
+                            </div>
+                        </div>
+                    )}
+                    {reportUser && (
+                        <ReportUser
+                            user={user}
+                            userId={userId}
+                            isCloseModal = {() => setReportUser(false)}
+                            setNotiSuccess={() => setNotiSuccess(true)}                              
+                        />
+                    )}
+                    {notiSuccess && (
+                        <ComfirmReport
+                            setNotiSuccess={() => setNotiSuccess(false)}
+                            reportUserSuccess={reportUserSuccess}
+                            setReportUserSuccess={() => setReportUserSuccess(false)}
+                            setReportPostSuccess={() => setReportUserSuccess(false)}
+                            setReportGroupSuccess={()=> setReportUserSuccess(false)}
+                        />
                     )}
                     {confirmationModal && (
                         <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>

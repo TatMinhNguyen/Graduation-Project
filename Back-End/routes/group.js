@@ -79,4 +79,6 @@ router.get('/get-detail-report/:postId', middleware.verifyToken, postGroupContro
 
 router.post('/keep-post/:postId', middleware.verifyToken, postGroupController.keepPost)
 
+router.post('/report-group/:groupId', middleware.verifyToken, groupController.reportGroup)
+
 module.exports = router;

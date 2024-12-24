@@ -1,4 +1,5 @@
 const GroupModel = require("../models/GroupModel");
+const ReportGroupModel = require('../models/ReportGroupModel')
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
 
@@ -584,6 +585,37 @@ const groupController = {
             return res.status(200).json(userResults);
         } catch (error) {
             return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+
+    reportGroup: async(req, res) => {
+        try {
+           const userId = req.user.id;
+           const groupId = req.params.groupId;
+           const {content, type} = req.body;
+           
+           const group = await GroupModel.findById(groupId)
+
+           if(!group) {
+               return res.status(404).json({ error: "Group not found" })
+           }
+
+           const newReport = new ReportGroupModel({
+                userId: userId,
+                groupId: groupId,
+                content: content,
+                type: type,
+           })
+
+           await newReport.save();
+
+           group.isReported = true;
+
+           await group.save();
+
+           return res.status(200).json({message: 'Report success'})
+        } catch (error) {
+            return res.status(500).json({ error: error.message});
         }
     },
 }

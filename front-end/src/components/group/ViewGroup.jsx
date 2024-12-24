@@ -1,26 +1,78 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { getAGroup } from '../../api/group/group';
+import { getAGroup, leaveGroup } from '../../api/group/group';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatToMonthYear } from '../../utils';
 import ChangePhoto from './ChangePhoto';
 import ChangeName from './ChangeName';
 import InviteMembers from './InviteMembers';
+import ReportGroup from './ReportGroup';
+import ComfirmReport from '../post/ComfirmReport';
+import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const ViewGroup = () => {
     const user = useSelector((state) => state.auth.login?.currentUser)
     const group = useSelector((state) => state.group.group)
     const { groupId } = useParams();
+    const modalRef = useRef(null);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const location = useLocation();
 
+    const [loading, setLoading] = useState(false);
+
     const [showEditPicture, setShowEditPicture] = useState(false)
     const [showEditName, setShowEditName] = useState(false)
 
+    const [modalReport, setModalReport] = useState(false);
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    const [reportGroup, setReportGroup] = useState(false)
+    const [reportGroupSuccess, setReportGroupSuccess] = useState(false)
+    const [notiSuccess, setNotiSuccess] = useState(false)
+
     const [showAddMembers, setShowAddMembers] = useState(false)
+
+    const [showLeave, setShowLeave] = useState(false)
+
+    const handleShowComfirmLeave = () => {
+        setModalReport(false)
+        setShowLeave(true)
+    }
+
+    const handleCancel = () => {
+        setShowLeave(false)
+      }
+
+    const handleLeaveGroup = async () => {
+        setLoading(true)
+        try {
+            await leaveGroup(user?.token, groupId)
+
+            navigate(`/groups`)
+        } catch (error) {
+            console.log(error)
+        } finally{
+            setLoading(false)
+        }
+    }
+
+    const handleThreeDotsClick = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setModalPosition({
+            top: rect.bottom + window.scrollY + 15,
+            left: rect.left + window.scrollX - 80,
+        });
+
+        setModalReport(true);
+    }
+
+    const handleReportGroup = () => {
+        setModalReport(false)
+        setReportGroup(true)
+        setReportGroupSuccess(true)
+    }
 
     const handleGetAGroup = async () => {
         try {
@@ -30,6 +82,24 @@ const ViewGroup = () => {
             console.log(error)
         }
     }
+
+    const handleClickOutside = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+            setModalReport(false)
+        }
+    };
+
+    useEffect(() => {
+        if ( modalReport) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, [ modalReport]);
 
     /* eslint-disable */
     useEffect(() => {
@@ -103,6 +173,14 @@ const ViewGroup = () => {
                                     </p>
                                 </div>                                
                             )}
+                            <div className='flex items-center hover:bg-gray-300 bg-gray-200 cursor-pointer px-2 py-2 rounded-md ml-3'
+                                onClick={handleThreeDotsClick}
+                            >
+                                <img className='h-6 w-6 mt-px'
+                                    src={require("../../assets/icons/menu.png")}
+                                    alt=''
+                                />                                                
+                            </div>
                         </div>
                     </div>                    
                 ) : (
@@ -139,8 +217,73 @@ const ViewGroup = () => {
                                     </p>
                                 </div>
                             )}
+                            <div className='flex items-center hover:bg-gray-300 bg-gray-200 cursor-pointer px-2 py-2 rounded-md ml-3'
+                                onClick={handleThreeDotsClick}
+                            >
+                                <img className='h-6 w-6 mt-px'
+                                    src={require("../../assets/icons/menu.png")}
+                                    alt=''
+                                />                                                
+                            </div>
                         </div>
                     </div>
+                )}
+                {modalReport && (
+                    <div
+                        ref={modalRef}
+                        className='absolute w-[300px] bg-white border border-gray-200 rounded shadow-2xl z-10'
+                        style={{
+                            top: modalPosition.top,
+                            left: modalPosition.left,
+                        }}                        
+                    >
+                        <div className='relative'>
+                            <div
+                                className={`absolute transform rotate-45 w-4 h-4 bg-white border-gray-300
+                                        top-[-8px] border-l border-t
+                                } left-[92px]`}>
+                            </div> 
+                            <div className=' pt-2.5 px-2'>
+                                <div className='flex hover:bg-gray-100 px-2 py-1 rounded cursor-pointer'
+                                    onClick={() => handleReportGroup()}
+                                >
+                                    <img className='w-5 h-5 mr-3 mt-2'
+                                        src={require('../../assets/icons/report-post.png')}
+                                        alt=''
+                                    />
+                                    <p className='py-1 font-medium  text-black'>Report group </p>
+                                </div>                                    
+                            </div>   
+                            <div className='pb-2.5 px-2'>
+                                <div className='flex hover:bg-gray-100 px-2 py-1 rounded cursor-pointer'
+                                    onClick={() => handleShowComfirmLeave()}
+                                >
+                                    <img className='w-5 h-5 mr-3 mt-2'
+                                        src={require('../../assets/icons/leave.png')}
+                                        alt=''
+                                    />
+                                    <p className='py-1 font-medium  text-black'>Leave group </p>
+                                </div>                                    
+                            </div>                                                           
+                        </div>
+                    </div>
+                )}
+                {reportGroup && (
+                    <ReportGroup
+                        user={user}
+                        groupId={groupId}
+                        isCloseModal = {() => setReportGroup(false)}
+                        setNotiSuccess={() => setNotiSuccess(true)}                          
+                    />
+                )}
+                {notiSuccess && (
+                    <ComfirmReport
+                        setNotiSuccess={() => setNotiSuccess(false)}
+                        reportGroupSuccess={reportGroupSuccess}
+                        setReportUserSuccess={() => setReportGroupSuccess(false)}
+                        setReportPostSuccess={() => setReportGroupSuccess(false)}
+                        setReportGroupSuccess={()=> setReportGroupSuccess(false)}
+                    />
                 )}
                 {showAddMembers && (
                     <InviteMembers
@@ -164,6 +307,38 @@ const ViewGroup = () => {
                         user = {user}
                         groupId = {groupId}
                     />
+                )}
+                {showLeave && (
+                    <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20'>
+                        <div className='w-1/3 bg-white p-4 rounded shadow-2xl border border-gray-100'>
+                            <h2 className='flex justify-center text-lg italic font-semibold mb-2 pb-2 border-b border-gray-300'>
+                                Leave group?
+                            </h2>
+                            <p className='text-sm text-gray-600 mb-5'>
+                            Are you sure you want to leave {group?.name}
+                            </p>
+                            {loading ? (
+                                <div className='flex justify-center'>
+                                    <LoadingSpinner/>
+                                </div>
+                            ):(
+                                <div className='flex justify-end space-x-4'>
+                                    <button 
+                                        className='bg-gray-200 px-4 py-2 rounded hover:bg-gray-300' 
+                                        onClick={handleCancel}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' 
+                                        onClick={() => handleLeaveGroup()}
+                                    >
+                                        Leave group
+                                    </button>
+                                </div>                                        
+                            )}
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

@@ -1,8 +1,10 @@
 const PostModel = require("../models/PostModel");
 const ReportPostModel = require("../models/ReportPostModel");
 const ReportUserModel = require("../models/ReportUserModel");
+const ReportGroupModel = require("../models/ReportGroupModel")
 const UserModel = require("../models/UserModel");
 const imagekit = require("../utils/imagekitConfig");
+const GroupModel = require("../models/GroupModel");
 
 const adminController = {
     getPostReported: async (req, res) => {
@@ -38,10 +40,6 @@ const adminController = {
 
             // Loại bỏ các bài viết không tồn tại hoặc không có isReported === true
             const validPosts = posts.filter((post) => post);
-
-            if (!validPosts || validPosts.length === 0) {
-                return res.status(404).json({ message: "Không có bài viết hợp lệ." });
-            }
 
             // Lấy thông tin tác giả từ UserModel
             const userPromises = validPosts.map((post) => UserModel.findById(post.userId));
@@ -212,10 +210,6 @@ const adminController = {
             // Loại bỏ các user không tồn tại 
             const validUsers = users.filter((user) => user);
 
-            if (!validUsers || validUsers.length === 0) {
-                return res.status(404).json({ message: "Không có bài viết hợp lệ." });
-            }
-
             const results = validUsers.map((user, index) => {
                 // const author = authors[index];
                 const report = reportedUsers.find((report) => report.reportedUserId === user._id.toString());
@@ -342,7 +336,145 @@ const adminController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
-    }
+    },
+
+    getReportedGroup : async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await UserModel.findById(userId);
+
+            if (!user || !user.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            // Lấy danh sách bài viết bị báo cáo từ ReportPostModel, sắp xếp theo thời gian báo cáo (createdAt)
+            const reportedGroups = await ReportGroupModel.find().sort({ createdAt: -1 });
+
+            if (!reportedGroups || reportedGroups.length === 0) {
+                return res.status(404).json({ message: "Không có nhom nào bị báo cáo." });
+            }
+
+            // Nhóm bài viết theo userId và chỉ giữ báo cáo sớm nhất
+            const uniqueUsers = {};
+            reportedGroups.forEach((report) => {
+                if (!uniqueUsers[report.groupId]) {
+                    uniqueUsers[report.groupId] = report;
+                }
+            });
+            const filteredGroups = Object.values(uniqueUsers);
+
+            // Tạo mảng promises để lấy thông tin bài viết từ PostModel
+            const groupPromises = filteredGroups.map((report) =>
+                GroupModel.findOne({
+                    _id: report.groupId,
+                    isReported: true
+                })
+            );            
+            const groups = await Promise.all(groupPromises);
+
+            // Loại bỏ các user không tồn tại 
+            const validGroups = groups.filter((group) => group);
+
+            const results = validGroups.map((group, index) => {
+                // const author = authors[index];
+                const report = reportedGroups.find((report) => report.groupId === group._id.toString());
+                return {
+                    _id: group._id,
+                    name: group.name,
+                    avatar: group.avatar,
+                    createdAt: report.createdAt
+                };
+            });
+
+            return res.status(200).json(results)
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    keepGroup : async(req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await UserModel.findById(userId);
+
+            if (!user || !user.isAdmin) {
+                return res.status(403).json({ message: "Bạn không phải admin." });
+            }
+
+            const groupId = req.params.groupId;
+
+            const group = await GroupModel.findById(groupId)
+
+            if(!group){
+                return res.status(404).json({ error: "group not found" })
+            }
+
+            group.isReported = false;
+
+            await group.save();
+
+            return res.status(200).json({message: "Keep"})
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    deleteGroup: async (req, res) => {
+        try {
+            const { groupId } = req.params; // Lấy ID của nhóm group từ params
+            const userId = req.user.id; // ID của người thực hiện yêu cầu
+            const user = await UserModel.findById(userId);
+    
+            // Tìm nhóm group bằng groupId
+            const group = await GroupModel.findById(groupId);
+            if (!group) {
+                return res.status(404).json({ message: "Không tìm thấy nhóm group." });
+            }
+    
+            // Kiểm tra quyền: chỉ người tạo nhóm mới có quyền xóa nhóm
+            if (group.createId.toString() !== userId && user.isAdmin === false) {
+                return res.status(403).json({ message: "Bạn không có quyền xóa nhóm group này." });
+            }
+    
+            // Xóa nhóm group
+            await GroupModel.findByIdAndDelete(groupId);
+    
+            return res.status(200).json({ message: "Xóa nhóm group thành công." });
+        } catch (error) {
+            return res.status(500).json({ message: "Lỗi server", error });
+        }
+    },
+
+    getDetailReportedGroup: async(req, res) => {
+        try {
+            const groupId = req.params.groupId
+            const reports = await ReportGroupModel.find({ groupId }).sort({ createdAt: -1 });
+
+            // Lấy thông tin tác giả từ UserModel
+            const userPromises = reports.map((post) => UserModel.findById(post.userId));
+            const authors = await Promise.all(userPromises);
+
+            const results = reports.map((post, index) => {
+                const author = authors[index];
+                return {
+                    _id: post._id,
+                    groupId: post.groupId,
+                    content: post.content,
+                    type: post.type,
+                    createdAt: post?.createdAt, // Thời điểm bị báo cáo
+                    author: {
+                        authorId: author?._id,
+                        authorName: author?.username,
+                        authorAvatar: author?.profilePicture,
+                    },
+                };
+            });
+
+            res.status(200).json(results);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
 }
 
 module.exports = adminController

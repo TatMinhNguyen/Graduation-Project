@@ -39,6 +39,7 @@ import GetBannedUser from './components/admin/GetBannedUser';
 import Room from './pages/call/Room';
 import GetPosts from './pages/home/getPosts/GetAllPosts';
 import GetFriendPosts from './pages/home/getPosts/GetFriendPosts';
+import GetGroupReported from './components/admin/GetGroupReported';
 
 function App() {
   const user = useSelector((state) => state.auth.login?.currentUser)
@@ -97,6 +98,7 @@ function App() {
         <Route path='/admin' element={<Admin/>}>
             <Route path='reported-posts' element={<GetPostReported/>}/>
             <Route path='reported-users' element={<GetBannedUser/>}/>
+            <Route path='reported-groups' element={<GetGroupReported/>}/>
         </Route> 
       </Routes>
     </Router>

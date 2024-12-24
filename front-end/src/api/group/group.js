@@ -314,3 +314,13 @@ export const keepPost = async (token, postId) => {
         console.log(error)
     }
 }
+
+export const reportGroup = async (token, groupId, data) => {
+    try {
+        await axios.post(`${apiUrl}/group/report-group/${groupId}`, data, {
+            headers: {token: `Bearer ${token}`}
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}

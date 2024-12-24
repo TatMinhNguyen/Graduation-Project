@@ -20,4 +20,13 @@ router.post('/unban-user/:userId', middleware.verifyToken, adminController.unBan
 router.get('/get-detail-report-user/:userId', middleware.verifyToken, adminController.getDetailReportUser)
 
 router.get('/get-baners', middleware.verifyToken, adminController.getBannedUser)
+
+router.get('/get-reported-group', middleware.verifyToken, adminController.getReportedGroup)
+
+router.post('/keep-group/:groupId', middleware.verifyToken, adminController.keepGroup)
+
+router.delete('/delete-group/:groupId', middleware.verifyToken, adminController.deleteGroup)
+
+router.get('/get-detail-report-group/:groupId', middleware.verifyToken, adminController.getDetailReportedGroup)
+
 module.exports = router;
