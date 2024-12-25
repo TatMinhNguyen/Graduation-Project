@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 
+import { ToastContainer } from 'react-toastify'; // Import ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS của Toastify
+
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Login from './pages/login/Login';
 import Register from './pages/register/Register';
@@ -101,6 +104,16 @@ function App() {
             <Route path='reported-groups' element={<GetGroupReported/>}/>
         </Route> 
       </Routes>
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right" // Vị trí của thông báo
+        autoClose={3000} // Thời gian tự đóng (ms)
+        hideProgressBar={true} // Hiển thị thanh tiến trình
+        newestOnTop={false} // Thông báo mới có ở trên không
+        closeOnClick // Đóng khi click
+        pauseOnHover // Dừng khi hover chuột
+        draggable // Có thể kéo thông báo
+      />
     </Router>
   );
 }

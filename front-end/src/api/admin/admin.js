@@ -1,6 +1,7 @@
 import axios from "axios";
 import { apiUrl } from "../API_URL"
 import { setGroups, setPosts, setUsers } from "../../redux/adminSlice";
+import { TokenInvalid } from "../../utils";
 
 export const getReportPosts = async (token, dispatch) => {
     try {
@@ -10,6 +11,9 @@ export const getReportPosts = async (token, dispatch) => {
         dispatch(setPosts(res.data))
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -20,6 +24,9 @@ export const keepPost = async (token, postId) => {
         }); 
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -30,6 +37,9 @@ export const deletePost = async (token, postId) => {
         }); 
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -41,6 +51,9 @@ export const getContentReportPosts = async (token, postId) => {
         return res.data
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -52,6 +65,9 @@ export const getReportedUser = async (token, dispatch) => {
         dispatch(setUsers(res.data))        
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -62,6 +78,9 @@ export const setBan = async (token, userId) => {
         });      
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -72,6 +91,9 @@ export const unBan = async (token, userId) => {
         });      
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -83,6 +105,9 @@ export const getDetailReportUser = async(token, userId) => {
         return res.data
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -94,6 +119,9 @@ export const getReportGroups = async (token, dispatch) => {
         dispatch(setGroups(res.data));
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -104,6 +132,9 @@ export const keepGroup = async (token, groupId) => {
         }); 
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -114,6 +145,9 @@ export const deleteGroup = async (token, groupId) => {
         }); 
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }
 
@@ -125,5 +159,8 @@ export const getDetailReportGroup = async(token, groupId) => {
         return res.data
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            TokenInvalid();
+        }
     }
 }

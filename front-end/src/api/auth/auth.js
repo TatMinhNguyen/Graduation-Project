@@ -1,6 +1,7 @@
 import axios from "axios";
-import { setEmail, setLogin, setLogOut, setPassword, setVerificationCode } from "../../redux/authSlice";
+import { setEmail, setLogin, setLogOut, setVerificationCode } from "../../redux/authSlice";
 import { apiUrl } from "../API_URL"
+import { toast } from "react-toastify";
 
 export const loginUser = async (user, dispatch, navigate) => {
     try {
@@ -11,15 +12,15 @@ export const loginUser = async (user, dispatch, navigate) => {
         navigate("/");
     } catch (error) {
         console.log(error);
-        if(error?.response.data === 'Account banned'){
-            alert("Your account has been banned! Please contact admin for more details.");
+        if (error?.response.data === 'Account banned') {
+            toast.error("Your account has been banned! Please contact admin.");
         }
-        if(error?.response.data === 'Incorrect password or email'){
-            alert("Account or password is incorrect!");
+        if (error?.response.data === 'Incorrect password or email') {
+            toast.error("Account or password is incorrect!");
         }
-        if(error?.response.data === "Account Invalid"){
-            alert("Account Invalid");
-        } 
+        if (error?.response.data === "Account Invalid") {
+            toast.info("Account Invalid");
+        }
     }
 };
 
@@ -32,7 +33,7 @@ export const registerUser = async (newUser, dispatch, navigate) => {
         navigate('/set-verify-code')
     } catch (error) {
         console.log(error);
-        alert("Account already exists!");
+        toast.error("Account already exists!");
     }
 }
 
@@ -41,10 +42,10 @@ export const setVeryficationCode = async (code, dispatch, navigate) => {
         await axios.post(`${apiUrl}/auth/set-verify`, code);
 
         // dispatch(clearVerificationCode())
-        navigate('/login')        
+        // navigate('/login')        
     } catch (error) {
         console.log(error);
-        alert("The verification code is incorrect or has expired!");        
+        toast.error("The verification code is incorrect or has expired!");        
     }
 }
 
@@ -58,7 +59,7 @@ export const getVeryficationCode = async (email, dispatch, navigate) => {
         navigate('/set-verify-code')        
     } catch (error) {
         console.log(error);
-        alert("Your account could not be found or the account has been verified!");        
+        toast.error("Your account could not be found or the account has been verified!");        
     }
 }
 
@@ -66,13 +67,13 @@ export const forgotPass = async(email, dispatch)=> {
     try {
         const res = await axios.post(`${apiUrl}/auth/forgot-password`, email);
 
-        dispatch(setEmail(res.data.email))
-        dispatch(setPassword(res.data.newPassword))
+        // dispatch(setEmail(res.data.email))
+        // dispatch(setPassword(res.data.newPassword))
 
         return res.data;
     } catch (error) {
         console.log(error)
-        alert("Your account could not be found!");
+        toast.error("Your account could not be found!");
     }
 }
 
@@ -85,19 +86,28 @@ export const logOut = async(token, dispatch, navigate) => {
         navigate('/login') 
     } catch (error) {
         console.log(error)
+        if(error?.response.data === 'Token is not valid!'){
+            navigate('/login');
+            toast.info("Your session has expired.");
+        }
     }
 }
 
-export const changePassword = async (token, pass) => {
+export const changePassword = async (token, pass, navigate) => {
     try {
         const res =  await axios.post(`${apiUrl}/auth/change-password`, pass, {
             headers: {token: `Bearer ${token}`}
         }) 
-        alert('Password changed successfully')
+        toast.success('Password changed successfully')
 
         return res.data;
     } catch (error) {
         console.log(error)
-        alert('Incorrect old password')
+        if(error?.response.data === 'Token is not valid!'){
+            navigate('/login');
+            toast.info("Your session has expired.");
+        } else {
+            toast.error('Incorrect old password')
+        }
     }
 }

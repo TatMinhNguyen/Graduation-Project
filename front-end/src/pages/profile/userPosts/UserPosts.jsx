@@ -84,7 +84,7 @@ const UserPosts = () => {
                 postId: postId,
                 type: type
             }
-            await setFelt(user?.token, data)
+            await setFelt(user?.token, data, navigation)
             setHoveredPostId(null);
             handleGetUserPost();
         } catch (error) {
@@ -94,7 +94,7 @@ const UserPosts = () => {
 
     const handleUnLike = async (postId) => {
         try {
-            await unFelt(user?.token, postId)
+            await unFelt(user?.token, postId, navigation)
             setHoveredPostId(null);
             handleGetUserPost();
         } catch (error) {
@@ -107,7 +107,7 @@ const UserPosts = () => {
             const data = {
                 type: type
             } 
-            await updateFelt(user?.token, data, postId) 
+            await updateFelt(user?.token, data, postId, navigation) 
             setHoveredPostId(null);
             handleGetUserPost();         
         } catch (error) {
@@ -157,7 +157,7 @@ const UserPosts = () => {
     const handleDeletepost = async(postId) => {
         setLoading(true)
         try {
-            await deletePost(user?.token, postId)
+            await deletePost(user?.token, postId, navigation)
 
             setShowDelete(false)
             setSelectedPost(null)
@@ -193,7 +193,7 @@ const UserPosts = () => {
 
     const handleGetUserPost = async () => {
         try {
-            await getUserPost(user?.token, userId, dispatch)
+            await getUserPost(user?.token, userId, dispatch, navigation)
             // setPosts(result);            
         } catch (error) {
             console.log(error)

@@ -18,7 +18,7 @@ const Home = () => {
 
   const handleGetProfile = async () => {
     try {
-      await getMyProfile(user?.token,dispatch)
+      await getMyProfile(user?.token,dispatch, navigate)
     } catch (error) {
       console.error('Errors:', error);
     }

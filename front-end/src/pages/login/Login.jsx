@@ -98,7 +98,7 @@ function Login() {
                                     </Link>                                
                                 </div>
                             </div> 
-                            <div className=' flex items-center'>
+                            {/* <div className=' flex items-center'>
                                 <div className='flex-1'></div>
                                 <div>
                                     <Link className='text-gray-500 border-b border-gray-400 font-medium my-2 text-sm hover:text-blue-900 hover:border-blue-900'
@@ -107,8 +107,8 @@ function Login() {
                                         Forgot verification code ?
                                     </Link>                                
                                 </div> 
-                            </div>                             
-                            <div className='flex-1 flex items-center justify-center mt-12'>
+                            </div>                              */}
+                            <div className='flex-1 flex items-center justify-center mt-20'>
                                 <button type="submit" 
                                     className="w-[40vh] bg-customBlue text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-500"
                                 >

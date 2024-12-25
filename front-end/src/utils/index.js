@@ -1,5 +1,13 @@
 import moment from 'moment';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+export const TokenInvalid = () => {
+  const navigate = useNavigate();
+  navigate('/login');
+  toast.error("Your session has expired. Please log in again.");
+}
 
 export const timeAgo = (createdAt) => {
     const now = moment();

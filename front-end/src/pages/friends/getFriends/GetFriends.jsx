@@ -35,7 +35,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleGetCurrentUser = async () => {
         try {
-            const res = await getProfile(user?.token, dispatch, user?.userId)
+            const res = await getProfile(user?.token, dispatch, user?.userId, navigation)
             setRequesting(res.friendRequesting)
             setMyFriend(res.friends)
         } catch (error) {
@@ -45,7 +45,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleGetRequested = async() =>{
         try {
-            const result = await getRequested(user?.token)
+            const result = await getRequested(user?.token, navigation)
             setRequestUser(result)
         } catch (error) {
             console.log(error)
@@ -54,7 +54,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleAccept = async (userId) => {
         try {
-            await acceptRequest(user?.token, userId);
+            await acceptRequest(user?.token, userId, navigation);
             handleGetRequested();
             handleGetCurrentUser();
             handleGetFriends();
@@ -65,7 +65,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleRefuse = async (userId) => {
         try {
-            await refuseRequest(user?.token, userId);
+            await refuseRequest(user?.token, userId, navigation);
             handleGetRequested()
         } catch (error) {
             console.log(error)
@@ -74,7 +74,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleAddFriend = async (userId) => {
         try {
-            await requestFriends(user?.token, userId);
+            await requestFriends(user?.token, userId, navigation);
             setClickedUsers(prev => ({
                 ...prev,
                 [userId]: true
@@ -86,7 +86,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleCancelRequest = async (userId) => {
         try {
-            await cancelRequest(user?.token, userId);
+            await cancelRequest(user?.token, userId, navigation);
             setClickedUsers(prev => ({
                 ...prev,
                 [userId]: false
@@ -141,7 +141,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleGetFriends = async () => {
         try {
-            const result = await getFriends(user?.token, userId);
+            const result = await getFriends(user?.token, userId, navigation);
             setData(result);
         } catch (error) {
             console.log(error);
@@ -160,7 +160,7 @@ const GetFriends = ({ userId, user }) => {
 
     const handleConfirmUnfriend = async (userId) => {
         try {
-            await cancelFriend(user?.token, userId)
+            await cancelFriend(user?.token, userId, navigation)
             setData(data.filter(f => f._id !== selectedFriend._id));
             setConfirmationModal(false);
             setSelectedFriend(null);

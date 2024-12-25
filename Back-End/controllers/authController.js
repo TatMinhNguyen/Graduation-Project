@@ -7,12 +7,26 @@ const authController = {
     //Phương thức đăng kí
     registerUser: async (req, res) => {
         try {
+            // Kiểm tra xem email đã tồn tại chưa
+            const existingUser = await UserModel.findOne({ email: req.body.email });
+    
+            if (existingUser) {
+                if (!existingUser.isVerify) { // Kiểm tra xem tài khoản có xác thực chưa
+                    // Nếu chưa xác thực, xóa tài khoản cũ
+                    await UserModel.deleteOne({ email: req.body.email });
+                } else {
+                    // Nếu tài khoản đã xác thực, trả về lỗi
+                    return res.status(400).json({ message: 'Email này đã được sử dụng!' });
+                }
+            }
+    
+            // Tiếp tục tạo tài khoản mới
             const salt = await bcrypt.genSalt(10);
             const hashed = await bcrypt.hash(req.body.password, salt);
-
+    
             const verificationCode = Math.floor(100000 + Math.random() * 900000);
             const expirationTime = new Date(Date.now() + 5 * 60 * 1000);
-
+    
             const newUser = new UserModel({
                 email: req.body.email,
                 username: req.body.username,
@@ -20,13 +34,13 @@ const authController = {
                 verificationCode: verificationCode,
                 verificationCodeExpires: expirationTime
             });
-
+    
             await newUser.save();
             res.status(200).json({ email: newUser.email, verificationCode: verificationCode });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
-    },
+    },    
 
     //Phương thức lấy mã xác thực
     verifyAccount: async (req, res) => {
@@ -94,7 +108,7 @@ const authController = {
                 isAdmin: user.isAdmin,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30d" }
+            { expiresIn: "30s" }
         );
     },
 

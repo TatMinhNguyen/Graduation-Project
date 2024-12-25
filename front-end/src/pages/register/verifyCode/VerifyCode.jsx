@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom';
-import { setVeryficationCode } from '../../../api/auth/auth';
+import { loginUser, setVeryficationCode } from '../../../api/auth/auth';
 
 const VerifyCode = () => {
     const verificationCode = useSelector((state) => state.auth.verificationCode);
+    const email = useSelector((state) => state.auth.user?.email)
+    const password = useSelector((state) => state.auth.user?.password)
 
     const [code, setCode] = useState('');
     const dispatch = useDispatch();
@@ -17,7 +19,12 @@ const VerifyCode = () => {
                 email : verificationCode.email,
                 verificationCode : code,
             }
+            const newUser = {
+                email : email,
+                password : password
+            }
             await setVeryficationCode(newCode, dispatch, navigate)
+            await loginUser(newUser, dispatch, navigate)
         } catch (error) {
             console.log(error)
         }

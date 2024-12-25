@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { acceptRequest, getFriends, getRequested, refuseRequest } from '../../api/friends/friends'
+import { acceptRequest, getFriends, getRequested, getSuggestions, refuseRequest, requestFriends } from '../../api/friends/friends'
 import { Link, useNavigate } from 'react-router-dom'
 import socket from '../../socket/index'
 import { createChat1vs1 } from '../../api/chat/chat'
 
 const RightBar = ({user}) => {
-  const [requestFriends, setRequestFriends] = useState([]);
+  const [requestFriend, setRequestFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   const [accepted, setAccepted] = useState([])
   const [refused, setRefused] = useState([])
+  const [requested, setRequested] = useState([])
 
   const navigate = useNavigate();
 
@@ -22,6 +24,12 @@ const RightBar = ({user}) => {
     } catch (error) {
       console.log(error)
     }
+  }
+
+  const handleGetSuggestions = async () => {
+    const result = await getSuggestions(user?.token)
+    const limitedResult = result.slice(0, 4)
+    setSuggestions(limitedResult);
   }
 
   const handleGetFriends = async () => {
@@ -59,6 +67,15 @@ const RightBar = ({user}) => {
     }))
   }
 
+  const handleRequest = async (e, userId) => {
+    e.stopPropagation();
+    await requestFriends(user?.token, userId);
+    setRequested(prev => ({
+      ...prev,
+      [userId]: true
+    }))
+  }
+
   useEffect(() => {
     // Lắng nghe sự kiện onlineUsers từ server
     socket.on("onlineUsers", (users) => {
@@ -76,16 +93,60 @@ const RightBar = ({user}) => {
   useEffect(()=> {
     handleGetRequestFriends();
     handleGetFriends();
+    handleGetSuggestions();
   },[])
   return (
     <div className='w-[22vw] -mt-2 overflow-y-auto h-[94vh] no-scrollbar relative'>
       <div className=' pb-1 mx-2'>
-        {requestFriends?.length > 0 && (
+        {requestFriend?.length === 0 && friends?.length <= 5 && user?.isAdmin === false && (
+          <div className='border-b border-gray-300'>
+            <h1 className='font-medium text-gray-500 ml-1'>
+              Suggestions
+            </h1> 
+            {suggestions?.map((user) => (
+              <div key={user._id} className='flex mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'
+                onClick={() => navigate(`/get-profile/${user?._id}`)}
+              >
+                <Link className='h-12 w-12' to={`/get-profile/${user?._id}`}>
+                  <img className='h-full w-full object-cover rounded-full hover:opacity-90'
+                    src={user?.profilePicture}
+                    alt="User Avatar" 
+                  />              
+                </Link>   
+                <div className='ml-3'>
+                  <h1 className='font-medium text-[15px]'>
+                    {user?.username}  
+                  </h1>  
+                  <p className='text-[13px] text-gray-500'>
+                    {user?.mutualFriends} mutual friends
+                  </p>
+                  {requested[user._id] ? (
+                    <p className='text-[14px] text-gray-600'>
+                        Friend request sent successfully.
+                    </p>
+                  ) : (
+                    <div className='flex'>
+                      <div className='mr-4 mt-1 px-16 py-1.5 bg-blue-200 hover:bg-blue-300 rounded-md font-medium text-[14px] text-customBlue'
+                        onClick={(e) => handleRequest(e, user._id)}
+                      >
+                        Add Friend
+                      </div>
+
+                    </div>                    
+                  )}
+                </div>              
+              </div>
+            ))}        
+          </div>
+        )}
+      </div>
+      <div className=' pb-1 mx-2'>
+        {requestFriend?.length > 0 && (
           <div className='border-b border-gray-300'>
             <h1 className='font-medium text-gray-500 ml-1'>
               Friend requests
             </h1>
-            {requestFriends?.map((user) => (
+            {requestFriend?.map((user) => (
               <div key={user._id} onClick={() => navigate(`/get-profile/${user?._id}`) }
                 className='flex mb-1 py-2 px-2 hover:bg-gray-200 rounded-lg cursor-pointer'
               >
@@ -156,8 +217,6 @@ const RightBar = ({user}) => {
             ))}                        
           </div>
         )}
-       
-
       </div>
     </div>
   )

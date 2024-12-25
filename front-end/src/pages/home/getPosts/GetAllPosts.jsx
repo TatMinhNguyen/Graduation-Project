@@ -23,7 +23,7 @@ const GetPosts = () => {
   
     const handleGetListPosts = async() => {
       try {
-        await getAllPosts(user?.token, dispatch, params)
+        await getAllPosts(user?.token, dispatch, params, navigate)
       } catch (error) {
         console.error('Errors:', error);
       }

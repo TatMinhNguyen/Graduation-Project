@@ -59,7 +59,7 @@ const SearchPosts = () => {
 
     const handleUnLike = async (postId) => {
         try {
-            await unFelt(user?.token, postId)
+            await unFelt(user?.token, postId, navigation)
             setHoveredPostId(null);
             await search(user?.token, params, dispatch);
         } catch (error) {
@@ -72,7 +72,7 @@ const SearchPosts = () => {
             const data = {
                 type: type
             } 
-            await updateFelt(user?.token, data, postId) 
+            await updateFelt(user?.token, data, postId, navigation) 
             setHoveredPostId(null);
             await search(user?.token, params, dispatch);         
         } catch (error) {
@@ -86,7 +86,7 @@ const SearchPosts = () => {
                 postId: postId,
                 type: type
             }
-            await setFelt(user?.token, data)
+            await setFelt(user?.token, data, navigation)
             setHoveredPostId(null);
             await search(user?.token, params, dispatch);
         } catch (error) {

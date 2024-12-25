@@ -10,14 +10,14 @@ const MutualFriends = ({userId , user}) => {
 
     const handleGetFriends = async() =>{
         try {
-            const result = await getMutuals(user?.token, userId)
+            const result = await getMutuals(user?.token, userId, navigation)
             setData(result)
         } catch (error) {
             console.log(error)
         }
     }
 
-    const handleGetUser = async(userId) => {
+    const handleGetUser = async(userId, navigation) => {
         navigation(`/get-profile/${userId}`)
     }
 

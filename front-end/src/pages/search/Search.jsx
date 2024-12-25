@@ -27,7 +27,7 @@ const Search = () => {
             q: searchQuery
         }
         try {
-            await search(user?.token, params, dispatch);
+            await search(user?.token, params, dispatch, navigate);
         } catch (error) {
             console.error("Error fetching search results:", error);
         } finally {

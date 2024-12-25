@@ -22,7 +22,7 @@ const Group = () => {
 
   const handleGetGroups = async() => {
     try {
-        const res = await getUserGroups(user?.token)
+        const res = await getUserGroups(user?.token, navigate)
         setGroups(res)
     } catch (error) {
         console.log(error)

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Link, } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
 import { forgotPass } from '../../../api/auth/auth';
 import { useDispatch } from 'react-redux';
 
@@ -11,13 +11,14 @@ const ForgotPassword = () => {
     const [isEmailFocused, setIsEmailFocused] = useState(false);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleForgotPassword = async () => {
         const newEmail = {
             email: email
         }
         try {
-            const res = await forgotPass(newEmail, dispatch)
+            const res = await forgotPass(newEmail, dispatch, navigate)
             setData(res)
         } catch (error) {
             console.log(error)

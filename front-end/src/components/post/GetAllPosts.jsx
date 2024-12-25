@@ -82,7 +82,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
                 postId: postId,
                 type: type
             }
-            await setFelt(user?.token, data)
+            await setFelt(user?.token, data, navigation)
             setHoveredPostId(null);
 
             if(!groupId){
@@ -98,7 +98,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
 
     const handleUnLike = async (postId) => {
         try {
-            await unFelt(user?.token, postId)
+            await unFelt(user?.token, postId, navigation)
             setHoveredPostId(null);
 
             if(!groupId){
@@ -117,7 +117,7 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             const data = {
                 type: type
             } 
-            await updateFelt(user?.token, data, postId) 
+            await updateFelt(user?.token, data, postId, navigation) 
             setHoveredPostId(null);
 
             if(!groupId){

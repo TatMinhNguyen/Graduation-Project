@@ -139,7 +139,7 @@ const Profile = () => {
 
     const handleGetUser = async () => {
         try {
-            const result = await getProfile(user?.token, dispatch, userId)
+            const result = await getProfile(user?.token, dispatch, userId, navigation)
             setProfile(result)
 
             // Xác định trạng thái quan hệ bạn bè
@@ -153,7 +153,7 @@ const Profile = () => {
                 setFriendStatus('none');
             }
             
-            await getMyProfile(user?.token, dispatch)
+            await getMyProfile(user?.token, dispatch, navigation)
         } catch (error) {
             console.log(error)
         }
@@ -161,7 +161,7 @@ const Profile = () => {
 
     const handleAccept = async () => {
         try {
-            await acceptRequest(user?.token, userId);
+            await acceptRequest(user?.token, userId, navigation);
             setFriendStatus('friends');
         } catch (error) {
             console.log(error);
@@ -170,7 +170,7 @@ const Profile = () => {
 
     const handleRefuse = async () => {
         try {
-            await refuseRequest(user?.token, userId);
+            await refuseRequest(user?.token, userId, navigation);
             setFriendStatus('none');
         } catch (error) {
             console.log(error);
@@ -179,7 +179,7 @@ const Profile = () => {
 
     const handleCancelRequest = async () => {
         try {
-            await cancelRequest(user?.token, userId);
+            await cancelRequest(user?.token, userId, navigation);
             setFriendStatus('none');
         } catch (error) {
             console.log(error);
@@ -188,7 +188,7 @@ const Profile = () => {
 
     const handleRequestFriend = async () => {
         try {
-            await requestFriends(user?.token, userId);
+            await requestFriends(user?.token, userId, navigation);
             setFriendStatus('requesting');
         } catch (error) {
             console.log(error);
@@ -197,7 +197,7 @@ const Profile = () => {
 
     const handleCancelFriend= async () => {
         try {
-            await cancelFriend(user?.token, userId);
+            await cancelFriend(user?.token, userId, navigation);
             setFriendStatus('none');
             setConfirmationModal(false)
         } catch (error) {

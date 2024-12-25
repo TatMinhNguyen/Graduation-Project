@@ -20,7 +20,7 @@ const GetFriendPosts = () => {
   
     const handleGetListPosts = async() => {
       try {
-        await getFriendsPosts(user?.token, dispatch, params)
+        await getFriendsPosts(user?.token, dispatch, params, navigate)
       } catch (error) {
         console.error('Errors:', error);
       }
