@@ -16,7 +16,7 @@ const GetViewGroup = () => {
 
   const handleGetAGroup = async () => {
       try {
-          const result = await getAGroup(user?.token, groupId , dispatch)
+          const result = await getAGroup(user?.token, groupId , dispatch, navigate)
           setGroup(result)
       } catch (error) {
           console.log(error)

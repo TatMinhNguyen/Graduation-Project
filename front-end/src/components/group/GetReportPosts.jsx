@@ -49,7 +49,7 @@ const GetReportPosts = () => {
 
   const handleGetPosts = async() => {
       try {
-          const res = await getReportPosts(user?.token, groupId);
+          const res = await getReportPosts(user?.token, groupId, navigate);
           setPosts(res)
       } catch (error) {
           console.log(error)
@@ -62,7 +62,7 @@ const GetReportPosts = () => {
 
   const handleKeepPost = async (postId) => {
       try {
-          await keepPost(user?.token, postId)
+          await keepPost(user?.token, postId, navigate)
           handleGetPosts();
       } catch (error) {
           console.log(error)
@@ -72,7 +72,7 @@ const GetReportPosts = () => {
   const handleDeletePost = async (postId) => {
       setLoading(true)
       try {
-          await deletePostGroup(user?.token, postId, groupId)
+          await deletePostGroup(user?.token, postId, groupId, navigate)
           handleGetPosts();
           handleCancel();
       } catch (error) {

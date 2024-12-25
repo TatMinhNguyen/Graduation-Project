@@ -31,9 +31,9 @@ const ChangeName = ({chat, user, isCloseModal, isClose}) => {
             handleCloseModal();
             isClose()
 
-            await getAChat(user?.token, chat?._id, dispatch)
-            await getMess(user?.token, chat?._id, params, dispatch);
-            await getUserChat(user?.token, dispatch)
+            await getAChat(user?.token, chat?._id, dispatch, navigate)
+            await getMess(user?.token, chat?._id, params, dispatch, navigate);
+            await getUserChat(user?.token, dispatch, navigate)
         } catch (error) {
             console.log(error)
         } finally {

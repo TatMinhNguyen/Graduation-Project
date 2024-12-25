@@ -48,7 +48,7 @@ const ViewGroup = () => {
     const handleLeaveGroup = async () => {
         setLoading(true)
         try {
-            await leaveGroup(user?.token, groupId)
+            await leaveGroup(user?.token, groupId, navigate)
 
             navigate(`/groups`)
         } catch (error) {
@@ -76,7 +76,7 @@ const ViewGroup = () => {
 
     const handleGetAGroup = async () => {
         try {
-            await getAGroup(user?.token, groupId, dispatch)
+            await getAGroup(user?.token, groupId, dispatch, navigate)
 
         } catch (error) {
             console.log(error)

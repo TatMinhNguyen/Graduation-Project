@@ -14,7 +14,7 @@ const GetFriends = () => {
 
   const handleRequest = async(userId) => {
     try {
-      await requestFriends(user?.token, userId)
+      await requestFriends(user?.token, userId, navigate)
       setIsClick(prev => ({
         ...prev,
         [userId]: true
@@ -26,7 +26,7 @@ const GetFriends = () => {
 
   const handleCancelRequest = async(userId) => {
     try {
-      await cancelRequest(user?.token, userId)
+      await cancelRequest(user?.token, userId, navigate)
       setIsClick(prev => ({
         ...prev,
         [userId]: false
@@ -38,7 +38,7 @@ const GetFriends = () => {
 
   const handleGetFriends = async() => {
     try {
-      const res = await getFriends(user?.token, user?.userId)
+      const res = await getFriends(user?.token, user?.userId, navigate)
       setFriends(res)
     } catch (error) {
       console.log(error)
@@ -47,7 +47,7 @@ const GetFriends = () => {
 
   const handleGetSuggestions = async() => {
     try {
-      const res = await getSuggestions(user?.token)
+      const res = await getSuggestions(user?.token, navigate)
       setSuggestions(res)
     } catch (error) {
       console.log(error)

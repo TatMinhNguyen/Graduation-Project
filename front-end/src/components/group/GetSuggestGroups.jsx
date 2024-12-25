@@ -11,7 +11,7 @@ const GetSuggestGroups = () => {
 
   const handleRequest = async (groupId) => {
     try {
-      const res = await joinGroup(user?.token, groupId);
+      const res = await joinGroup(user?.token, groupId, navigate);
 
       if(res?.group?.type === false) {
         setGroupStatus(prevStatus => ({
@@ -31,7 +31,7 @@ const GetSuggestGroups = () => {
 
   const handleCancelRequest = async (groupId) => {
     try {
-      await cancelJoinGroup(user?.token, groupId);
+      await cancelJoinGroup(user?.token, groupId, navigate);
 
       setGroupStatus(prevStatus => ({
         ...prevStatus,
@@ -44,7 +44,7 @@ const GetSuggestGroups = () => {
 
   const handleGetSuggest = async () => {
     try {
-      const res = await getSuggestGroup(user?.token);
+      const res = await getSuggestGroup(user?.token, navigate);
       setSuggestions(res);
 
       // Cập nhật trạng thái cho từng nhóm

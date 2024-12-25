@@ -85,7 +85,7 @@ const CreateGroup = ({isClose}) => {
 
     const handleGetSuggest = async() => {
         try {
-            const result = await getSuggestionUser(user?.token)
+            const result = await getSuggestionUser(user?.token, navigate)
             setMembers(result)
         } catch (error) {
             console.log(error)
@@ -97,7 +97,7 @@ const CreateGroup = ({isClose}) => {
         const data = {
             searchInput: searchInput
         }
-        const res =  await SearchSuggestionUser(user?.token, data)
+        const res =  await SearchSuggestionUser(user?.token, data, navigate)
         setMembers(res)
     }
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { changePassword } from '../../api/auth/auth';
+import { useNavigate } from 'react-router-dom';
 
 const ChangePassword = ({isCloseModal, user}) => {
 
@@ -11,6 +12,8 @@ const ChangePassword = ({isCloseModal, user}) => {
 
     const [reTypePassword, setReTypePassword] = useState('')
     const [isReTypePasswordFocused, setIsReTypePasswordFocused] = useState(false)
+
+    const navigate = useNavigate();
 
     const handleCloseModal = () => {
         isCloseModal()
@@ -37,7 +40,7 @@ const ChangePassword = ({isCloseModal, user}) => {
                 oldPassword: currentPassword,
                 newPassword: reTypePassword
             }
-            const result = await changePassword(user?.token, data)
+            const result = await changePassword(user?.token, data, navigate)
 
             if(result){
                 isCloseModal();

@@ -60,10 +60,10 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
             const member = {
                 memberId: memberId
             }
-            await deleteMember(user?.token, member, chatId)
+            await deleteMember(user?.token, member, chatId, navigate)
             
-            await getMess(user?.token, chatId, params, dispatch);
-            await getUserChat(user?.token, dispatch)
+            await getMess(user?.token, chatId, params, dispatch, navigate);
+            await getUserChat(user?.token, dispatch, navigate)
             isCloseModal()
         } catch (error) {
             console.log(error)
@@ -75,9 +75,9 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
     const handleLeaveGroup = async () => {
         setLoading(true)
         try {
-            await leaveGroup(user?.token, chatId)
+            await leaveGroup(user?.token, chatId, navigate)
             
-            await getUserChat(user?.token, dispatch)
+            await getUserChat(user?.token, dispatch, navigate)
             navigate(`/messenger`)
         } catch (error) {
             console.log(error)
@@ -97,7 +97,7 @@ const GetMembers = ({chatId, createId, isCloseModal}) => {
     
     const handleGetMembers = async () => {
         try {
-            const res = await getMembers(user?.token, chatId)
+            const res = await getMembers(user?.token, chatId, navigate)
             setMembers(res)
         } catch (error) {
             console.log(error)

@@ -16,7 +16,7 @@ const ViewAdminGroup = () => {
 
   const handleGetAGroup = async () => {
       try {
-          await getAGroup(user?.token, groupId, dispatch)
+          await getAGroup(user?.token, groupId, dispatch, navigate)
       } catch (error) {
           console.log(error)
       }

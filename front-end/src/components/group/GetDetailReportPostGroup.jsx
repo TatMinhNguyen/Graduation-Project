@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { getContentReportPosts } from '../../api/group/group'
+import { useNavigate } from 'react-router-dom';
 
 const GetDetailReportPostGroup = ({user, post, isClose}) => {
     const [data, setData] = useState([])
 
+    const navigate = useNavigate();
+
     const handleGetReport = async() => {
         try {
-            const res = await getContentReportPosts(user?.token, post?.postId)
+            const res = await getContentReportPosts(user?.token, post?.postId, navigate)
             setData(res);
         } catch (error) {
             console.log(error)

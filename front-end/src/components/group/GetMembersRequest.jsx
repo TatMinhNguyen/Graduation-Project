@@ -16,7 +16,7 @@ const GetMembersRequest = () => {
 
   const handleGetMemberes = async() => {
     try {
-      const result = await getPendingMembers(user?.token, groupId)
+      const result = await getPendingMembers(user?.token, groupId,navigate)
       setMemberes(result)
     } catch (error) {
       console.log(error)
@@ -25,7 +25,7 @@ const GetMembersRequest = () => {
 
   const handleGetAGroup = async () => {
     try {
-        const result = await getAGroup(user?.token, groupId, dispatch)
+        const result = await getAGroup(user?.token, groupId, dispatch, navigate)
         setGroup(result)
     } catch (error) {
         console.log(error)
@@ -34,7 +34,7 @@ const GetMembersRequest = () => {
 
   const handleApprove = async (userId) => {
     try {
-      await approve(user?.token, groupId, userId)
+      await approve(user?.token, groupId, userId, navigate)
 
       handleGetMemberes();
       handleGetAGroup();
@@ -45,7 +45,7 @@ const GetMembersRequest = () => {
 
   const handleDecline = async (userId) => {
     try {
-      await decline(user?.token, groupId, userId)
+      await decline(user?.token, groupId, userId, navigate)
 
       handleGetMemberes();
       handleGetAGroup();

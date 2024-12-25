@@ -16,12 +16,14 @@ import { getAllPosts, getUserPost, updatePost } from '../../api/post/post'
 import { search } from '../../api/search/search'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import { getGroupPosts, updatePostGroup } from '../../api/group/group'
+import { useNavigate } from 'react-router-dom'
 
 const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVideo, oldTypeText, postId, searchQuery, groupId}) => {
     const textareaRef = useRef(null);
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     
     const [loading, setLoading] = useState(false);
 
@@ -120,17 +122,17 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             }
             formData.append('typeText', typeText);
 
-            await updatePost(user?.token, formData, postId)
-            await updatePostGroup(user?.token, formData, postId)
+            await updatePost(user?.token, formData, postId, navigate)
+            await updatePostGroup(user?.token, formData, postId, navigate)
 
             isCloseModal();
             setImagesId([]);
             setVideoId('');
 
-            await getAllPosts(user?.token, dispatch, params)
+            await getAllPosts(user?.token, dispatch, params, navigate)
             fetchSearchResults();
-            await getUserPost(user?.token, user?.userId, dispatch)
-            await getGroupPosts(user?.token, groupId, dispatch, params)
+            await getUserPost(user?.token, user?.userId, dispatch, navigate)
+            await getGroupPosts(user?.token, groupId, dispatch, params, navigate)
 
         } catch (error) {
             console.log(error)
@@ -147,7 +149,7 @@ const EditPost = ({user, params, isCloseModal, profile, text, oldImages, oldVide
             q: searchQuery
         }
         try {
-            await search(user?.token, params, dispatch);
+            await search(user?.token, params, dispatch, navigate);
         } catch (error) {
             console.error("Error fetching search results:", error);
         }

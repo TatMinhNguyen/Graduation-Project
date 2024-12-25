@@ -61,7 +61,7 @@ const SearchPosts = () => {
         try {
             await unFelt(user?.token, postId, navigation)
             setHoveredPostId(null);
-            await search(user?.token, params, dispatch);
+            await search(user?.token, params, dispatch, navigation);
         } catch (error) {
             console.log(error)
         }
@@ -74,7 +74,7 @@ const SearchPosts = () => {
             } 
             await updateFelt(user?.token, data, postId, navigation) 
             setHoveredPostId(null);
-            await search(user?.token, params, dispatch);         
+            await search(user?.token, params, dispatch, navigation);         
         } catch (error) {
             console.log(error)
         }
@@ -88,7 +88,7 @@ const SearchPosts = () => {
             }
             await setFelt(user?.token, data, navigation)
             setHoveredPostId(null);
-            await search(user?.token, params, dispatch);
+            await search(user?.token, params, dispatch, navigation);
         } catch (error) {
             console.log(error)
         }
@@ -160,8 +160,8 @@ const SearchPosts = () => {
             setShowDelete(false)
             setSelectedPost(null)
 
-            await deletePost(user?.token, postId)
-            await search(user?.token, params, dispatch);
+            await deletePost(user?.token, postId, navigation)
+            await search(user?.token, params, dispatch, navigation);
         } catch (error) {
             console.log(error)
         }

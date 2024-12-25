@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux'
 import { createPost, getAllPosts } from '../../api/post/post'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import { createPostGroup, getGroupPosts } from '../../api/group/group'
+import { useNavigate } from 'react-router-dom'
 
 const CreatePost = ({user, params, isCloseModal, profile, groupId}) => {
     const imageInputRef = useRef(null);
@@ -32,6 +33,8 @@ const CreatePost = ({user, params, isCloseModal, profile, groupId}) => {
     // console.log(imagePreviews)
 
     const dispatch = useDispatch();
+
+    const navigate = useNavigate();
     const textareaRef = useRef(null);
 
     const handleShowFont = () => {
@@ -101,7 +104,7 @@ const CreatePost = ({user, params, isCloseModal, profile, groupId}) => {
 
     const handleGetListPosts = async() => {
         try {
-          await getAllPosts(user?.token, dispatch, params)
+          await getAllPosts(user?.token, dispatch, params, navigate)
         } catch (error) {
           console.error('Errors:', error);
         }
@@ -128,11 +131,11 @@ const CreatePost = ({user, params, isCloseModal, profile, groupId}) => {
           formData.append('typeText', typeText); // Nếu typeText luôn có giá trị   
 
           if(!groupId){
-            await createPost(user?.token, formData);
+            await createPost(user?.token, formData, navigate);
           }
           else{
-            await createPostGroup(user?.token, formData, groupId)
-            await getGroupPosts(user?.token, groupId, dispatch, params)
+            await createPostGroup(user?.token, formData, groupId, navigate)
+            await getGroupPosts(user?.token, groupId, dispatch, params, navigate)
           }
           
           // Reset state after successful post

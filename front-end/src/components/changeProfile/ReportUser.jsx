@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { reportUser } from '../../api/profile/profile';
 import LoadingSpinner from '../spinner/LoadingSpinner';
+import { useNavigate } from 'react-router-dom';
 
 const ReportUser = ({isCloseModal, user, userId, setNotiSuccess}) => {
     const [type, setType] = useState(null)
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleReportUser = async() => {
         const data = {
@@ -14,7 +17,7 @@ const ReportUser = ({isCloseModal, user, userId, setNotiSuccess}) => {
         }
         setLoading(true)
         try {
-            await reportUser(user?.token, userId, data)
+            await reportUser(user?.token, userId, data, navigate)
             isCloseModal()
             setNotiSuccess()
             setContent('')

@@ -57,8 +57,8 @@ const GetMessages = () => {
 
   const handleGetMess = async () => {
     try {
-        await getMess(user?.token, chatId, params, dispatch);
-        await checkMessages(user?.token, chatId)
+        await getMess(user?.token, chatId, params, dispatch, navigate);
+        await checkMessages(user?.token, chatId, navigate)
     } catch (error) {
         console.error('Errors:', error);
     }
@@ -105,14 +105,14 @@ const GetMessages = () => {
             formData.append('image', image)
         }
 
-        await addMess(user?.token, formData)
+        await addMess(user?.token, formData, navigate)
 
         setImage(null)
         setMessages('')
         setImagePreview(null)
 
         handleGetMess();
-        await getUserChat(user?.token, dispatch)
+        await getUserChat(user?.token, dispatch, navigate)
 
     } catch (error) {
         console.log(error)
@@ -124,7 +124,7 @@ const GetMessages = () => {
   }
 
   const handleGetAChat = async () => {
-    await getAChat(user?.token, chatId, dispatch)
+    await getAChat(user?.token, chatId, dispatch, navigate)
   }
 
   const handleCall = () => {

@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import LoadingSpinner from '../spinner/LoadingSpinner'
 import { reportPost } from '../../api/post/post'
+import { useNavigate } from 'react-router-dom'
 
 const ReportPost = ({isCloseModal, user, postId, setNotiSuccess}) => {
     const [type, setType] = useState(null)
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleReportPost = async() => {
         const data = {
@@ -14,7 +17,7 @@ const ReportPost = ({isCloseModal, user, postId, setNotiSuccess}) => {
         }
         setLoading(true)
         try {
-            await reportPost(user?.token, postId, data)
+            await reportPost(user?.token, postId, data, navigate)
             isCloseModal()
             setNotiSuccess()
             setContent('')

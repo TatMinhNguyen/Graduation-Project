@@ -25,7 +25,7 @@ const GetPostsGroup = () => {
 
   const handleGetListPosts = async() => {
     try {
-      await getGroupPosts(user?.token, groupId, dispatch, params)
+      await getGroupPosts(user?.token, groupId, dispatch, params, navigate)
     } catch (error) {
       console.error('Errors:', error);
     }

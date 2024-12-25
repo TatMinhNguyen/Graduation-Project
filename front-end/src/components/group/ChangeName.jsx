@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { editGroup, getAGroup } from '../../api/group/group'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { useNavigate } from 'react-router-dom'
 
 const ChangeName = ({isCloseModal, name, type, user, groupId}) => {
     const [groupName, setGroupName] = useState(name);
@@ -10,6 +11,7 @@ const ChangeName = ({isCloseModal, name, type, user, groupId}) => {
     const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     const handleCloseModal = () => {
         isCloseModal(false);        
@@ -22,11 +24,11 @@ const ChangeName = ({isCloseModal, name, type, user, groupId}) => {
             type: groupType,
         }
         try {
-            await editGroup(user?.token, groupId, newGroup)
+            await editGroup(user?.token, groupId, newGroup, navigate)
             
             handleCloseModal();
 
-            await getAGroup(user?.token, groupId, dispatch)
+            await getAGroup(user?.token, groupId, dispatch, navigate)
         } catch (error) {
             console.log(error)
         } finally {

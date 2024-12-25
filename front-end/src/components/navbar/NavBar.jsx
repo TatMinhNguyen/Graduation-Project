@@ -90,12 +90,12 @@ const NavBar = ({user}) => {
     // if (!incomingCall) return null; // Không hiển thị nếu không có cuộc gọi
 
     const handleGetAChat = async (chatId) => {
-        await getAChat(user?.token, chatId, dispatch)
+        await getAChat(user?.token, chatId, dispatch, navigation)
     }
 
     const handleGetNotifications = async () => {
         try {
-            const result = await getNotification(user?.token)
+            const result = await getNotification(user?.token, navigation)
             setNotifications(result)
         } catch (error) {
             console.log(error)
@@ -121,7 +121,7 @@ const NavBar = ({user}) => {
 
     const handleGetProfile = async () => {
         try {
-            await getMyProfile(user?.token, dispatch)
+            await getMyProfile(user?.token, dispatch, navigation)
         } catch (error) {
           console.error('Errors:', error);
         }

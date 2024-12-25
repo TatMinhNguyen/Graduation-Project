@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { changeAvatar, getMyProfile } from '../../api/profile/profile';
 import { useDispatch } from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 
 const ChangeAvatar = ({isCloseModal, avatar, user}) => {
@@ -10,6 +11,7 @@ const ChangeAvatar = ({isCloseModal, avatar, user}) => {
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     // console.log(imagePreview)
 
@@ -47,12 +49,12 @@ const ChangeAvatar = ({isCloseModal, avatar, user}) => {
                 formData.append('image', image);
             }
 
-            await changeAvatar(user?.token, formData)
+            await changeAvatar(user?.token, formData, navigate)
 
             setImage(null)
             handleCloseModal();
 
-            await getMyProfile(user?.token, dispatch)
+            await getMyProfile(user?.token, dispatch, navigate)
         } catch (error) {
             console.log(error)
         } finally {

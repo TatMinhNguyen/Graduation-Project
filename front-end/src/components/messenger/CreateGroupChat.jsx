@@ -25,7 +25,7 @@ const CreateGroupChat = ({isClose}) => {
         const data = {
             searchInput: searchInput
         }
-        const res =  await searchMembers(user?.token, data)
+        const res =  await searchMembers(user?.token, data, navigate)
         setData(res)
     }
 
@@ -57,7 +57,7 @@ const CreateGroupChat = ({isClose}) => {
         try {
             await createChatRoom(user?.token, newGroup, navigate)
             isClose();
-            await getUserChat(user?.token, dispatch)
+            await getUserChat(user?.token, dispatch, navigate)
         } catch (error) {
             console.log(error)
         }

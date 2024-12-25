@@ -8,7 +8,7 @@ const LeftBar = ({profile, user}) => {
 
   const handleGetUserGroup = async () => {
     try {
-      const result = await getUserGroups(user?.token)
+      const result = await getUserGroups(user?.token, navigate)
       setGroups(result)
     } catch (error) {
       console.log(error)

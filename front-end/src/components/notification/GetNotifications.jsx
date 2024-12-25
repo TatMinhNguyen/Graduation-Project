@@ -11,12 +11,12 @@ const GetNotifications = ({notifications}) => {
     const navigation = useNavigate()
 
     const handleGetAPost = async(postId, notiId) => {
-        await checkNotification(user?.token, notiId)
+        await checkNotification(user?.token, notiId, navigation)
         navigation(`/get-post/${postId}`)
     }
 
     const handleGetUser = async(userId, notiId) => {
-        await checkNotification(user?.token, notiId)
+        await checkNotification(user?.token, notiId, navigation)
         navigation(`/get-profile/${userId}`)
     }
     return (

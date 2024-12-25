@@ -18,7 +18,7 @@ const RightBar = ({user}) => {
 
   const handleGetRequestFriends = async () => {
     try {
-      const result = await getRequested(user?.token)
+      const result = await getRequested(user?.token, navigate)
       const limitedResult = result.slice(0, 2) // Chỉ lấy tối đa 2 phần tử
       setRequestFriends(limitedResult)
     } catch (error) {
@@ -27,14 +27,14 @@ const RightBar = ({user}) => {
   }
 
   const handleGetSuggestions = async () => {
-    const result = await getSuggestions(user?.token)
+    const result = await getSuggestions(user?.token, navigate)
     const limitedResult = result.slice(0, 4)
     setSuggestions(limitedResult);
   }
 
   const handleGetFriends = async () => {
     try {
-      const result = await getFriends(user?.token, user?.userId)
+      const result = await getFriends(user?.token, user?.userId, navigate)
       setFriends(result)
     } catch (error) {
       console.log(error)
@@ -51,7 +51,7 @@ const RightBar = ({user}) => {
 
   const handleAccept = async (e, userId) => {
     e.stopPropagation();
-    await acceptRequest(user?.token, userId)
+    await acceptRequest(user?.token, userId, navigate)
     setAccepted(prev => ({
       ...prev,
       [userId]: true
@@ -60,7 +60,7 @@ const RightBar = ({user}) => {
 
   const handleRefuse = async (e, userId) => {
     e.stopPropagation();
-    await refuseRequest(user?.token, userId)
+    await refuseRequest(user?.token, userId, navigate)
     setRefused(prev => ({
       ...prev,
       [userId]: true
@@ -69,7 +69,7 @@ const RightBar = ({user}) => {
 
   const handleRequest = async (e, userId) => {
     e.stopPropagation();
-    await requestFriends(user?.token, userId);
+    await requestFriends(user?.token, userId, navigate);
     setRequested(prev => ({
       ...prev,
       [userId]: true

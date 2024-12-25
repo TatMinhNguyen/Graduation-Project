@@ -12,7 +12,7 @@ const GetMyGroups = () => {
 
     const handleRequest = async(groupId) => {
         try {
-            await joinGroup(user?.token, groupId)
+            await joinGroup(user?.token, groupId, navigate)
             handleGetSuggest();
             handleGetGroups();
         } catch (error) {
@@ -22,7 +22,7 @@ const GetMyGroups = () => {
 
     const handleCancelRequest = async(groupId) => {
         try {
-            await cancelJoinGroup(user?.token, groupId)
+            await cancelJoinGroup(user?.token, groupId, navigate)
             handleGetSuggest();
             handleGetGroups();
         } catch (error) {
@@ -32,7 +32,7 @@ const GetMyGroups = () => {
 
     const handleGetGroups = async() => {
         try {
-            const res = await getUserGroups(user?.token)
+            const res = await getUserGroups(user?.token, navigate)
             setGroups(res)
         } catch (error) {
             console.log(error)
@@ -41,7 +41,7 @@ const GetMyGroups = () => {
 
     const handleGetSuggest = async() => {
         try {
-            const res = await getSuggestGroup(user?.token)
+            const res = await getSuggestGroup(user?.token, navigate)
             setSuggestions(res)
         } catch (error) {
             console.log(error)

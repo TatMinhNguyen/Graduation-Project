@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { addMemberes, getMess, getUserChat, searchUser } from '../../api/chat/chat';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingSpinner from '../spinner/LoadingSpinner';
+import { useNavigate } from 'react-router-dom';
 
 const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
@@ -11,6 +12,7 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const getNewMembersId = (selectedUsers) => {
         return selectedUsers.map(user => user.userId);
@@ -29,9 +31,9 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
             const newMembers = {
                 newMembers: newMembersId
             }
-            await addMemberes(user?.token, newMembers, chatId)
-            await getMess(user?.token, chatId, params, dispatch);
-            await getUserChat(user?.token, dispatch)
+            await addMemberes(user?.token, newMembers, chatId, navigate)
+            await getMess(user?.token, chatId, params, dispatch, navigate);
+            await getUserChat(user?.token, dispatch, navigate)
             onCloseModal();
             isCloseModal();            
         } catch (error) {
@@ -46,7 +48,7 @@ const AddMembers = ({chatId, onCloseModal, isCloseModal}) => {
         const data = {
             searchInput: searchInput
         }
-        const res =  await searchUser(user?.token, data, chatId)
+        const res =  await searchUser(user?.token, data, chatId, navigate)
         setData(res)
     }
 

@@ -14,7 +14,7 @@ const GetRequests = () => {
 
   const handleRequests = async() => {
     try {
-      const res = await getRequested(user?.token)
+      const res = await getRequested(user?.token, navigate)
       setRequests(res)
     } catch (error) {
       console.log(error)
@@ -23,7 +23,7 @@ const GetRequests = () => {
 
   const handleAccept = async (userId) => {
     try {
-        await acceptRequest(user?.token, userId);
+        await acceptRequest(user?.token, userId, navigate);
         setClickedUsers(prev => ({
             ...prev,
             [userId]: true
@@ -39,7 +39,7 @@ const GetRequests = () => {
 
   const handleRefuse = async (userId) => {
       try {
-          await refuseRequest(user?.token, userId);
+          await refuseRequest(user?.token, userId, navigate);
           setClickedUsers(prev => ({
             ...prev,
             [userId]: true

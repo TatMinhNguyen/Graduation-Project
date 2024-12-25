@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAGroup, getMembers, InviteUser, SearchInviteUser } from '../../api/group/group'
+import { useNavigate } from 'react-router-dom'
 
 const InviteMembers = ({isCloseModal, groupId}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
@@ -9,6 +10,7 @@ const InviteMembers = ({isCloseModal, groupId}) => {
     const [selectedUsers, setSelectedUsers] = useState([]);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const getNewMembersId = (selectedUsers) => {
         return selectedUsers.map(user => user.userId);
@@ -21,11 +23,11 @@ const InviteMembers = ({isCloseModal, groupId}) => {
         const newMembers = {
             newMembers: newMembersId
         }
-        await InviteUser(user?.token, newMembers, groupId)
+        await InviteUser(user?.token, newMembers, groupId, navigate)
         isCloseModal();
 
-        await getMembers(user?.token, groupId, dispatch)
-        await getAGroup(user?.token, groupId, dispatch)
+        await getMembers(user?.token, groupId, dispatch, navigate)
+        await getAGroup(user?.token, groupId, dispatch, navigate)
     }
 
     const handleSearch = async(e) => {
@@ -33,7 +35,7 @@ const InviteMembers = ({isCloseModal, groupId}) => {
         const data = {
             searchInput: searchInput
         }
-        const res =  await SearchInviteUser(user?.token, data, groupId)
+        const res =  await SearchInviteUser(user?.token, data, groupId, navigate)
         setData(res)
     }
 

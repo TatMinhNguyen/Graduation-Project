@@ -52,10 +52,10 @@ const GetMembers = () => {
         const member = {
             memberId: memberId
         }
-        await deleteMember(user?.token, member, groupId)
+        await deleteMember(user?.token, member, groupId, navigate)
         
         handleGetMemberes();
-        await getAGroup(user?.token, groupId, dispatch)
+        await getAGroup(user?.token, groupId, dispatch, navigate)
     } catch (error) {
         console.log(error)
     } finally{
@@ -66,7 +66,7 @@ const GetMembers = () => {
   const handleLeaveGroup = async () => {
     setLoading(true)
     try {
-        await leaveGroup(user?.token, groupId)
+        await leaveGroup(user?.token, groupId, navigate)
 
         navigate(`/groups`)
     } catch (error) {
@@ -133,7 +133,7 @@ const GetMembers = () => {
 
   const handleGetMemberes = async() => {
     try {
-      await getMembers(user?.token, groupId, dispatch)
+      await getMembers(user?.token, groupId, dispatch, navigate)
     //   setMemberes(result)
     } catch (error) {
       console.log(error)

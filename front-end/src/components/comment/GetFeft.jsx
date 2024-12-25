@@ -18,7 +18,7 @@ const GetFeft = ({isCloseModal , postId}) => {
 
     const handleGetFeft = async() => {
         try {
-            const result = await getFelt(user?.token, postId)
+            const result = await getFelt(user?.token, postId, navigation)
             setData(result)
         } catch (error) {
             console.log(error)

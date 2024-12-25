@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { changeProfile, getMyProfile } from '../../api/profile/profile'
 import { useDispatch } from 'react-redux'
 import LoadingSpinner from '../spinner/LoadingSpinner'
+import { useNavigate } from 'react-router-dom'
 
 const ChangeProfile = ({user, isCloseModal, myProfile}) => {
     const [username, setUsername] = useState(myProfile?.username)
@@ -11,6 +12,7 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
     const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     const handleCloseModal = () => {
         isCloseModal(false);        
@@ -24,11 +26,11 @@ const ChangeProfile = ({user, isCloseModal, myProfile}) => {
             address: address
         }
         try {
-            await changeProfile(user?.token, profile)
+            await changeProfile(user?.token, profile, navigate)
             
             handleCloseModal();
 
-            await getMyProfile(user?.token, dispatch)
+            await getMyProfile(user?.token, dispatch, navigate)
         } catch (error) {
             console.log(error)
         } finally {

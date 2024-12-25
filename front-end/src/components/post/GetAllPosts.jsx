@@ -86,10 +86,10 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             setHoveredPostId(null);
 
             if(!groupId){
-                await getAllPosts(user?.token, dispatch, params);
-                await getFriendsPosts(user?.token, dispatch, params);
+                await getAllPosts(user?.token, dispatch, params, navigation);
+                await getFriendsPosts(user?.token, dispatch, params, navigation);
             }else{
-                await getGroupPosts(user?.token, groupId, dispatch, params)
+                await getGroupPosts(user?.token, groupId, dispatch, params, navigation)
             }
         } catch (error) {
             console.log(error)
@@ -102,10 +102,10 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             setHoveredPostId(null);
 
             if(!groupId){
-                await getAllPosts(user?.token, dispatch, params)
-                await getFriendsPosts(user?.token, dispatch, params);
+                await getAllPosts(user?.token, dispatch, params, navigation)
+                await getFriendsPosts(user?.token, dispatch, params, navigation);
             }else{
-                await getGroupPosts(user?.token, groupId, dispatch, params)
+                await getGroupPosts(user?.token, groupId, dispatch, params, navigation)
             }
         } catch (error) {
             console.log(error)
@@ -121,10 +121,10 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
             setHoveredPostId(null);
 
             if(!groupId){
-                await getAllPosts(user?.token, dispatch, params)
-                await getFriendsPosts(user?.token, dispatch, params);
+                await getAllPosts(user?.token, dispatch, params, navigation)
+                await getFriendsPosts(user?.token, dispatch, params, navigation);
             }else{
-                await getGroupPosts(user?.token, groupId, dispatch, params)
+                await getGroupPosts(user?.token, groupId, dispatch, params, navigation)
             }       
         } catch (error) {
             console.log(error)
@@ -174,18 +174,18 @@ const GetAllPosts = ({user, posts, params, profile, groupId}) => {
         setLoading(true)
         try {
             if(!groupId){
-                await deletePost(user?.token, postId)
+                await deletePost(user?.token, postId, navigation)
             }else{
-                await deletePostGroup(user?.token, postId, groupId)
+                await deletePostGroup(user?.token, postId, groupId, navigation)
             }
             
             setShowDelete(false)
             setSelectedPost(null)
 
             if(!groupId){
-                await getAllPosts(user?.token, dispatch, params)
+                await getAllPosts(user?.token, dispatch, params, navigation)
             }else{
-                await getGroupPosts(user?.token, groupId, dispatch, params)
+                await getGroupPosts(user?.token, groupId, dispatch, params, navigation)
             }
         } catch (error) {
             console.log(error)

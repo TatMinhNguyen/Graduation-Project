@@ -31,17 +31,17 @@ const GetChats = () => {
   
     const handleGetUserChats = async() => {
       try {
-          await getUserChat(user?.token, dispatch)
+          await getUserChat(user?.token, dispatch, navigate)
       } catch (error) {
           console.log(error)
       }
     }
 
     const handleCheckMessage = async(chatId) => {
-        await checkMessages(user?.token, chatId)
+        await checkMessages(user?.token, chatId, navigate)
         navigate(`/messenger/${chatId}`)
         
-        await getUserChat(user?.token, dispatch)
+        await getUserChat(user?.token, dispatch, navigate)
     }
 
     const handleCreateChat = async(userId) => {
@@ -57,7 +57,7 @@ const GetChats = () => {
         const data = {
             searchInput: searchInput
         }
-        const result = await searchMembers(user?.token, data)
+        const result = await searchMembers(user?.token, data, navigate)
 
         setResultSearch(result);
     }

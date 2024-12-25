@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { editPhoto, getAGroup } from '../../api/group/group';
 import LoadingSpinner from '../spinner/LoadingSpinner';
+import { useNavigate } from 'react-router-dom';
 
 const ChangePhoto = ({isCloseModal, avatar, user, groupId}) => {
     const [image, setImage] = useState(null)
@@ -10,6 +11,7 @@ const ChangePhoto = ({isCloseModal, avatar, user, groupId}) => {
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     // console.log(imagePreview)
 
@@ -47,12 +49,12 @@ const ChangePhoto = ({isCloseModal, avatar, user, groupId}) => {
                 formData.append('image', image);
             }
 
-            await editPhoto(user?.token, groupId, formData)
+            await editPhoto(user?.token, groupId, formData, navigate)
 
             setImage(null)
             handleCloseModal();
 
-            await getAGroup(user?.token, groupId, dispatch)
+            await getAGroup(user?.token, groupId, dispatch, navigate)
         } catch (error) {
             console.log(error)
         } finally {

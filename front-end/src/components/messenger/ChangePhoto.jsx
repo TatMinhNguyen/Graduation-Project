@@ -59,9 +59,9 @@ const ChangePhoto = ({isCloseModal, avatar, user, chatId, isClose}) => {
             handleCloseModal();
             isClose();
 
-            await getAChat(user?.token, chatId, dispatch)
-            await getMess(user?.token, chatId, params, dispatch);
-            await getUserChat(user?.token, dispatch)
+            await getAChat(user?.token, chatId, dispatch , navigate)
+            await getMess(user?.token, chatId, params, dispatch , navigate);
+            await getUserChat(user?.token, dispatch , navigate)
         } catch (error) {
             console.log(error)
         } finally {

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { ImageComment } from '../CssPictures/ImageComment';
 import LoadingSpinner from '../spinner/LoadingSpinner';
 import socket from '../../socket';
+import { useNavigate } from 'react-router-dom';
 
 export const Comment = ({comments, user, authorPost, postId, profile}) => {
 
@@ -32,6 +33,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Lắng nghe sự kiện onlineUsers từ server
@@ -103,12 +105,12 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
   const handleDeleteComment = async(commentId) => {
     setLoading(true)
     try {
-      await deleteComment(user?.token, commentId)
+      await deleteComment(user?.token, commentId, navigate)
 
       setConfirmModal(false)
       setSelectedComment(null)
 
-      await getComments(user?.token, dispatch, postId)
+      await getComments(user?.token, dispatch, postId, navigate)
     } catch (error) {
       console.log(error)
     } finally {
@@ -159,7 +161,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
         formData.append('imageId', imageId)
       }
 
-      await editcomment(user?.token, formData, commentId)
+      await editcomment(user?.token, formData, commentId, navigate)
 
       // setDescription('')
       setImage(null) 
@@ -172,7 +174,7 @@ export const Comment = ({comments, user, authorPost, postId, profile}) => {
           textareaRef.current.style.height = 'auto';
       }
 
-      await getComments(user?.token, dispatch, postId)
+      await getComments(user?.token, dispatch, postId, navigate)
     } catch (error) {
       console.log(error)
     }finally {
