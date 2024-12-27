@@ -14,7 +14,7 @@ export const getFriends = async (token, userId, navigate) => {
         console.log(error);
         if(error?.response.data === 'Token is not valid!'){
             navigate('/login');
-            toast.info("Your session has expired.");
+            // toast.info("Your session has expired.");
         }
     }
 };
@@ -31,7 +31,7 @@ export const getSuggestions = async (token, navigate) => {
         console.log(error);
         if(error?.response.data === 'Token is not valid!'){
             navigate('/login');
-            toast.info("Your session has expired.");
+            // toast.info("Your session has expired.");
         }
     }
 };
@@ -48,7 +48,7 @@ export const getRequested = async (token, navigate) => {
         console.log(error);
         if(error?.response.data === 'Token is not valid!'){
             navigate('/login');
-            toast.info("Your session has expired.");
+            // toast.info("Your session has expired.");
         }
     }
 };

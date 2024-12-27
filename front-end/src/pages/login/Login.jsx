@@ -47,7 +47,7 @@ function Login() {
                                 className='w-32 h-32'
                             />
                         </div>
-                        <form className="p-4 px-[50px]" on onSubmit={handleLogin}>
+                        <form className="p-4 px-[50px]" onSubmit={handleLogin}>
                             <div className="relative mb-5 mt-[2vh]">
                                 <input
                                     type="text"

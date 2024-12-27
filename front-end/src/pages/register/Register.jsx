@@ -4,12 +4,14 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate, } from "react-router-dom";
 import { registerUser } from '../../api/auth/auth';
 import { setEmail, setPassword } from '../../redux/authSlice';
+import LoadingSpinner from '../../components/spinner/LoadingSpinner';
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setCurrentEmail] = useState('');
     const [password, setCurrentPassword] = useState('');
 
+    const [loading, setLoading] = useState(false);
     const [isEmailFocused, setIsEmailFocused] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     const [isUsernameFocused, setIsUsernameFocused] = useState(false);
@@ -34,6 +36,7 @@ const Register = () => {
 
     const handleRegister = async(e) => {
         e.preventDefault();
+        setLoading(true)
         try {
             const newUser = {
                 username : username,
@@ -45,6 +48,8 @@ const Register = () => {
             dispatch(setPassword(newUser.password));
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -239,11 +244,16 @@ const Register = () => {
                             </p>
                         </div>
                         <div className='flex-1 flex items-center justify-center'>
-                            <button type="submit" 
-                                className="w-[40vh] bg-green-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-700"
-                            >
-                                Sign Up
-                            </button>                                
+                            {loading ? (
+                                <LoadingSpinner/>
+                            ) : (
+                                <button type="submit" 
+                                    className="w-[40vh] bg-green-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-700"
+                                >
+                                    Sign Up
+                                </button>                                 
+                            )}
+                               
                         </div>
                     </form>
                     <div className='flex-1 flex items-center justify-center'>

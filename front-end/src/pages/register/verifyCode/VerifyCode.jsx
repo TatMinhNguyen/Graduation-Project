@@ -47,19 +47,19 @@ const VerifyCode = () => {
                         </h1>
                     </div>
                     <div className='mt-[5vh]'>
-                        <div className='flex-1 flex items-center px-[15vh]'>
-                            <p className='text-center text-gray-700 text-base'>
-                                Your verification code is  
+                        <div className='px-[14vh]'>
+                            <p className='text-[16px] text-gray-700'>
+                                Your verification code has been sent to the email:  
                             </p>
-                            <p className='text-center text-black text-base ml-2 font-medium'>
-                                {verificationCode.verificationCode}
+                            <p className='text-black text-base font-medium'>
+                                {verificationCode.email}
                             </p>
                         </div>
-                        <div className='flex-1 flex items-center px-[15vh] mt-4'>
+                        {/* <div className='flex-1 flex items-center px-[15vh] mt-4'>
                             <p className='text-center text-gray-700 text-base'>
                                 Enter it below to verify account:
                             </p>
-                        </div>
+                        </div> */}
                     </div>
                     <form className="p-4 px-[14vh]" onSubmit={handleVerifyAccount}>
                         <div className="mb-5 mt-[0vh]">

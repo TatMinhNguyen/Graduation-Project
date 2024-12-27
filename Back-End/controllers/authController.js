@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/UserModel");
 const BlackListToken = require("../models/BlackListTokenModel");
+const nodemailer = require('nodemailer');
 
 const authController = {
     //Phương thức đăng kí
@@ -36,7 +37,26 @@ const authController = {
             });
     
             await newUser.save();
-            res.status(200).json({ email: newUser.email, verificationCode: verificationCode });
+    
+            // Gửi email
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail', 
+                auth: {
+                    user: 'nguyentatminh2k2@gmail.com', 
+                    pass: 'owbdkqfurftirtnk'  
+                }
+            });
+    
+            const mailOptions = {
+                from: 'nguyentatminh2k2@gmail.com', // Email gửi
+                to: newUser.email, // Email người nhận
+                subject: 'Mã xác thực tài khoản',
+                text: `Mã xác thực của bạn là: ${verificationCode}. Mã này có hiệu lực trong 5 phút.`
+            };
+    
+            await transporter.sendMail(mailOptions);
+    
+            res.status(200).json({ email: newUser.email, message: 'Mã xác thực đã được gửi qua email.' });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
@@ -93,8 +113,25 @@ const authController = {
             user.verificationCodeExpires = expirationTime;
             await user.save();
 
-            // Gửi lại mã xác thực mới cho người dùng
-            res.status(200).json({ email: user.email, verificationCode: verificationCode });
+            // Gửi email
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail', 
+                auth: {
+                    user: 'nguyentatminh2k2@gmail.com', 
+                    pass: 'owbdkqfurftirtnk'  
+                }
+            });
+    
+            const mailOptions = {
+                from: 'nguyentatminh2k2@gmail.com', // Email gửi
+                to: user.email, // Email người nhận
+                subject: 'Mã xác thực tài khoản',
+                text: `Mã xác thực của bạn là: ${verificationCode}. Mã này có hiệu lực trong 5 phút.`
+            };
+    
+            await transporter.sendMail(mailOptions);
+    
+            res.status(200).json({ email: user.email, message: 'Mã xác thực đã được gửi qua email.' });
         } catch (err) {
             res.status(500).json({ message: 'Có lỗi xảy ra.', error: err.message });
         }
@@ -108,7 +145,7 @@ const authController = {
                 isAdmin: user.isAdmin,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30s" }
+            { expiresIn: "30d" }
         );
     },
 

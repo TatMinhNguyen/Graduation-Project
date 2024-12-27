@@ -19,7 +19,7 @@ const RightBar = ({user}) => {
   const handleGetRequestFriends = async () => {
     try {
       const result = await getRequested(user?.token, navigate)
-      const limitedResult = result.slice(0, 2) // Chỉ lấy tối đa 2 phần tử
+      const limitedResult = result?.slice(0, 2) // Chỉ lấy tối đa 2 phần tử
       setRequestFriends(limitedResult)
     } catch (error) {
       console.log(error)
@@ -28,7 +28,7 @@ const RightBar = ({user}) => {
 
   const handleGetSuggestions = async () => {
     const result = await getSuggestions(user?.token, navigate)
-    const limitedResult = result.slice(0, 4)
+    const limitedResult = result?.slice(0, 4)
     setSuggestions(limitedResult);
   }
 

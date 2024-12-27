@@ -13,7 +13,7 @@ export const getUserGroups = async(token, navigate) => {
         console.log(error)
         if(error?.response.data === 'Token is not valid!'){
             navigate('/login');
-            toast.info("Your session has expired.");
+            // toast.info("Your session has expired.");
         }
     }
 }
