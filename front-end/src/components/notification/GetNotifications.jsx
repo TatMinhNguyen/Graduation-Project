@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { checkNotification } from '../../api/notification/notification';
 import { useSelector } from 'react-redux';
 
-const GetNotifications = ({notifications}) => {
-
+const GetNotifications = ({notifications, setShowModalNotification, handleGetNotifications}) => {
     const user = useSelector((state) => state.auth.login?.currentUser)
 
     const navigation = useNavigate()
@@ -13,11 +12,43 @@ const GetNotifications = ({notifications}) => {
     const handleGetAPost = async(postId, notiId) => {
         await checkNotification(user?.token, notiId, navigation)
         navigation(`/get-post/${postId}`)
+        setShowModalNotification();
+        handleGetNotifications();
     }
 
     const handleGetUser = async(userId, notiId) => {
         await checkNotification(user?.token, notiId, navigation)
         navigation(`/get-profile/${userId}`)
+        setShowModalNotification();
+        handleGetNotifications();
+    }
+
+    const handleGetGroup = async(groupId, notiId) => {
+        await checkNotification(user?.token, notiId, navigation)
+        navigation(`/groups/${groupId}`)
+        setShowModalNotification();
+        handleGetNotifications();        
+    }
+
+    const handleGetRequestMembers = async(groupId, notiId) => {
+        await checkNotification(user?.token, notiId, navigation)
+        navigation(`/groups/${groupId}/member-requests`)
+        setShowModalNotification();
+        handleGetNotifications();        
+    }
+
+    const handleGetMembers = async(groupId, notiId) => {
+        await checkNotification(user?.token, notiId, navigation)
+        navigation(`/groups/${groupId}/members`)
+        setShowModalNotification();
+        handleGetNotifications();        
+    }
+
+    const handleGetReportPosts = async(groupId, notiId) => {
+        await checkNotification(user?.token, notiId, navigation)
+        navigation(`/groups/${groupId}/reported-posts`)
+        setShowModalNotification();
+        handleGetNotifications();        
     }
     return (
         <div>
@@ -48,7 +79,16 @@ const GetNotifications = ({notifications}) => {
                             <div key={notification?._id} 
                                 onClick={()=> 
                                     {notification?.type === 'friend_request' || notification?.type === 'friend_accept' ? 
-                                        (handleGetUser(notification?.sender?._id, notification?._id)) : (handleGetAPost(notification?.postId?._id, notification?._id))
+                                        (handleGetUser(notification?.sender?._id, notification?._id)) : 
+                                    ['invite-members', 'accept-group'].includes(notification.type) ?
+                                        (handleGetGroup(notification.groupId, notification._id)) :
+                                    notification.type === 'request-group' ?
+                                        (handleGetRequestMembers(notification.groupId, notification._id)) : 
+                                    notification.type === 'report-post' ?
+                                        (handleGetReportPosts(notification.groupId, notification._id)) : 
+                                    notification.type === 'join-group' ?
+                                        (handleGetMembers(notification.groupId, notification._id)) :
+                                        (handleGetAPost(notification?.postId, notification?._id)) 
                                     }}
                             >
                                 <div className={`flex mx-1 my-1 cursor-pointer hover:bg-gray-200 rounded-md p-1.5 py-1 ${notification?.read === false ? '' : 'opacity-60'}`}>
@@ -75,6 +115,11 @@ const GetNotifications = ({notifications}) => {
                                                 style={{ backgroundPosition: '-1.5px -1191px', backgroundImage: `url(${require('../../assets/icons/icons.png')})` }}
                                             >
                                             </div>                                            
+                                        ) : ['invite-members', 'request-group', 'join-group', 'accept-group', 'report-post'].includes(notification?.type) ? (
+                                            <div className='rounded-full bg-customBlue w-6 h-6'
+                                                style={{ backgroundPosition: '-2px 1245px', backgroundImage: `url(${require('../../assets/icons/icons.png')})` }}
+                                            >
+                                            </div>                                             
                                         ) : (
                                             <>  
                                                 {notification?.type_felt === '1' ? (

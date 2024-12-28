@@ -1,4 +1,5 @@
 const CommentModel = require("../models/CommentModel");
+const GroupModel = require("../models/GroupModel");
 const NotificationModel = require("../models/NotificationModel");
 const PostGroupModel = require("../models/PostGroupModel");
 const PostModel = require("../models/PostModel");
@@ -67,7 +68,7 @@ const commentController = {
                     
                     const populatedNotification = await NotificationModel.findById(notification._id)
                     .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    // .populate('postId', 'description')               // Populate thông tin bài viết
                     .populate('commentId', 'content')                // Populate thông tin comment
                     .exec();
         
@@ -76,13 +77,36 @@ const commentController = {
                 }
 
             }
-            
+
             if (postGroup) {
+                const group = await GroupModel.findById(postGroup.groupId);
                 postGroup.comment += 1;
                 await postGroup.save();
+
+                if(userId !== postGroup.userId) {
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: postGroup.userId,
+                        type: 'set_comment',
+                        postId: postGroup._id,
+                        commentId: newComment._id,
+                        message: `commented on your post in the ${group.name} group.`
+                    })
+
+                    await notification.save(); 
+                    
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    // .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    // Gửi thông báo realtime qua socket
+                    sendNotification([postGroup.userId], populatedNotification); 
+                }
+
             }
             
-
             await newComment.save();
 
 
@@ -192,7 +216,7 @@ const commentController = {
                     
                     const populatedNotification = await NotificationModel.findById(notification._id)
                     .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-                    .populate('postId', 'description')               // Populate thông tin bài viết
+                    // .populate('postId', 'description')               // Populate thông tin bài viết
                     .populate('commentId', 'content')                // Populate thông tin comment
                     .exec();
         

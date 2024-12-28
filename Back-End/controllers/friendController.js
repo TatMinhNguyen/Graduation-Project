@@ -127,7 +127,7 @@ const friendController = {
 
             const populatedNotification = await NotificationModel.findById(notification._id)
             .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-            .populate('postId', 'description')               // Populate thông tin bài viết
+            // .populate('postId', 'description')               // Populate thông tin bài viết
             .populate('commentId', 'content')                // Populate thông tin comment
             .exec();
 
@@ -226,7 +226,7 @@ const friendController = {
 
             const populatedNotification = await NotificationModel.findById(notification._id)
             .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
-            .populate('postId', 'description')               // Populate thông tin bài viết
+            // .populate('postId', 'description')               // Populate thông tin bài viết
             .populate('commentId', 'content')                // Populate thông tin comment
             .exec();
 

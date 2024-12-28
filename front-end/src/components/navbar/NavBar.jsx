@@ -308,6 +308,8 @@ const NavBar = ({user}) => {
                     >
                         <GetNotifications
                             notifications = {notifications}
+                            setShowModalNotification={()=>setShowModalNotification(false)}
+                            handleGetNotifications={() => handleGetNotifications()}
                         />
                     </div>
                 )}

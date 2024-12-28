@@ -4,6 +4,8 @@ const PostGroupModel = require("../models/PostGroupModel");
 const imagekit = require("../utils/imagekitConfig");
 const FeelModel = require("../models/FeelModel");
 const ReportPostGroupModel = require("../models/ReportPostGroupModel");
+const NotificationModel = require("../models/NotificationModel");
+const { sendNotification } = require("../socket/socket");
 
 const postGroupController = {
     //Create a post
@@ -78,23 +80,25 @@ const postGroupController = {
 
             await group.save();
 
-            // const notification = new NotificationModel({
-            //     sender: userId,
-            //     receiver: user.friends,
-            //     type: 'create_post',
-            //     postId: newPost._id,
-            //     message: `posted a new article.`
-            // })
+            const receivers = group.members.filter(member => member.toString() !== userId)
 
-            // await notification.save();
+            const notification = new NotificationModel({
+                sender: userId,
+                receiver: receivers,
+                type: 'create_post',
+                postId: newPost._id,
+                message: `posted a new article in the ${group.name} group.`
+            })
 
-            // const populatedNotification = await NotificationModel.findById(notification._id)
-            // .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            await notification.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
             // .populate('postId', 'description')               // Populate thông tin bài viết
-            // .populate('commentId', 'content')                // Populate thông tin comment
-            // .exec();
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
 
-            // sendNotification(user.friends, populatedNotification)
+            sendNotification(receivers, populatedNotification)
 
             const result = {
                 author: {
@@ -444,29 +448,49 @@ const postGroupController = {
 
     reportPost: async(req, res) => {
         try {
-           const userId = req.user.id;
-           const postId = req.params.postId;
-           const {content, type} = req.body;
-           
-           const post = await PostGroupModel.findById(postId)
+            const userId = req.user.id;
+            const postId = req.params.postId;
+            const {content, type} = req.body;
+            
+            const post = await PostGroupModel.findById(postId)
 
-           if(!post) {
-               return res.status(404).json({ error: "Post not found" })
-           }
+            if(!post) {
+                return res.status(404).json({ error: "Post not found" })
+            }
 
-           const newReport = new ReportPostGroupModel({
-                userId: userId,
-                postId: postId,
-                groupId: post.groupId,
-                content: content,
-                type: type,
-           })
+            const group = await GroupModel.findById(post.groupId)
 
-           await newReport.save();
+            const newReport = new ReportPostGroupModel({
+                    userId: userId,
+                    postId: postId,
+                    groupId: post.groupId,
+                    content: content,
+                    type: type,
+            })
 
-           post.isReported = true;
+            await newReport.save();
 
-           await post.save();
+            post.isReported = true;
+
+            await post.save();
+
+            const notification = new NotificationModel({
+                sender: userId,
+                receiver: [group.createId],
+                type: 'report-post',
+                groupId: group._id,
+                message: `reported a violation about a post in your group ${group.name}.`
+                })
+
+            await notification.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            // .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            sendNotification([group.createId], populatedNotification)
 
            return res.status(200).json({message: 'Report success'})
         } catch (error) {

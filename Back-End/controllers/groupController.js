@@ -1,6 +1,8 @@
 const GroupModel = require("../models/GroupModel");
+const NotificationModel = require("../models/NotificationModel");
 const ReportGroupModel = require('../models/ReportGroupModel')
 const UserModel = require("../models/UserModel");
+const { sendNotification } = require("../socket/socket");
 const imagekit = require("../utils/imagekitConfig");
 
 function removeVietnameseTones(str) {
@@ -30,6 +32,26 @@ const groupController = {
             });
 
             await newGroup.save();
+
+            const receivers = members.filter(member => member.toString() !== createId)
+
+            const notification = new NotificationModel({
+                sender: createId,
+                receiver: receivers,
+                type: 'invite-members',
+                groupId: newGroup._id,
+                message: `invited you to join group ${newGroup.name}.`
+            })
+
+            await notification.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            // .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            sendNotification(receivers, populatedNotification)
     
             return res.status(201).json({ message: "Tạo nhóm thành công", group: newGroup });
         } catch (error) {
@@ -131,7 +153,26 @@ const groupController = {
                         if (index !== -1) {
                             group.pendingMembers.splice(index, 1); // Xóa 1 phần tử tại vị trí index
                         }
-                    });                
+                    });  
+                    // const receivers = group.members.filter(member => member.toString() !== group.createId)
+
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: newMembers,
+                        type: 'invite-members',
+                        groupId: group._id,
+                        message: `invited you to join group ${group.name}.`
+                    })
+        
+                    await notification.save();
+        
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    // .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    sendNotification(newMembers, populatedNotification)              
                 }else{
                     newMembers.forEach(member => {
                         if (!group.pendingMembers.includes(member)) {
@@ -145,7 +186,24 @@ const groupController = {
                     if (!group.members.includes(member)) {
                         group.members.push(member);
                     }
-                });                 
+                }); 
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: newMembers,
+                    type: 'invite-members',
+                    groupId: group._id,
+                    message: `invited you to join group ${group.name}.`
+                })
+    
+                await notification.save();
+    
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                // .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                sendNotification(newMembers, populatedNotification)                
             }
 
             // Lưu lại nhóm group
@@ -250,9 +308,45 @@ const groupController = {
             // Thêm người dùng vào danh sách thành viên
             if(group.type === true) {
                 group.members.push(userId);
+
+                const notification = new NotificationModel({
+                    sender: userId,
+                    receiver: [group.createId],
+                    type: 'join-group',
+                    groupId: group._id,
+                    message: `has joined your group ${group.name}.`
+                })
+    
+                await notification.save();
+    
+                const populatedNotification = await NotificationModel.findById(notification._id)
+                .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                // .populate('postId', 'description')               // Populate thông tin bài viết
+                .populate('commentId', 'content')                // Populate thông tin comment
+                .exec();
+    
+                sendNotification([group.createId], populatedNotification)
             }else {
                 if(!group.pendingMembers.includes(userId)){
-                   group.pendingMembers.push(userId) 
+                    group.pendingMembers.push(userId) 
+
+                    const notification = new NotificationModel({
+                        sender: userId,
+                        receiver: [group.createId],
+                        type: 'request-group',
+                        groupId: group._id,
+                        message: `sends a request to join your group ${group.name}.`
+                    })
+        
+                    await notification.save();
+        
+                    const populatedNotification = await NotificationModel.findById(notification._id)
+                    .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+                    // .populate('postId', 'description')               // Populate thông tin bài viết
+                    .populate('commentId', 'content')                // Populate thông tin comment
+                    .exec();
+        
+                    sendNotification([group.createId], populatedNotification)
                 }  
             }
             
@@ -261,7 +355,7 @@ const groupController = {
     
             return res.status(200).json({ group });
         } catch (error) {
-            return res.status(500).json({ message: "Lỗi server", error });
+            return res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
 
@@ -340,6 +434,24 @@ const groupController = {
             group.members.push(requestId);
 
             await group.save();
+
+            const notification = new NotificationModel({
+                sender: userId,
+                receiver: [requestId],
+                type: 'accept-group',
+                groupId: group._id,
+                message: `has approved you for group ${group.name}.`
+            })
+
+            await notification.save();
+
+            const populatedNotification = await NotificationModel.findById(notification._id)
+            .populate('sender', 'username profilePicture')  // Populate thông tin người gửi
+            // .populate('postId', 'description')               // Populate thông tin bài viết
+            .populate('commentId', 'content')                // Populate thông tin comment
+            .exec();
+
+            sendNotification([requestId], populatedNotification)
 
             return res.status(200).json("Request approved successfully");
         }
